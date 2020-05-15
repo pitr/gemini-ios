@@ -64,7 +64,6 @@ extension PhotonActionSheetProtocol {
             guard let url = tab.url?.displayURL else { return }
 
             self.profile.readingList.createRecordWithURL(url.absoluteString, title: tab.title ?? "", addedBy: UIDevice.current.name)
-            UnifiedTelemetry.recordEvent(category: .action, method: .add, object: .readingListItem, value: .pageActionMenu)
             success(Strings.AppMenuAddToReadingListConfirmMessage, .addToReadingList)
         }
 
@@ -74,7 +73,6 @@ extension PhotonActionSheetProtocol {
                     return
             }
             bvc.addBookmark(url: url.absoluteString, title: tab.title, favicon: tab.displayFavicon)
-            UnifiedTelemetry.recordEvent(category: .action, method: .add, object: .bookmark, value: .pageActionMenu)
             success(Strings.AppMenuAddBookmarkConfirmMessage, .bookmarkPage)
         }
 
@@ -86,8 +84,6 @@ extension PhotonActionSheetProtocol {
                     success(Strings.AppMenuRemoveBookmarkConfirmMessage, .removeBookmark)
                 }
             }
-
-            UnifiedTelemetry.recordEvent(category: .action, method: .delete, object: .bookmark, value: .pageActionMenu)
         }
 
         let pinToTopSites = PhotonActionSheetItem(title: Strings.PinTopsiteActionTitle, iconString: "action_pin") { _, _ in
@@ -112,26 +108,6 @@ extension PhotonActionSheetProtocol {
 
                 return self.profile.history.removeFromPinnedTopSites(site)
             }.uponQueue(.main) { _ in }
-        }
-
-        let sendToDevice = PhotonActionSheetItem(title: Strings.SendToDeviceTitle, iconString: "menu-Send-to-Device") { _, _ in
-            guard let bvc = presentableVC as? PresentableVC & InstructionsViewControllerDelegate & DevicePickerViewControllerDelegate else { return }
-            if !self.profile.hasAccount() {
-                let instructionsViewController = InstructionsViewController()
-                instructionsViewController.delegate = bvc
-                let navigationController = UINavigationController(rootViewController: instructionsViewController)
-                navigationController.modalPresentationStyle = .formSheet
-                bvc.present(navigationController, animated: true, completion: nil)
-                return
-            }
-
-            let devicePickerViewController = DevicePickerViewController()
-            devicePickerViewController.pickerDelegate = bvc
-            devicePickerViewController.profile = self.profile
-            devicePickerViewController.profileNeedsShutdown = false
-            let navigationController = UINavigationController(rootViewController: devicePickerViewController)
-            navigationController.modalPresentationStyle = .formSheet
-            bvc.present(navigationController, animated: true, completion: nil)
         }
 
         let sharePage = PhotonActionSheetItem(title: Strings.AppMenuSharePageTitleString, iconString: "action_share") { _, _ in
@@ -170,7 +146,7 @@ extension PhotonActionSheetProtocol {
             }
         }
 
-        mainActions.append(contentsOf: [sendToDevice, copyURL])
+        mainActions.append(contentsOf: [copyURL])
 
         let pinAction = (isPinned ? removeTopSitesPin : pinToTopSites)
         var commonActions = [toggleDesktopSite, pinAction]

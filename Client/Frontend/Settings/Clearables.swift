@@ -49,7 +49,6 @@ class HistoryClearable: Clearable {
             SDImageCache.shared.clearMemory()
             self.profile.recentlyClosedTabs.clearTabs()
             CSSearchableIndex.default().deleteAllSearchableItems()
-            NotificationCenter.default.post(name: .PrivateDataClearedHistory, object: nil)
             log.debug("HistoryClearable succeeded: \(success).")
             return Deferred(value: success)
         }
@@ -162,9 +161,7 @@ class TrackingProtectionClearable: Clearable {
 
     func clear() -> Success {
         let result = Success()
-        ContentBlocker.shared.clearWhitelist() {
-            result.fill(Maybe(success: ()))
-        }
+        result.fill(Maybe(success: ()))
         return result
     }
 }
@@ -182,8 +179,6 @@ class DownloadedFilesClearable: Clearable {
                 try? FileManager.default.removeItem(at: file)
             }
         }
-
-        NotificationCenter.default.post(name: .PrivateDataClearedDownloadedFiles, object: nil)
 
         return succeed()
     }

@@ -188,8 +188,7 @@ class ReadingListPanel: UITableViewController, LibraryPanel {
         self.profile = profile
         super.init(nibName: nil, bundle: nil)
 
-        [ Notification.Name.FirefoxAccountChanged,
-          Notification.Name.DynamicFontChanged,
+        [ Notification.Name.DynamicFontChanged,
           Notification.Name.DatabaseWasReopened ].forEach {
             NotificationCenter.default.addObserver(self, selector: #selector(notificationReceived), name: $0, object: nil)
         }
@@ -224,7 +223,7 @@ class ReadingListPanel: UITableViewController, LibraryPanel {
 
     @objc func notificationReceived(_ notification: Notification) {
         switch notification.name {
-        case .FirefoxAccountChanged, .DynamicFontChanged:
+        case .DynamicFontChanged:
             refreshReadingList()
         case .DatabaseWasReopened:
             if let dbName = notification.object as? String, dbName == "ReadingList.db" {
@@ -371,13 +370,11 @@ class ReadingListPanel: UITableViewController, LibraryPanel {
             // Reading list items are closest in concept to bookmarks.
             let visitType = VisitType.bookmark
             libraryPanelDelegate?.libraryPanel(didSelectURL: encodedURL, visitType: visitType)
-            UnifiedTelemetry.recordEvent(category: .action, method: .open, object: .readingListItem)
         }
     }
 
     fileprivate func deleteItem(atIndex indexPath: IndexPath) {
         if let record = records?[indexPath.row] {
-            UnifiedTelemetry.recordEvent(category: .action, method: .delete, object: .readingListItem, value: .readingListPanel)
             if profile.readingList.deleteRecord(record).value.isSuccess {
                 records?.remove(at: indexPath.row)
                 tableView.deleteRows(at: [indexPath], with: .automatic)
@@ -391,7 +388,6 @@ class ReadingListPanel: UITableViewController, LibraryPanel {
 
     fileprivate func toggleItem(atIndex indexPath: IndexPath) {
         if let record = records?[indexPath.row] {
-            UnifiedTelemetry.recordEvent(category: .action, method: .tap, object: .readingListItem, value: !record.unread ? .markAsUnread : .markAsRead, extras: [ "from": "reading-list-panel" ])
             if let updatedRecord = profile.readingList.updateRecord(record, unread: !record.unread).value.successValue {
                 records?[indexPath.row] = updatedRecord
                 tableView.reloadRows(at: [indexPath], with: .automatic)
@@ -429,8 +425,6 @@ extension ReadingListPanel: UITableViewDragDelegate {
         guard let site = getSiteDetails(for: indexPath), let url = URL(string: site.url), let itemProvider = NSItemProvider(contentsOf: url) else {
             return []
         }
-
-        UnifiedTelemetry.recordEvent(category: .action, method: .drag, object: .url, value: .readingListPanel)
 
         let dragItem = UIDragItem(itemProvider: itemProvider)
         dragItem.localObject = site

@@ -12,8 +12,6 @@ import Shared
 class PhotonActionSheet: UIViewController, UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate, Themeable {
     fileprivate(set) var actions: [[PhotonActionSheetItem]]
 
-    var syncManager: SyncManager? // used to display the sync button
-
     private var site: Site?
     private let style: PresentationStyle
     private var tintColor = UIColor.theme.actionMenu.foreground
@@ -298,8 +296,7 @@ class PhotonActionSheet: UIViewController, UITableViewDelegate, UITableViewDataS
         let cell = tableView.dequeueReusableCell(withIdentifier: PhotonActionSheetUX.CellName, for: indexPath) as! PhotonActionSheetCell
         let action = actions[indexPath.section][indexPath.row]
         cell.tintColor = self.tintColor
-        let syncManager = action.accessory == .Sync ? self.syncManager : nil
-        cell.configure(with: action, syncManager: syncManager)
+        cell.configure(with: action)
         return cell
     }
 

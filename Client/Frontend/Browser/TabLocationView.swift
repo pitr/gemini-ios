@@ -54,8 +54,6 @@ class TabLocationView: UIView {
         didSet {
             updateTextWithURL()
             pageOptionsButton.isHidden = (url == nil)
-
-            trackingProtectionButton.isHidden = !["https", "http"].contains(url?.scheme ?? "")
             setNeedsUpdateConstraints()
         }
     }
@@ -119,31 +117,6 @@ class TabLocationView: UIView {
         return lockImageView
     }()
 
-    class TrackingProtectionButton: UIButton {
-        // Disable showing the button if the feature is off in the prefs
-        override var isHidden: Bool {
-            didSet {
-                separatorLine?.isHidden = isHidden
-                guard !isHidden, let appDelegate = UIApplication.shared.delegate as? AppDelegate, let profile = appDelegate.profile else { return }
-                if !FirefoxTabContentBlocker.isTrackingProtectionEnabled(prefs: profile.prefs) {
-                    isHidden = true
-                }
-            }
-        }
-
-        var separatorLine: UIView?
-    }
-
-    lazy var trackingProtectionButton: TrackingProtectionButton = {
-        let trackingProtectionButton = TrackingProtectionButton()
-        trackingProtectionButton.setImage(UIImage.templateImageNamed("tracking-protection"), for: .normal)
-        trackingProtectionButton.addTarget(self, action: #selector(didPressTPShieldButton(_:)), for: .touchUpInside)
-        trackingProtectionButton.tintColor = UIColor.Photon.Grey50
-        trackingProtectionButton.imageView?.contentMode = .scaleAspectFill
-        trackingProtectionButton.accessibilityIdentifier = "TabLocationView.trackingProtectionButton"
-        return trackingProtectionButton
-    }()
-
     fileprivate lazy var readerModeButton: ReaderModeButton = {
         let readerModeButton = ReaderModeButton(frame: .zero)
         readerModeButton.addTarget(self, action: #selector(tapReaderModeButton), for: .touchUpInside)
@@ -202,12 +175,9 @@ class TabLocationView: UIView {
             make.width.equalTo(10)
         }
 
-        // Link these so they hide/show in-sync.
-        trackingProtectionButton.separatorLine = separatorLineForTP
-
         pageOptionsButton.separatorLine = separatorLineForPageOptions
 
-        let subviews = [trackingProtectionButton, separatorLineForTP, space10px, lockImageView, urlTextField, readerModeButton, separatorLineForPageOptions, pageOptionsButton]
+        let subviews = [separatorLineForTP, space10px, lockImageView, urlTextField, readerModeButton, separatorLineForPageOptions, pageOptionsButton]
         contentView = UIStackView(arrangedSubviews: subviews)
         contentView.distribution = .fill
         contentView.alignment = .center
@@ -219,10 +189,6 @@ class TabLocationView: UIView {
 
         lockImageView.snp.makeConstraints { make in
             make.width.equalTo(TabLocationViewUX.StatusIconSize)
-            make.height.equalTo(TabLocationViewUX.ButtonSize)
-        }
-        trackingProtectionButton.snp.makeConstraints { make in
-            make.width.equalTo(TabLocationViewUX.TPIconSize)
             make.height.equalTo(TabLocationViewUX.ButtonSize)
         }
         separatorLineForTP.snp.makeConstraints { make in
@@ -257,7 +223,7 @@ class TabLocationView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private lazy var _accessibilityElements = [urlTextField, readerModeButton, pageOptionsButton, trackingProtectionButton]
+    private lazy var _accessibilityElements = [urlTextField, readerModeButton, pageOptionsButton]
 
     override var accessibilityElements: [Any]? {
         get {
@@ -343,8 +309,6 @@ extension TabLocationView: UIDragInteractionDelegate {
             return []
         }
 
-        UnifiedTelemetry.recordEvent(category: .action, method: .drag, object: .locationBar)
-
         let dragItem = UIDragItem(itemProvider: itemProvider)
         return [dragItem]
     }
@@ -385,28 +349,9 @@ extension TabLocationView: Themeable {
 
 extension TabLocationView: TabEventHandler {
     func tabDidChangeContentBlocking(_ tab: Tab) {
-        updateBlockerStatus(forTab: tab)
-    }
-
-    private func updateBlockerStatus(forTab tab: Tab) {
-        assertIsMainThread("UI changes must be on the main thread")
-        guard let blocker = tab.contentBlocker else { return }
-        trackingProtectionButton.alpha = 1.0
-        switch blocker.status {
-        case .Blocking:
-            trackingProtectionButton.setImage(UIImage(imageLiteralResourceName: "tracking-protection-active-block"), for: .normal)
-        case .NoBlockedURLs:
-            trackingProtectionButton.setImage(UIImage.templateImageNamed("tracking-protection"), for: .normal)
-            trackingProtectionButton.alpha = 0.5
-        case .Whitelisted:
-            trackingProtectionButton.setImage(UIImage.templateImageNamed("tracking-protection-off"), for: .normal)
-        case .Disabled:
-            trackingProtectionButton.isHidden = true
-        }
     }
 
     func tabDidGainFocus(_ tab: Tab) {
-        updateBlockerStatus(forTab: tab)
         menuBadge.show(tab.changedUserAgent)
     }
 

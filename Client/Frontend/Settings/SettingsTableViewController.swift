@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import Account
 import Shared
 import UIKit
 
@@ -229,7 +228,6 @@ class BoolSetting: Setting {
     @objc func switchValueChanged(_ control: UISwitch) {
         writeBool(control)
         settingDidChange?(control.isOn)
-        UnifiedTelemetry.recordEvent(category: .action, method: .change, object: .setting, value: self.prefKey, extras: ["to": control.isOn])
     }
 
     // These methods allow a subclass to control how the pref is saved
@@ -544,20 +542,17 @@ class AccountSetting: Setting {
 
     override func onConfigureCell(_ cell: UITableViewCell) {
         super.onConfigureCell(cell)
-        if settings.profile.rustFxA.userProfile != nil {
-            cell.selectionStyle = .none
-        }
     }
 
     override var accessoryType: UITableViewCell.AccessoryType { return .none }
 }
 
 class WithAccountSetting: AccountSetting {
-    override var hidden: Bool { return !profile.hasAccount() }
+    override var hidden: Bool { return true }
 }
 
 class WithoutAccountSetting: AccountSetting {
-    override var hidden: Bool { return profile.hasAccount() }
+    override var hidden: Bool { return false }
 }
 
 @objc
@@ -605,7 +600,6 @@ class SettingsTableViewController: ThemedTableViewController {
         settings = generateSettings()
         NotificationCenter.default.addObserver(self, selector: #selector(syncDidChangeState), name: .ProfileDidStartSyncing, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(syncDidChangeState), name: .ProfileDidFinishSyncing, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(firefoxAccountDidChange), name: .FirefoxAccountChanged, object: nil)
 
         applyTheme()
     }
@@ -623,7 +617,7 @@ class SettingsTableViewController: ThemedTableViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
 
-        [Notification.Name.ProfileDidStartSyncing, Notification.Name.ProfileDidFinishSyncing, Notification.Name.FirefoxAccountChanged].forEach { name in
+        [Notification.Name.ProfileDidStartSyncing, Notification.Name.ProfileDidFinishSyncing].forEach { name in
             NotificationCenter.default.removeObserver(self, name: name, object: nil)
         }
     }

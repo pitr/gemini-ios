@@ -76,11 +76,6 @@ open class AppInfo {
         return baseBundleIdentifier
     }
 
-    // Return the MozWhatsNewTopic key from the Info.plist
-    public static var whatsNewTopic: String? {
-        return Bundle.main.object(forInfoDictionaryKey: "MozWhatsNewTopic") as? String
-    }
-
     // Return whether the currently executing code is running in an Application
     public static var isApplication: Bool {
         return Bundle.main.object(forInfoDictionaryKey: "CFBundlePackageType") as! String == "APPL"
@@ -88,11 +83,4 @@ open class AppInfo {
 
     // The port for the internal webserver, tests can change this
     public static var webserverPort = 6571
-
-    public static var isChinaEdition: Bool = {
-        if UserDefaults.standard.bool(forKey: debugPrefIsChinaEdition) {
-            return true
-        }
-        return Locale.current.identifier == "zh_CN"
-    }()
 }

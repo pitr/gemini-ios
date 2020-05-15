@@ -47,7 +47,7 @@ class DownloadsPanel: UIViewController, UITableViewDelegate, UITableViewDataSour
     let profile: Profile
     var tableView = UITableView()
 
-    private let events: [Notification.Name] = [.FileDidDownload, .PrivateDataClearedDownloadedFiles, .DynamicFontChanged]
+    private let events: [Notification.Name] = [.FileDidDownload, .DynamicFontChanged]
 
     private lazy var emptyStateOverlayView: UIView = self.createEmptyStateOverlayView()
 
@@ -104,7 +104,7 @@ class DownloadsPanel: UIViewController, UITableViewDelegate, UITableViewDataSour
             self.reloadData()
 
             switch notification.name {
-            case .FileDidDownload, .PrivateDataClearedDownloadedFiles:
+            case .FileDidDownload:
                 break
             case .DynamicFontChanged:
                 if self.emptyStateOverlayView.superview != nil {
@@ -342,7 +342,6 @@ class DownloadsPanel: UIViewController, UITableViewDelegate, UITableViewDataSour
         tableView.deselectRow(at: indexPath, animated: true)
 
         if let downloadedFile = downloadedFileForIndexPath(indexPath) {
-            UnifiedTelemetry.recordEvent(category: .action, method: .tap, object: .download, value: .downloadsPanel)
 
             if downloadedFile.mimeType == MIMEType.Calendar {
                 let dc = UIDocumentInteractionController(url: downloadedFile.path)
@@ -382,14 +381,12 @@ class DownloadsPanel: UIViewController, UITableViewDelegate, UITableViewDataSour
                     self.tableView.deleteRows(at: [indexPath], with: .right)
                     self.tableView.endUpdates()
                     self.updateEmptyPanelState()
-                    UnifiedTelemetry.recordEvent(category: .action, method: .delete, object: .download, value: .downloadsPanel)
                 }
             }
         })
         let share = UITableViewRowAction(style: .normal, title: shareTitle, handler: { (action, indexPath) in
             if let downloadedFile = self.downloadedFileForIndexPath(indexPath) {
                 self.shareDownloadedFile(downloadedFile, indexPath: indexPath)
-                UnifiedTelemetry.recordEvent(category: .action, method: .share, object: .download, value: .downloadsPanel)
             }
         })
         share.backgroundColor = view.tintColor

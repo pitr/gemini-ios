@@ -4,12 +4,9 @@
 
 import UIKit
 import Shared
-import Account
 
 /// App Settings Screen (triggered by tapping the 'Gear' in the Tab Tray Controller)
 class AppSettingsTableViewController: SettingsTableViewController {
-    var showContentBlockerSetting = false
-
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -25,15 +22,6 @@ class AppSettingsTableViewController: SettingsTableViewController {
         // Refresh the user's FxA profile upon viewing settings. This will update their avatar,
         // display name, etc.
         ////profile.rustAccount.refreshProfile()
-
-        if showContentBlockerSetting {
-            let viewController = ContentBlockerSettingViewController(prefs: profile.prefs)
-            viewController.profile = profile
-            viewController.tabManager = tabManager
-            navigationController?.pushViewController(viewController, animated: false)
-            // Add a done button from this view
-            viewController.navigationItem.rightBarButtonItem = navigationItem.rightBarButtonItem
-        }
     }
 
     override func generateSettings() -> [SettingSection] {
@@ -43,7 +31,6 @@ class AppSettingsTableViewController: SettingsTableViewController {
 
         let prefs = profile.prefs
         var generalSettings: [Setting] = [
-            SearchSetting(settings: self),
             NewTabPageSetting(settings: self),
             HomeSetting(settings: self),
             OpenWithSetting(settings: self),
@@ -60,15 +47,6 @@ class AppSettingsTableViewController: SettingsTableViewController {
             generalSettings.insert(TranslationSetting(settings: self), at: 6)
         }
 
-        let accountChinaSyncSetting: [Setting]
-        if !AppInfo.isChinaEdition {
-            accountChinaSyncSetting = []
-        } else {
-            accountChinaSyncSetting = [
-                // Show China sync service setting:
-                ChinaSyncServiceSetting(settings: self)
-            ]
-        }
         // There is nothing to show in the Customize section if we don't include the compact tab layout
         // setting on iPad. When more options are added that work on both device types, this logic can
         // be changed.
@@ -84,24 +62,12 @@ class AppSettingsTableViewController: SettingsTableViewController {
 
         let accountSectionTitle = NSAttributedString(string: Strings.FxAFirefoxAccount)
 
-        let footerText = !profile.hasAccount() ? NSAttributedString(string: Strings.FxASyncUsageDetails) : nil
         settings += [
-            SettingSection(title: accountSectionTitle, footerTitle: footerText, children: [
-                // Without a Firefox Account:
-                ConnectSetting(settings: self),
-                AdvancedAccountSetting(settings: self),
-                // With a Firefox Account:
-                AccountStatusSetting(settings: self),
-                SyncNowSetting(settings: self)
-            ] + accountChinaSyncSetting )]
+            SettingSection(title: accountSectionTitle, footerTitle: nil, children: [])]
 
         settings += [ SettingSection(title: NSAttributedString(string: Strings.SettingsGeneralSectionTitle), children: generalSettings)]
 
         var privacySettings = [Setting]()
-        privacySettings.append(LoginsSetting(settings: self, delegate: settingsDelegate))
-        privacySettings.append(TouchIDPasscodeSetting(settings: self))
-
-        privacySettings.append(ClearPrivateDataSetting(settings: self))
 
         privacySettings += [
             BoolSetting(prefs: prefs,
@@ -111,32 +77,17 @@ class AppSettingsTableViewController: SettingsTableViewController {
                 statusText: NSLocalizedString("When Leaving Private Browsing", tableName: "PrivateBrowsing", comment: "Will be displayed in Settings under 'Close Private Tabs'"))
         ]
 
-        privacySettings.append(ContentBlockerSetting(settings: self))
-
-        privacySettings += [
-            PrivacyPolicySetting()
-        ]
-
         settings += [
             SettingSection(title: NSAttributedString(string: privacyTitle), children: privacySettings),
             SettingSection(title: NSAttributedString(string: NSLocalizedString("Support", comment: "Support section title")), children: [
-                ShowIntroductionSetting(settings: self),
-                SendFeedbackSetting(),
-                SendAnonymousUsageDataSetting(prefs: prefs, delegate: settingsDelegate),
                 OpenSupportPageSetting(delegate: settingsDelegate),
             ]),
             SettingSection(title: NSAttributedString(string: NSLocalizedString("About", comment: "About settings section title")), children: [
                 VersionSetting(settings: self),
-                LicenseAndAcknowledgementsSetting(),
-                YourRightsSetting(),
                 ExportBrowserDataSetting(settings: self),
                 ExportLogDataSetting(settings: self),
                 DeleteExportedDataSetting(settings: self),
-                ForceCrashSetting(settings: self),
-                SlowTheDatabase(settings: self),
-                ForgetSyncAuthStateDebugSetting(settings: self),
-                SentryIDSetting(settings: self),
-                ChangeToChinaSetting(settings: self)
+                SlowTheDatabase(settings: self)
             ])]
 
         return settings

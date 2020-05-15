@@ -6,11 +6,7 @@ import Shared
 
 private var appDelegate: AppDelegate.Type
 
-if AppConstants.IsRunningTest {
-    appDelegate = TestAppDelegate.self
-} else {
-    appDelegate = AppDelegate.self
-}
+appDelegate = AppDelegate.self
 
 // Ignore SIGPIPE exceptions globally
 // https://stackoverflow.com/questions/108183/how-to-prevent-sigpipes-or-handle-them-properly

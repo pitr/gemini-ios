@@ -25,11 +25,6 @@ extension PhotonActionSheetProtocol {
         sheet.modalPresentationStyle = style
         sheet.photonTransitionDelegate = PhotonActionSheetAnimator()
 
-        if profile.hasSyncableAccount() {
-            // the sync manager is only needed when we have a logged in user with sync in a good state
-            sheet.syncManager = profile.syncManager // the syncmanager is used to display the sync button in the browser menu
-        }
-
         if let popoverVC = sheet.popoverPresentationController, sheet.modalPresentationStyle == .popover {
             popoverVC.delegate = viewController
             popoverVC.sourceView = view
@@ -39,7 +34,7 @@ extension PhotonActionSheetProtocol {
         viewController.present(sheet, animated: true, completion: nil)
     }
 
-    typealias PageOptionsVC = QRCodeViewControllerDelegate & SettingsDelegate & PresentingModalViewControllerDelegate & UIViewController
+    typealias PageOptionsVC = SettingsDelegate & PresentingModalViewControllerDelegate & UIViewController
 
     func fetchBookmarkStatus(for url: String) -> Deferred<Maybe<Bool>> {
         return profile.places.isBookmarked(url: url)
@@ -92,20 +87,7 @@ extension PhotonActionSheetProtocol {
             }
         }
 
-        if let url = tab.webView?.url, let helper = tab.contentBlocker, helper.isEnabled {
-            let isWhitelisted = helper.status == .Whitelisted
-
-            let title = !isWhitelisted ? Strings.TrackingProtectionReloadWithout : Strings.TrackingProtectionReloadWith
-            let imageName = helper.isEnabled ? "menu-TrackingProtection-Off" : "menu-TrackingProtection"
-            let toggleTP = PhotonActionSheetItem(title: title, iconString: imageName) { _, _ in
-                ContentBlocker.shared.whitelist(enable: !isWhitelisted, url: url) {
-                    tab.reload()
-                }
-            }
-            return [toggleDesktopSite, toggleTP]
-        } else {
-            return [toggleDesktopSite]
-        }
+        return [toggleDesktopSite]
     }
 
 }

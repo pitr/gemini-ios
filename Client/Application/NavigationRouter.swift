@@ -4,7 +4,6 @@
 
 import Foundation
 import Shared
-import Glean
 
 struct FxALaunchParams {
     var query: [String: String]
@@ -28,8 +27,6 @@ enum SettingsPage: String {
     case homepage = "homepage"
     case mailto = "mailto"
     case search = "search"
-    case clearPrivateData = "clear-private-data"
-    case fxa = "fxa"
     case theme = "theme"
 }
 
@@ -63,10 +60,8 @@ extension URLComponents {
 // The root navigation for the Router. Look at the tests to see a complete URL
 enum NavigationPath {
     case url(webURL: URL?, isPrivate: Bool)
-    case fxa(params: FxALaunchParams)
     case deepLink(DeepLink)
     case text(String)
-    case glean(url: URL)
 
     init?(url: URL) {
         let urlString = url.absoluteString
@@ -86,8 +81,6 @@ enum NavigationPath {
 
         if urlString.starts(with: "\(scheme)://deep-link"), let deepURL = components.valueForQuery("url"), let link = DeepLink(urlString: deepURL.lowercased()) {
             self = .deepLink(link)
-        } else if urlString.starts(with: "\(scheme)://fxa-signin"), components.valueForQuery("signin") != nil {
-            self = .fxa(params: FxALaunchParams(query: url.getQuery()))
         } else if urlString.starts(with: "\(scheme)://open-url") {
             let url = components.valueForQuery("url")?.asURL
             // Unless the `open-url` URL specifies a `private` parameter,
@@ -97,21 +90,16 @@ enum NavigationPath {
         } else if urlString.starts(with: "\(scheme)://open-text") {
             let text = components.valueForQuery("text")
             self = .text(text ?? "")
-        } else if urlString.starts(with: "\(scheme)://glean") {
-            self = .glean(url: url)
-        }
-        else {
+        } else {
             return nil
         }
     }
 
     static func handle(nav: NavigationPath, with bvc: BrowserViewController) {
         switch nav {
-        case .fxa(let params): NavigationPath.handleFxA(params: params, with: bvc)
         case .deepLink(let link): NavigationPath.handleDeepLink(link, with: bvc)
         case .url(let url, let isPrivate): NavigationPath.handleURL(url: url, isPrivate: isPrivate, with: bvc)
         case .text(let text): NavigationPath.handleText(text: text, with: bvc)
-        case .glean(let url): NavigationPath.handleGlean(url: url)
         }
     }
 
@@ -131,14 +119,6 @@ enum NavigationPath {
         }
     }
 
-    private static func handleFxA(params: FxALaunchParams, with bvc: BrowserViewController) {
-        bvc.presentSignInViewController(params)
-    }
-    
-    private static func handleGlean(url: URL) {
-        Glean.shared.handleCustomUrl(url: url)
-    }
-
     private static func handleHomePanel(panel: HomePanelPath, with bvc: BrowserViewController) {
         switch panel {
         case .bookmarks: bvc.showLibrary(panel: .bookmarks)
@@ -156,7 +136,6 @@ enum NavigationPath {
         } else {
             bvc.openBlankNewTab(focusLocationField: true, isPrivate: isPrivate)
         }
-        LeanPlumClient.shared.track(event: .openedNewTab, withParameters: ["Source": "External App or Extension"])
     }
 
     private static func handleText(text: String, with bvc: BrowserViewController) {
@@ -194,14 +173,6 @@ enum NavigationPath {
             viewController.model = profile.searchEngines
             viewController.profile = profile
             controller.pushViewController(viewController, animated: true)
-        case .clearPrivateData:
-            let viewController = ClearPrivateDataTableViewController()
-            viewController.profile = profile
-            viewController.tabManager = tabManager
-            controller.pushViewController(viewController, animated: true)
-        case .fxa:
-            let viewController = bvc.getSignInOrFxASettingsVC(flowType: .emailLoginFlow)
-            controller.pushViewController(viewController, animated: true)
         case .theme:
             controller.pushViewController(ThemeSettingsController(), animated: true)
         }
@@ -214,8 +185,6 @@ func == (lhs: NavigationPath, rhs: NavigationPath) -> Bool {
     switch (lhs, rhs) {
     case let (.url(lhsURL, lhsPrivate), .url(rhsURL, rhsPrivate)):
         return lhsURL == rhsURL && lhsPrivate == rhsPrivate
-    case let (.fxa(lhs), .fxa(rhs)):
-        return lhs.query == rhs.query
     case let (.deepLink(lhs), .deepLink(rhs)):
         return lhs == rhs
     default:

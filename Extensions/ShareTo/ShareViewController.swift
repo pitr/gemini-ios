@@ -6,7 +6,6 @@ import UIKit
 import SnapKit
 import Shared
 import Storage
-import Account
 
 extension UIStackView {
     func addBackground(color: UIColor) {
@@ -69,7 +68,6 @@ class ShareViewController: UIViewController {
     private var viewsShownDuringDoneAnimation = [UIView]()
     private var stackView: UIStackView!
     private var actionDoneRow: (row: UIStackView, label: UILabel)!
-    private var sendToDevice: SendToDevice?
     private var pageInfoHeight: Constraint?
     private var actionRowHeights = [Constraint]()
     private var pageInfoRowTitleLabel: UILabel?
@@ -107,7 +105,6 @@ class ShareViewController: UIViewController {
         }
 
         let profile = BrowserProfile(localName: "profile")
-        RustFirefoxAccounts.startup(prefs: profile.prefs).uponQueue(.main) { _ in }
     }
 
     private func setupRows() {
@@ -122,7 +119,6 @@ class ShareViewController: UIViewController {
             makeActionRow(addTo: stackView, label: Strings.ShareBookmarkThisPage, imageName: "AddToBookmarks", action: #selector(actionBookmarkThisPage), hasNavigation: false)
             makeActionRow(addTo: stackView, label: Strings.ShareAddToReadingList, imageName: "AddToReadingList", action: #selector(actionAddToReadingList), hasNavigation: false)
             makeSeparator(addTo: stackView)
-            makeActionRow(addTo: stackView, label: Strings.ShareSendToDevice, imageName: "menu-Send-to-Device", action: #selector(actionSendToDevice), hasNavigation: true)
         } else {
             pageInfoRowUrlLabel?.removeFromSuperview()
             makeActionRow(addTo: stackView, label: Strings.ShareSearchInFirefox, imageName: "quickSearch", action: #selector(actionSearchInFirefox), hasNavigation: false)
@@ -359,20 +355,6 @@ extension ShareViewController {
         }
 
         finish()
-    }
-
-    @objc func actionSendToDevice(gesture: UIGestureRecognizer) {
-        guard let shareItem = shareItem, case .shareItem(let item) = shareItem else {
-            return
-        }
-
-        gesture.isEnabled = false
-        sendToDevice = SendToDevice()
-        guard let sendToDevice = sendToDevice else { return }
-        sendToDevice.sharedItem = item
-        sendToDevice.delegate = delegate
-        let vc = sendToDevice.initialViewController()
-        navigationController?.pushViewController(vc, animated: true)
     }
 
     func openFirefox(withUrl url: String, isSearch: Bool) {

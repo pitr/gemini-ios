@@ -153,11 +153,6 @@ class LibraryViewController: UIViewController {
             }
 
             selectedPanel = newSelectedPanel
-            if selectedPanel == .bookmarks {
-                UnifiedTelemetry.recordEvent(category: .action, method: .view, object: .bookmarksPanel, value: .homePanelTabButton)
-            } else if selectedPanel == .downloads {
-                UnifiedTelemetry.recordEvent(category: .action, method: .view, object: .downloadsPanel, value: .homePanelTabButton)
-            }
             break
         }
     }

@@ -37,17 +37,6 @@ public class RustPlaces {
             isOpen = true
             return nil
         } catch let err as NSError {
-            if let placesError = err as? PlacesError {
-                switch placesError {
-                case .panic(let message):
-                    Sentry.shared.sendWithStacktrace(message: "Panicked when opening Rust Places database", tag: SentryTag.rustPlaces, severity: .error, description: message)
-                default:
-                    Sentry.shared.sendWithStacktrace(message: "Unspecified or other error when opening Rust Places database", tag: SentryTag.rustPlaces, severity: .error, description: placesError.localizedDescription)
-                }
-            } else {
-                Sentry.shared.sendWithStacktrace(message: "Unknown error when opening Rust Places database", tag: SentryTag.rustPlaces, severity: .error, description: err.localizedDescription)
-            }
-
             return err
         }
     }
@@ -145,7 +134,6 @@ public class RustPlaces {
         do {
             try api?.migrateBookmarksFromBrowserDb(path: browserDB.databasePath)
         } catch let err as NSError {
-            Sentry.shared.sendWithStacktrace(message: "Error encountered while migrating bookmarks from BrowserDB", tag: SentryTag.rustPlaces, severity: .error, description: err.localizedDescription)
         }
     }
 
@@ -299,15 +287,6 @@ public class RustPlaces {
                 try _ = self.api?.syncBookmarks(unlockInfo: unlockInfo)
                 deferred.fill(Maybe(success: ()))
             } catch let err as NSError {
-                if let placesError = err as? PlacesError {
-                    switch placesError {
-                    case .panic(let message):
-                        Sentry.shared.sendWithStacktrace(message: "Panicked when syncing Places database", tag: SentryTag.rustPlaces, severity: .error, description: message)
-                    default:
-                        Sentry.shared.sendWithStacktrace(message: "Unspecified or other error when syncing Places database", tag: SentryTag.rustPlaces, severity: .error, description: placesError.localizedDescription)
-                    }
-                }
-
                 deferred.fill(Maybe(failure: err))
             }
         }

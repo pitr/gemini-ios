@@ -114,7 +114,6 @@ class ReaderModeBarView: UIView {
     }
 
     @objc func tappedReadStatusButton(_ sender: UIButton!) {
-        UnifiedTelemetry.recordEvent(category: .action, method: .tap, object: .readingListItem, value: unread ? .markAsRead : .markAsUnread, extras: [ "from": "reader-mode-toolbar" ])
         delegate?.readerModeBar(self, didSelectButton: unread ? .markAsRead : .markAsUnread)
     }
 
@@ -123,7 +122,6 @@ class ReaderModeBarView: UIView {
     }
 
     @objc func tappedListStatusButton(_ sender: UIButton!) {
-        UnifiedTelemetry.recordEvent(category: .action, method: added ? .delete : .add, object: .readingListItem, value: .readerModeToolbar)
         delegate?.readerModeBar(self, didSelectButton: added ? .removeFromReadingList : .addToReadingList)
     }
 

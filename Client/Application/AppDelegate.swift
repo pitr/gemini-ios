@@ -10,12 +10,8 @@ import MessageUI
 import SDWebImage
 import SwiftKeychainWrapper
 import LocalAuthentication
-import SyncTelemetry
-import Sync
 import CoreSpotlight
 import UserNotifications
-import Account
-import Glean
 
 #if canImport(BackgroundTasks)
  import BackgroundTasks
@@ -38,7 +34,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
     var rootViewController: UIViewController!
     weak var profile: Profile?
     var tabManager: TabManager!
-    var adjustIntegration: AdjustIntegration?
     var applicationCleanlyBackgrounded = true
     var shutdownWebServer: DispatchSourceTimer?
 
@@ -46,9 +41,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
     var launchOptions: [AnyHashable: Any]?
 
     var receivedURLs = [URL]()
-    var unifiedTelemetry: UnifiedTelemetry?
-
-    var glean = Glean.shared
 
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         //
@@ -87,11 +79,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
     func startApplication(_ application: UIApplication, withLaunchOptions launchOptions: [AnyHashable: Any]?) -> Bool {
         log.info("startApplication begin")
 
-        // Need to get "settings.sendUsageData" this way so that Sentry can be initialized
-        // before getting the Profile.
-        let sendUsageData = NSUserDefaultsPrefs(prefix: "profile").boolForKey(AppConstants.PrefSendUsageData) ?? true
-        Sentry.shared.setup(sendUsageData: sendUsageData)
-
         // Set the Firefox UA for browsing.
         setUserAgent()
 
@@ -109,11 +96,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         Logger.browserLogger.newLogWithDate(logDate)
 
         let profile = getProfile(application)
-
-        // Initialize Glean telemetry
-        glean.initialize(uploadEnabled: sendUsageData, configuration: Configuration(channel: AppConstants.BuildChannel.rawValue))
-
-        unifiedTelemetry = UnifiedTelemetry(profile: profile)
 
         // Set up a web server that serves us static content. Do this early so that it is ready when the UI is presented.
         setUpWebServer(profile)
@@ -139,14 +121,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             }
         }
 
-        adjustIntegration = AdjustIntegration(profile: profile)
-
-        self.updateAuthenticationInfo()
         SystemUtils.onFirstRun()
 
-        RustFirefoxAccounts.startup(prefs: profile.prefs).uponQueue(.main) { _ in
-            print("RustFirefoxAccounts started")
-        }
         log.info("startApplication end")
         return true
     }
@@ -193,7 +169,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         if let profile = self.profile {
             return profile
         }
-        let p = BrowserProfile(localName: "profile", syncDelegate: application.syncDelegate)
+        let p = BrowserProfile(localName: "profile")
         self.profile = p
         return p
     }
@@ -201,8 +177,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         var shouldPerformAdditionalDelegateHandling = true
-
-        adjustIntegration?.triggerApplicationDidFinishLaunchingWithOptions(launchOptions)
 
         UIScrollView.doBadSwizzleStuff()
 
@@ -227,51 +201,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         // that is an iOS bug or not.
         AutocompleteTextField.appearance().semanticContentAttribute = .forceLeftToRight
 
-        pushNotificationSetup()
-
-        // Leanplum usersearch variable setup for onboarding research
-        _ = OnboardingUserResearch()
-        // Leanplum setup
-
-        if let profile = self.profile, LeanPlumClient.shouldEnable(profile: profile) {
-            LeanPlumClient.shared.setup(profile: profile)
-            LeanPlumClient.shared.set(enabled: true)
-        }
-
-        if #available(iOS 13.0, *) {
-            BGTaskScheduler.shared.register(forTaskWithIdentifier: "org.mozilla.ios.sync.part1", using: DispatchQueue.global()) { task in
-                guard self.profile?.hasSyncableAccount() ?? false else {
-                    self.shutdownProfileWhenNotActive(application)
-                    return
-                }
-
-                NSLog("background sync part 1") // NSLog to see in device console
-                let collection = ["bookmarks", "history"]
-                self.profile?.syncManager.syncNamedCollections(why: .backgrounded, names: collection).uponQueue(.main) { _ in
-                    task.setTaskCompleted(success: true)
-                    let request = BGProcessingTaskRequest(identifier: "org.mozilla.ios.sync.part2")
-                    request.earliestBeginDate = Date(timeIntervalSinceNow: 1)
-                    request.requiresNetworkConnectivity = true
-                    do {
-                        try BGTaskScheduler.shared.submit(request)
-                    } catch {
-                        NSLog(error.localizedDescription)
-                    }
-                }
-            }
-
-            // Split up the sync tasks so each can get maximal time for a bg task.
-            // This task runs after the bookmarks+history sync.
-            BGTaskScheduler.shared.register(forTaskWithIdentifier: "org.mozilla.ios.sync.part2", using: DispatchQueue.global()) { task in
-                NSLog("background sync part 2") // NSLog to see in device console
-                let collection = ["tabs", "logins", "clients"]
-                self.profile?.syncManager.syncNamedCollections(why: .backgrounded, names: collection).uponQueue(.main) { _ in
-                    self.shutdownProfileWhenNotActive(application)
-                    task.setTaskCompleted(success: true)
-                }
-            }
-        }
-
         return shouldPerformAdditionalDelegateHandling
     }
 
@@ -282,11 +211,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
 
         if let profile = profile, let _ = profile.prefs.boolForKey(PrefsKeys.AppExtensionTelemetryOpenUrl) {
             profile.prefs.removeObjectForKey(PrefsKeys.AppExtensionTelemetryOpenUrl)
-            var object = UnifiedTelemetry.EventObject.url
-            if case .text(_) = routerpath {
-                object = .searchText
-            }
-            UnifiedTelemetry.recordEvent(category: .appExtensionAction, method: .applicationOpenUrl, object: object)
         }
 
         DispatchQueue.main.async {
@@ -312,12 +236,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         if let profile = self.profile {
             profile._reopen()
 
-            if profile.prefs.boolForKey(PendingAccountDisconnectedKey) ?? false {
-                profile.removeAccount()
-            }
-
-            profile.syncManager.applicationDidBecomeActive()
-
             setUpWebServer(profile)
         }
         
@@ -335,8 +253,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             quickActions.handleShortCutItem(shortcut, withBrowserViewController: BrowserViewController.foregroundBVC())
             quickActions.launchedShortcutItem = nil
         }
-
-        UnifiedTelemetry.recordEvent(category: .action, method: .foreground, object: .app)
 
         // Delay these operations until after UIKit/UIApp init is complete
         // - loadQueuedTabs accesses the DB and shows up as a hot path in profiling
@@ -368,8 +284,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         // TODO: iOS 13 needs to iterate all the BVCs.
         BrowserViewController.foregroundBVC().downloadQueue.pauseAll()
 
-        UnifiedTelemetry.recordEvent(category: .action, method: .background, object: .app)
-
         let singleShotTimer = DispatchSource.makeTimerSource(queue: DispatchQueue.main)
         // 2 seconds is ample for a localhost request to be completed by GCDWebServer. <500ms is expected on newer devices.
         singleShotTimer.schedule(deadline: .now() + 2.0, repeating: .never)
@@ -379,64 +293,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         }
         singleShotTimer.resume()
         shutdownWebServer = singleShotTimer
-
-        if #available(iOS 13.0, *) {
-            scheduleBGSync(application: application)
-        } else {
-            syncOnDidEnterBackground(application: application)
-        }
-    }
-
-    fileprivate func syncOnDidEnterBackground(application: UIApplication) {
-        guard let profile = self.profile else {
-            return
-        }
-
-        profile.syncManager.applicationDidEnterBackground()
-
-        // Create an expiring background task. This allows plenty of time for db locks to be released
-        // async. Otherwise we are getting crashes due to db locks not released yet.
-        var taskId: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier(rawValue: 0)
-        taskId = application.beginBackgroundTask (expirationHandler: {
-            print("Running out of background time, but we have a profile shutdown pending.")
-            self.shutdownProfileWhenNotActive(application)
-            application.endBackgroundTask(taskId)
-        })
-
-        if profile.hasSyncableAccount() {
-            profile.syncManager.syncEverything(why: .backgrounded).uponQueue(.main) { _ in
-                self.shutdownProfileWhenNotActive(application)
-                application.endBackgroundTask(taskId)
-            }
-        } else {
-            profile._shutdown()
-            application.endBackgroundTask(taskId)
-        }
-    }
-
-    fileprivate func shutdownProfileWhenNotActive(_ application: UIApplication) {
-        // Only shutdown the profile if we are not in the foreground
-        guard application.applicationState != .active else {
-            return
-        }
-
-        profile?._shutdown()
-    }
-
-    func applicationWillEnterForeground(_ application: UIApplication) {
-        // The reason we need to call this method here instead of `applicationDidBecomeActive`
-        // is that this method is only invoked whenever the application is entering the foreground where as
-        // `applicationDidBecomeActive` will get called whenever the Touch ID authentication overlay disappears.
-        self.updateAuthenticationInfo()
-    }
-
-    fileprivate func updateAuthenticationInfo() {
-        if let authInfo = KeychainWrapper.sharedAppContainerKeychain.authenticationInfo() {
-            if !LAContext().canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil) {
-                authInfo.useTouchID = false
-                KeychainWrapper.sharedAppContainerKeychain.setAuthenticationInfo(authInfo)
-            }
-        }
     }
 
     fileprivate func setUpWebServer(_ profile: Profile) {
@@ -502,12 +358,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         if let url = userActivity.webpageURL {
             let query = url.getQuery()
 
-            // Check for fxa sign-in code and launch the login screen directly
-            if query["signin"] != nil {
-                bvc.launchFxAFromDeeplinkURL(url)
-                return true
-            }
-
             // Per Adjust documenation, https://docs.adjust.com/en/universal-links/#running-campaigns-through-universal-links,
             // it is recommended that links contain the `deep_link` query parameter. This link will also
             // be url encoded.
@@ -538,35 +388,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         let handledShortCutItem = QuickActions.sharedInstance.handleShortCutItem(shortcutItem, withBrowserViewController: BrowserViewController.foregroundBVC())
 
         completionHandler(handledShortCutItem)
-    }
-
-    @available(iOS 13.0, *)
-    private func scheduleBGSync(application: UIApplication) {
-        if profile?.syncManager.isSyncing ?? false {
-            // If syncing, create a bg task because _shutdown() is blocking and might take a few seconds to complete
-            var taskId = UIBackgroundTaskIdentifier(rawValue: 0)
-            taskId = application.beginBackgroundTask(expirationHandler: {
-                self.shutdownProfileWhenNotActive(application)
-                application.endBackgroundTask(taskId)
-            })
-
-            DispatchQueue.main.async {
-                self.shutdownProfileWhenNotActive(application)
-                application.endBackgroundTask(taskId)
-            }
-        } else {
-            // Blocking call, however without sync running it should be instantaneous
-            profile?._shutdown()
-
-            let request = BGProcessingTaskRequest(identifier: "org.mozilla.ios.sync.part1")
-            request.earliestBeginDate = Date(timeIntervalSinceNow: 1)
-            request.requiresNetworkConnectivity = true
-            do {
-                try BGTaskScheduler.shared.submit(request)
-            } catch {
-                NSLog(error.localizedDescription)
-            }
-        }
     }
 }
 

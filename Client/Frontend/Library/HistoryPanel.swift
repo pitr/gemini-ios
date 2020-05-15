@@ -97,9 +97,7 @@ class HistoryPanel: SiteTableViewController, LibraryPanel {
     override init(profile: Profile) {
         super.init(profile: profile)
 
-        [ Notification.Name.FirefoxAccountChanged,
-          Notification.Name.PrivateDataClearedHistory,
-          Notification.Name.DynamicFontChanged,
+        [ Notification.Name.DynamicFontChanged,
           Notification.Name.DatabaseWasReopened ].forEach {
             NotificationCenter.default.addObserver(self, selector: #selector(onNotificationReceived), name: $0, object: nil)
         }
@@ -119,13 +117,7 @@ class HistoryPanel: SiteTableViewController, LibraryPanel {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        // Add a refresh control if the user is logged in and the control was not added before. If the user is not
-        // logged in, remove any existing control.
-        if profile.hasSyncableAccount() && refreshControl == nil {
-            addRefreshControl()
-        } else if !profile.hasSyncableAccount() && refreshControl != nil {
-            removeRefreshControl()
-        }
+        removeRefreshControl()
     }
 
     // MARK: - Refreshing TableView
@@ -147,9 +139,7 @@ class HistoryPanel: SiteTableViewController, LibraryPanel {
         refreshControl?.endRefreshing()
 
         // Remove the refresh control if the user has logged out in the meantime
-        if !profile.hasSyncableAccount() {
-            removeRefreshControl()
-        }
+        removeRefreshControl()
     }
 
     // MARK: - Loading data
@@ -198,13 +188,6 @@ class HistoryPanel: SiteTableViewController, LibraryPanel {
     }
 
     func resyncHistory() {
-        profile.syncManager.syncHistory().uponQueue(.main) { syncResult in
-            self.endRefreshing()
-
-            if syncResult.isSuccess {
-                self.reloadData()
-            }
-        }
     }
 
     // MARK: - Actions
@@ -352,13 +335,6 @@ class HistoryPanel: SiteTableViewController, LibraryPanel {
 
     func onNotificationReceived(_ notification: Notification) {
         switch notification.name {
-        case .FirefoxAccountChanged, .PrivateDataClearedHistory:
-            reloadData()
-
-            if profile.hasSyncableAccount() {
-                resyncHistory()
-            }
-            break
         case .DynamicFontChanged:
             reloadData()
 

@@ -1469,7 +1469,6 @@ open class BrowserSchema: Schema {
         do {
             try db.executeChange(sql)
         } catch let err as NSError {
-            Sentry.shared.sendWithStacktrace(message: "Error dropping tableList table", tag: SentryTag.browserDB, severity: .error, description: "\(err.localizedDescription)")
             return false
         }
 
@@ -1478,7 +1477,6 @@ open class BrowserSchema: Schema {
         do {
             try db.setVersion(previousVersion)
         } catch let err as NSError {
-            Sentry.shared.sendWithStacktrace(message: "Error setting database version", tag: SentryTag.browserDB, severity: .error, description: "\(err.localizedDescription)")
             return false
         }
 
@@ -1522,8 +1520,6 @@ open class BrowserSchema: Schema {
                 try db.executeChange(sql)
             } catch let err as NSError {
                 log.error("Error altering clients table: \(err.localizedDescription); SQL was \(sql)")
-                let extra = ["table": "clients", "errorDescription": "\(err.localizedDescription)", "sql": "\(sql)"]
-                Sentry.shared.sendWithStacktrace(message: "Error altering table", tag: SentryTag.browserDB, severity: .error, extra: extra)
                 return .failure
             }
         }
@@ -1534,8 +1530,6 @@ open class BrowserSchema: Schema {
                 try db.executeChange(sql)
             } catch let err as NSError {
                 log.error("Error altering clients table: \(err.localizedDescription); SQL was \(sql)")
-                let extra = ["table": "clients", "errorDescription": "\(err.localizedDescription)", "sql": "\(sql)"]
-                Sentry.shared.sendWithStacktrace(message: "Error altering table", tag: SentryTag.browserDB, severity: .error, extra: extra)
                 return .failure
             }
         }

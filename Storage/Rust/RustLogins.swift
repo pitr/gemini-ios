@@ -115,7 +115,6 @@ public class RustLogins {
             }
         } catch {
             print(error)
-            Sentry.shared.send(message: "setupPlaintextHeaderAndGetSalt failed", tag: SentryTag.rustLogins, severity: .error, description: error.localizedDescription)
         }
         let saltOf32Chars = UUID().uuidString.replacingOccurrences(of: "-", with: "")
         return saltOf32Chars
@@ -142,13 +141,9 @@ public class RustLogins {
                         didAttemptToMoveToBackup = true
                         return open()
                     }
-                case .panic(let message):
-                    Sentry.shared.sendWithStacktrace(message: "Panicked when opening Rust Logins database", tag: SentryTag.rustLogins, severity: .error, description: message)
                 default:
-                    Sentry.shared.sendWithStacktrace(message: "Unspecified or other error when opening Rust Logins database", tag: SentryTag.rustLogins, severity: .error, description: loginsStoreError.localizedDescription)
+                    log.error(err)
                 }
-            } else {
-                Sentry.shared.sendWithStacktrace(message: "Unknown error when opening Rust Logins database", tag: SentryTag.rustLogins, severity: .error, description: err.localizedDescription)
             }
 
             return err
@@ -161,7 +156,6 @@ public class RustLogins {
             isOpen = false
             return nil
         } catch let err as NSError {
-            Sentry.shared.sendWithStacktrace(message: "Unknown error when closing Logins database", tag: SentryTag.rustLogins, severity: .error, description: err.localizedDescription)
             return err
         }
     }
@@ -182,7 +176,6 @@ public class RustLogins {
         do {
             try storage.interrupt()
         } catch let err as NSError {
-            Sentry.shared.sendWithStacktrace(message: "Error interrupting Logins database", tag: SentryTag.rustLogins, severity: .error, description: err.localizedDescription)
         }
     }
 
@@ -214,15 +207,6 @@ public class RustLogins {
                 try _ = self.storage.sync(unlockInfo: unlockInfo)
                 deferred.fill(Maybe(success: ()))
             } catch let err as NSError {
-                if let loginsStoreError = err as? LoginsStoreError {
-                    switch loginsStoreError {
-                    case .panic(let message):
-                        Sentry.shared.sendWithStacktrace(message: "Panicked when syncing Logins database", tag: SentryTag.rustLogins, severity: .error, description: message)
-                    default:
-                        Sentry.shared.sendWithStacktrace(message: "Unspecified or other error when syncing Logins database", tag: SentryTag.rustLogins, severity: .error, description: loginsStoreError.localizedDescription)
-                    }
-                }
-
                 deferred.fill(Maybe(failure: err))
             }
         }

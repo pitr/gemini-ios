@@ -3,11 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
-import Account
 import Shared
 import SnapKit
 import Storage
-import Sync
 import XCGLogger
 
 private let log = Logger.browserLogger
@@ -44,8 +42,6 @@ class RemoteTabsPanel: SiteTableViewController, LibraryPanel {
 
     override init(profile: Profile) {
         super.init(profile: profile)
-        NotificationCenter.default.addObserver(self, selector: #selector(notificationReceived), name: .FirefoxAccountChanged, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(notificationReceived), name: .ProfileDidFinishSyncing, object: nil)
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -80,7 +76,7 @@ class RemoteTabsPanel: SiteTableViewController, LibraryPanel {
 
     @objc func notificationReceived(_ notification: Notification) {
         switch notification.name {
-        case .FirefoxAccountChanged, .ProfileDidFinishSyncing:
+        case .ProfileDidFinishSyncing:
             DispatchQueue.main.async {
                 self.tableViewController.refreshTabs()
             }
@@ -340,7 +336,6 @@ class RemoteTabsNotLoggedInCell: UITableViewCell {
     static let Identifier = "RemoteTabsNotLoggedInCell"
     var libraryPanel: LibraryPanel?
     let instructionsLabel = UILabel()
-    let signInButton = UIButton()
     let titleLabel = UILabel()
     let emptyStateImageView = UIImageView()
 
@@ -349,7 +344,6 @@ class RemoteTabsNotLoggedInCell: UITableViewCell {
         selectionStyle = .none
 
         self.libraryPanel = libraryPanel
-        let createAnAccountButton = UIButton(type: .system)
 
         emptyStateImageView.image = UIImage.templateImageNamed(emptySyncImageName)
         contentView.addSubview(emptyStateImageView)
@@ -364,19 +358,6 @@ class RemoteTabsNotLoggedInCell: UITableViewCell {
         instructionsLabel.textAlignment = .center
         instructionsLabel.numberOfLines = 0
         contentView.addSubview(instructionsLabel)
-
-        signInButton.setTitle(Strings.FxASignInToSync, for: [])
-        signInButton.setTitleColor(UIColor.Photon.White100, for: [])
-        signInButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        signInButton.layer.cornerRadius = RemoteTabsPanelUX.EmptyStateSignInButtonCornerRadius
-        signInButton.clipsToBounds = true
-        signInButton.addTarget(self, action: #selector(signIn), for: .touchUpInside)
-        contentView.addSubview(signInButton)
-
-        createAnAccountButton.setTitle(NSLocalizedString("Create an account", comment: "See http://mzl.la/1Qtkf0j"), for: [])
-        createAnAccountButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .caption1)
-        createAnAccountButton.addTarget(self, action: #selector(createAnAccount), for: .touchUpInside)
-        contentView.addSubview(createAnAccountButton)
 
         emptyStateImageView.snp.makeConstraints { (make) -> Void in
             make.centerX.equalTo(instructionsLabel)
@@ -393,11 +374,6 @@ class RemoteTabsNotLoggedInCell: UITableViewCell {
             make.centerX.equalTo(emptyStateImageView)
         }
 
-        createAnAccountButton.snp.makeConstraints { (make) -> Void in
-            make.centerX.equalTo(signInButton)
-            make.top.equalTo(signInButton.snp.bottom).offset(RemoteTabsPanelUX.EmptyStateTopPaddingInBetweenItems)
-        }
-
         applyTheme()
     }
 
@@ -409,20 +385,7 @@ class RemoteTabsNotLoggedInCell: UITableViewCell {
         emptyStateImageView.tintColor = UIColor.theme.tableView.rowText
         titleLabel.textColor = UIColor.theme.tableView.headerTextDark
         instructionsLabel.textColor = UIColor.theme.tableView.headerTextDark
-        signInButton.backgroundColor = RemoteTabsPanelUX.EmptyStateSignInButtonColor
         backgroundColor = UIColor.theme.homePanel.panelBackground
-    }
-
-    @objc fileprivate func signIn() {
-        if let libraryPanel = self.libraryPanel {
-            libraryPanel.libraryPanelDelegate?.libraryPanelDidRequestToSignIn()
-        }
-    }
-
-    @objc fileprivate func createAnAccount() {
-        if let libraryPanel = self.libraryPanel {
-            libraryPanel.libraryPanelDelegate?.libraryPanelDidRequestToCreateAccount()
-        }
     }
 
     override func updateConstraints() {
@@ -438,17 +401,6 @@ class RemoteTabsNotLoggedInCell: UITableViewCell {
                 make.right.lessThanOrEqualTo(contentView.snp.centerX).offset(-30).priority(1000)
             }
 
-            signInButton.snp.remakeConstraints { make in
-                make.height.equalTo(RemoteTabsPanelUX.EmptyStateSignInButtonHeight)
-                make.width.equalTo(RemoteTabsPanelUX.EmptyStateSignInButtonWidth)
-                make.centerY.equalTo(emptyStateImageView).offset(2*RemoteTabsPanelUX.EmptyStateTopPaddingInBetweenItems)
-
-                // Sets proper landscape layout for bigger phones: iPhone 6 and on.
-                make.right.greaterThanOrEqualTo(contentView.snp.right).offset(-70).priority(100)
-
-                // Sets proper landscape layout for smaller phones: iPhone 4 & 5.
-                make.left.greaterThanOrEqualTo(contentView.snp.centerX).offset(10).priority(1000)
-            }
         } else {
             instructionsLabel.snp.remakeConstraints { make in
                 make.top.equalTo(titleLabel.snp.bottom).offset(RemoteTabsPanelUX.EmptyStateTopPaddingInBetweenItems)
@@ -456,12 +408,6 @@ class RemoteTabsNotLoggedInCell: UITableViewCell {
                 make.width.equalTo(RemoteTabsPanelUX.EmptyStateInstructionsWidth)
             }
 
-            signInButton.snp.remakeConstraints { make in
-                make.centerX.equalTo(contentView)
-                make.top.equalTo(instructionsLabel.snp.bottom).offset(RemoteTabsPanelUX.EmptyStateTopPaddingInBetweenItems)
-                make.height.equalTo(RemoteTabsPanelUX.EmptyStateSignInButtonHeight)
-                make.width.equalTo(RemoteTabsPanelUX.EmptyStateSignInButtonWidth)
-            }
         }
         super.updateConstraints()
     }
@@ -505,7 +451,7 @@ fileprivate class RemoteTabsTableViewController: UITableViewController {
         
         // Add a refresh control if the user is logged in and the control was not added before. If the user is not
         // logged in, remove any existing control.
-        if profile.hasSyncableAccount() && refreshControl == nil {
+        if refreshControl == nil {
             addRefreshControl()
         }
 
@@ -543,9 +489,7 @@ fileprivate class RemoteTabsTableViewController: UITableViewController {
         refreshControl?.endRefreshing()
 
         // Remove the refresh control if the user has logged out in the meantime
-        if !profile.hasSyncableAccount() {
-            removeRefreshControl()
-        }
+        removeRefreshControl()
     }
 
     func updateDelegateClientAndTabData(_ clientAndTabs: [ClientAndTabs]) {
@@ -568,37 +512,8 @@ fileprivate class RemoteTabsTableViewController: UITableViewController {
         assert(Thread.isMainThread)
 
         // Short circuit if the user is not logged in
-        guard profile.hasSyncableAccount() else {
-            self.endRefreshing()
-            self.tableViewDelegate = RemoteTabsPanelErrorDataSource(libraryPanel: remoteTabsPanel, error: .notLoggedIn)
-            return
-        }
-
-        // Get cached tabs.
-        self.profile.getCachedClientsAndTabs().uponQueue(.main) { result in
-            guard let clientAndTabs = result.successValue else {
-                self.endRefreshing()
-                self.tableViewDelegate = RemoteTabsPanelErrorDataSource(libraryPanel: remoteTabsPanel, error: .failedToSync)
-                return
-            }
-
-            // Update UI with cached data.
-            self.updateDelegateClientAndTabData(clientAndTabs)
-
-            if updateCache {
-                // Fetch updated tabs.
-                self.profile.getClientsAndTabs().uponQueue(.main) { result in
-                    if let clientAndTabs = result.successValue {
-                        // Update UI with updated tabs.
-                        self.updateDelegateClientAndTabData(clientAndTabs)
-                    }
-
-                    self.endRefreshing()
-                }
-            } else {
-                self.endRefreshing()
-            }
-        }
+        self.endRefreshing()
+        self.tableViewDelegate = RemoteTabsPanelErrorDataSource(libraryPanel: remoteTabsPanel, error: .notLoggedIn)
     }
 
     @objc fileprivate func longPress(_ longPressGestureRecognizer: UILongPressGestureRecognizer) {

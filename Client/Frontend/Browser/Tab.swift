@@ -130,10 +130,6 @@ class Tab: NSObject {
             guard noImageMode != oldValue else {
                 return
             }
-
-            contentBlocker?.noImageMode(enabled: noImageMode)
-
-            UserScriptManager.shared.injectUserScriptsIntoTab(self, nightMode: nightMode, noImageMode: noImageMode)
         }
     }
 
@@ -152,8 +148,6 @@ class Tab: NSObject {
             UserScriptManager.shared.injectUserScriptsIntoTab(self, nightMode: nightMode, noImageMode: noImageMode)
         }
     }
-
-    var contentBlocker: FirefoxTabContentBlocker?
 
     /// The last title shown by this tab. Used by the tab tray to show titles for zombie tabs.
     var lastTitle: String?
@@ -199,8 +193,6 @@ class Tab: NSObject {
         self.isPrivate = isPrivate
 
         debugTabCount += 1
-
-        UnifiedTelemetry.recordEvent(category: .action, method: .add, object: .tab, value: isPrivate ? .privateTab : .normalTab)
     }
 
     class func toRemoteTab(_ tab: Tab) -> RemoteTab? {
@@ -608,20 +600,6 @@ extension Tab: TabWebViewDelegate {
     }
     fileprivate func tabWebViewSearchWithFirefox(_ tabWebViewSearchWithFirefox: TabWebView, didSelectSearchWithFirefoxForSelection selection: String) {
         tabDelegate?.tab(self, didSelectSearchWithFirefoxForSelection: selection)
-    }
-}
-
-extension Tab: ContentBlockerTab {
-    func currentURL() -> URL? {
-        return url
-    }
-
-    func currentWebView() -> WKWebView? {
-        return webView
-    }
-
-    func imageContentBlockingEnabled() -> Bool {
-        return noImageMode
     }
 }
 

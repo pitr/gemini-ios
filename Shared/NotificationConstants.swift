@@ -5,28 +5,10 @@
 extension Notification.Name {
     public static let DataLoginDidChange = Notification.Name("DataLoginDidChange")
 
-    // add a property to allow the observation of firefox accounts
-    public static let FirefoxAccountChanged = Notification.Name("FirefoxAccountChanged")
-
-    public static let FirefoxAccountStateChange = Notification.Name("FirefoxAccountStateChange")
-
-    public static let RegisterForPushNotifications = Notification.Name("RegisterForPushNotifications")
-
-    public static let FirefoxAccountProfileChanged = Notification.Name("FirefoxAccountProfileChanged")
-
-    public static let FirefoxAccountDeviceRegistrationUpdated = Notification.Name("FirefoxAccountDeviceRegistrationUpdated")
-
-    public static let PrivateDataClearedHistory = Notification.Name("PrivateDataClearedHistory")
-    public static let PrivateDataClearedDownloadedFiles = Notification.Name("PrivateDataClearedDownloadedFiles")
-
     // Fired when the user finishes navigating to a page and the location has changed
     public static let OnLocationChange = Notification.Name("OnLocationChange")
   
     // MARK: Notification UserInfo Keys
-    public static let UserInfoKeyHasSyncableAccount = Notification.Name("UserInfoKeyHasSyncableAccount")
-
-    // Fired when the login synchronizer has finished applying remote changes
-    public static let DataRemoteLoginChangesWereApplied = Notification.Name("DataRemoteLoginChangesWereApplied")
 
     // Fired when a the page metadata extraction script has completed and is being passed back to the native client
     public static let OnPageMetadataFetched = Notification.Name("OnPageMetadataFetched")
@@ -45,8 +27,6 @@ extension Notification.Name {
     public static let PasscodeDidRemove = Notification.Name("PasscodeDidRemove")
 
     public static let DynamicFontChanged = Notification.Name("DynamicFontChanged")
-
-    public static let UserInitiatedSyncManually = Notification.Name("UserInitiatedSyncManually")
 
     public static let FaviconDidLoad = Notification.Name("FaviconDidLoad")
 

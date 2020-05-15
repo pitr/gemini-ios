@@ -40,13 +40,10 @@ class ActivityStreamDataObserver: DataObserver {
     let invalidationTime: UInt64
     weak var delegate: DataObserverDelegate?
 
-    fileprivate let events: [Notification.Name] = [.FirefoxAccountChanged, .ProfileDidFinishSyncing, .PrivateDataClearedHistory]
-
     init(profile: Profile) {
         self.profile = profile
         self.profile.history.setTopSitesCacheSize(ActivityStreamTopSiteCacheSize)
         self.invalidationTime = OneMinuteInMilliseconds * 15
-        events.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.notificationReceived), name: $0, object: nil) }
     }
 
     /*
@@ -74,15 +71,6 @@ class ActivityStreamDataObserver: DataObserver {
         self.delegate?.willInvalidateDataSources(forceTopSites: topSites)
         self.profile.recommendations.repopulate(invalidateTopSites: shouldInvalidateTopSites).uponQueue(.main) { _ in
             self.delegate?.didInvalidateDataSources(refresh: topSites, topSitesRefreshed: shouldInvalidateTopSites)
-        }
-    }
-
-    @objc func notificationReceived(_ notification: Notification) {
-        switch notification.name {
-        case .ProfileDidFinishSyncing, .FirefoxAccountChanged, .PrivateDataClearedHistory:
-             refreshIfNeeded(forceTopSites: true)
-        default:
-            log.warning("Received unexpected notification \(notification.name)")
         }
     }
 }

@@ -443,8 +443,6 @@ extension TabTrayController: UITextFieldDelegate {
         tabDisplayManager.searchedTabs = filteredTabs
 
         tabDisplayManager.searchTabsAnimated()
-        
-        UnifiedTelemetry.recordEvent(category: .action, method: .press, object: .tabSearch)
     }
 
     func clearSearch() {
@@ -644,7 +642,7 @@ extension TabTrayController: UIViewControllerPreviewingDelegate {
         }
         let tabVC = TabPeekViewController(tab: tab, delegate: self)
         if let browserProfile = profile as? BrowserProfile {
-            tabVC.setState(withProfile: browserProfile, clientPickerDelegate: self)
+            tabVC.setState(withProfile: browserProfile)
         }
         previewingContext.sourceRect = self.view.convert(cell.frame, from: collectionView)
 
@@ -666,7 +664,6 @@ extension TabTrayController: TabDisplayCompletionDelegate {
         switch type {
         case .addTab:
             dismissTabTray()
-            LeanPlumClient.shared.track(event: .openedNewTab, withParameters: ["Source": "Tab Tray"])
         case .removedLastTab:
             // when removing the last tab (only in normal mode) we will automatically open a new tab.
             // When that happens focus it by dismissing the tab tray
@@ -910,19 +907,6 @@ fileprivate class EmptyPrivateTabsView: UIView {
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-}
-
-extension TabTrayController: DevicePickerViewControllerDelegate {
-    func devicePickerViewController(_ devicePickerViewController: DevicePickerViewController, didPickDevices devices: [RemoteDevice]) {
-        if let item = devicePickerViewController.shareItem {
-            _ = self.profile.sendItem(item, toDevices: devices)
-        }
-        devicePickerViewController.dismiss(animated: true, completion: nil)
-    }
-
-    func devicePickerViewControllerDidCancel(_ devicePickerViewController: DevicePickerViewController) {
-        devicePickerViewController.dismiss(animated: true, completion: nil)
     }
 }
 

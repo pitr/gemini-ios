@@ -34,11 +34,7 @@ class TabManagerStore {
 
     fileprivate func tabsStateArchivePath() -> String? {
         let profilePath: String?
-        if  AppConstants.IsRunningTest {
-            profilePath = (UIApplication.shared.delegate as? TestAppDelegate)?.dirForTestProfile
-        } else {
-            profilePath = fileManager.containerURL( forSecurityApplicationGroupIdentifier: AppInfo.sharedContainerIdentifier)?.appendingPathComponent("profile.profile").path
-        }
+        profilePath = fileManager.containerURL( forSecurityApplicationGroupIdentifier: AppInfo.sharedContainerIdentifier)?.appendingPathComponent("profile.profile").path
         guard let path = profilePath else { return nil }
         return URL(fileURLWithPath: path).appendingPathComponent("tabsState.archive").path
     }
@@ -53,11 +49,6 @@ class TabManagerStore {
         let unarchiver = NSKeyedUnarchiver(forReadingWith: tabData)
         unarchiver.decodingFailurePolicy = .setErrorAndReturn
         guard let tabs = unarchiver.decodeObject(forKey: "tabs") as? [SavedTab] else {
-            Sentry.shared.send(
-                message: "Failed to restore tabs",
-                tag: SentryTag.tabManager,
-                severity: .error,
-                description: "\(unarchiver.error ??? "nil")")
             return [SavedTab]()
         }
         return tabs

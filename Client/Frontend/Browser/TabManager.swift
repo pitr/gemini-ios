@@ -399,8 +399,6 @@ class TabManager: NSObject {
         removeTab(tab, flushToDisk: true, notify: true)
         updateIndexAfterRemovalOf(tab, deletedIndex: index)
         hideNetworkActivitySpinner()
-        
-        UnifiedTelemetry.recordEvent(category: .action, method: .close, object: .tab)
     }
 
     private func updateIndexAfterRemovalOf(_ tab: Tab, deletedIndex: Int) {
@@ -433,7 +431,6 @@ class TabManager: NSObject {
         assert(Thread.isMainThread)
 
         guard let removalIndex = tabs.firstIndex(where: { $0 === tab }) else {
-            Sentry.shared.sendWithStacktrace(message: "Could not find index of tab to remove", tag: .tabManager, severity: .fatal, description: "Tab count: \(count)")
             return
         }
 
@@ -621,20 +618,11 @@ extension TabManager: WKNavigationDelegate {
     // Note the main frame JSContext (i.e. document, window) is not available yet.
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         UIApplication.shared.isNetworkActivityIndicatorVisible = true
-
-        if let tab = self[webView], let blocker = tab.contentBlocker {
-            blocker.clearPageStats()
-        }
     }
 
     // The main frame JSContext is available, and DOM parsing has begun.
     // Do not excute JS at this point that requires running prior to DOM parsing.
     func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
-        guard let tab = self[webView] else { return }
-
-        if let tpHelper = tab.contentBlocker, !tpHelper.isEnabled {
-            webView.evaluateJavaScript("window.__firefox__.TrackingProtectionStats.setEnabled(false, \(UserScriptManager.securityToken))")
-        }
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
