@@ -524,7 +524,7 @@ class BrowserViewController: UIViewController {
         // not flash before we present. This change of alpha also participates in the animation when
         // the intro view is dismissed.
         if UIDevice.current.userInterfaceIdiom == .phone {
-            self.view.alpha = (profile.prefs.intForKey(PrefsKeys.IntroSeen) != nil) ? 1.0 : 0.0
+            self.view.alpha = 1.0
         }
 
         if !displayedRestoreTabsAlert && !cleanlyBackgrounded() {
