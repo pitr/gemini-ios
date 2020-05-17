@@ -1468,7 +1468,7 @@ open class BrowserSchema: Schema {
         let sql = "DROP TABLE IF EXISTS tableList"
         do {
             try db.executeChange(sql)
-        } catch let err as NSError {
+        } catch _ as NSError {
             return false
         }
 
@@ -1476,7 +1476,7 @@ open class BrowserSchema: Schema {
         // using `PRAGMA user_version = ?`.
         do {
             try db.setVersion(previousVersion)
-        } catch let err as NSError {
+        } catch _ as NSError {
             return false
         }
 

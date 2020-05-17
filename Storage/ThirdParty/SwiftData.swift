@@ -491,7 +491,7 @@ open class ConcreteSQLiteDBConnection: SQLiteDBConnection {
             // its backup location. If we cannot even close the connection, something has
             // gone really wrong. In that case, bail out and return `nil` to force SwiftData
             // into using a `FailedSQLiteDBConnection` so we can retry again later.
-            if let error = self.closeCustomConnection(immediately: true) {
+            if self.closeCustomConnection(immediately: true) != nil {
                 return nil
             }
 
@@ -813,7 +813,7 @@ open class ConcreteSQLiteDBConnection: SQLiteDBConnection {
                 }
 
                 log.debug("Finished moving database \(baseFilename) successfully.")
-            } catch let error as NSError {
+            } catch _ as NSError {
             }
         } else {
             // No backup was attempted since the database file did not exist.

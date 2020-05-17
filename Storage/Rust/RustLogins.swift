@@ -175,7 +175,7 @@ public class RustLogins {
     public func interrupt() {
         do {
             try storage.interrupt()
-        } catch let err as NSError {
+        } catch _ as NSError {
         }
     }
 

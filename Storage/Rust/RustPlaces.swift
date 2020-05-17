@@ -133,7 +133,7 @@ public class RustPlaces {
 
         do {
             try api?.migrateBookmarksFromBrowserDb(path: browserDB.databasePath)
-        } catch let err as NSError {
+        } catch _ as NSError {
         }
     }
 

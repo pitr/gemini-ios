@@ -904,7 +904,6 @@ class BrowserViewController: UIViewController {
     /// Call this whenever the page URL changes.
     fileprivate func updateURLBarDisplayURL(_ tab: Tab) {
         urlBar.currentURL = tab.url?.displayURL
-        urlBar.locationView.showLockIcon(forSecureContent:  tab.webView?.hasOnlySecureContent ?? false)
         let isPage = tab.url?.displayURL?.isWebPage() ?? false
         navigationToolbar.updatePageStatus(isPage)
     }
@@ -1045,10 +1044,6 @@ class BrowserViewController: UIViewController {
         }
 
         if let url = webView.url {
-            if tab === tabManager.selectedTab {
-                urlBar.locationView.showLockIcon(forSecureContent: webView.hasOnlySecureContent)
-            }
-
             if (!InternalURL.isValid(url: url)), !url.isFileURL {
                 postLocationChangeNotificationForTab(tab, navigation: navigation)
             }

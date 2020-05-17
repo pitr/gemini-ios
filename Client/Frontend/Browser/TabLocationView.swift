@@ -41,10 +41,6 @@ class TabLocationView: UIView {
         didSet { updateTextWithURL() }
     }
 
-    func showLockIcon(forSecureContent isSecure: Bool) {
-        lockImageView.isHidden = !isSecure
-    }
-
     var url: URL? {
         didSet {
             updateTextWithURL()
@@ -79,14 +75,6 @@ class TabLocationView: UIView {
         return urlTextField
     }()
 
-    fileprivate lazy var lockImageView: UIImageView = {
-        let lockImageView = UIImageView(image: UIImage.templateImageNamed("lock_verified"))
-        lockImageView.isAccessibilityElement = true
-        lockImageView.contentMode = .center
-        lockImageView.accessibilityLabel = NSLocalizedString("Secure connection", comment: "Accessibility label for the lock icon, which is only present if the connection is secure")
-        return lockImageView
-    }()
-
     lazy var pageOptionsButton: ToolbarButton = {
         let pageOptionsButton = ToolbarButton(frame: .zero)
         pageOptionsButton.setImage(UIImage.templateImageNamed("menu-More-Options"), for: .normal)
@@ -110,8 +98,6 @@ class TabLocationView: UIView {
     // A vertical separator next to the page options button.
     lazy var separatorLineForPageOptions: UIView = makeSeparator()
 
-    lazy var separatorLineForTP: UIView = makeSeparator()
-
     override init(frame: CGRect) {
         super.init(frame: frame)
 
@@ -133,7 +119,7 @@ class TabLocationView: UIView {
 
         pageOptionsButton.separatorLine = separatorLineForPageOptions
 
-        let subviews = [separatorLineForTP, space10px, lockImageView, urlTextField, separatorLineForPageOptions, pageOptionsButton]
+        let subviews = [space10px, urlTextField, separatorLineForPageOptions, pageOptionsButton]
         contentView = UIStackView(arrangedSubviews: subviews)
         contentView.distribution = .fill
         contentView.alignment = .center
@@ -141,15 +127,6 @@ class TabLocationView: UIView {
 
         contentView.snp.makeConstraints { make in
             make.edges.equalTo(self)
-        }
-
-        lockImageView.snp.makeConstraints { make in
-            make.width.equalTo(TabLocationViewUX.StatusIconSize)
-            make.height.equalTo(TabLocationViewUX.ButtonSize)
-        }
-        separatorLineForTP.snp.makeConstraints { make in
-            make.width.equalTo(1)
-            make.height.equalTo(26)
         }
 
         pageOptionsButton.snp.makeConstraints { make in
@@ -274,9 +251,6 @@ extension TabLocationView: Themeable {
         pageOptionsButton.unselectedTintColor = UIColor.theme.urlbar.pageOptionsUnselected
         pageOptionsButton.tintColor = pageOptionsButton.unselectedTintColor
         separatorLineForPageOptions.backgroundColor = UIColor.Photon.Grey40
-        separatorLineForTP.backgroundColor = separatorLineForPageOptions.backgroundColor
-
-        lockImageView.tintColor = pageOptionsButton.tintColor
 
         let color = ThemeManager.instance.currentName == .dark ? UIColor(white: 0.3, alpha: 0.6): UIColor.theme.textField.background
         menuBadge.badge.tintBackground(color: color)
