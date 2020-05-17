@@ -115,8 +115,6 @@ class ShareViewController: UIViewController {
             makeActionRow(addTo: stackView, label: Strings.ShareOpenInFirefox, imageName: "open-in-firefox", action: #selector(actionOpenInFirefoxNow), hasNavigation: false)
             makeActionRow(addTo: stackView, label: Strings.ShareLoadInBackground, imageName: "menu-Show-Tabs", action: #selector(actionLoadInBackground), hasNavigation: false)
             makeActionRow(addTo: stackView, label: Strings.ShareBookmarkThisPage, imageName: "AddToBookmarks", action: #selector(actionBookmarkThisPage), hasNavigation: false)
-            makeActionRow(addTo: stackView, label: Strings.ShareAddToReadingList, imageName: "AddToReadingList", action: #selector(actionAddToReadingList), hasNavigation: false)
-            makeSeparator(addTo: stackView)
         } else {
             pageInfoRowUrlLabel?.removeFromSuperview()
             makeActionRow(addTo: stackView, label: Strings.ShareSearchInFirefox, imageName: "quickSearch", action: #selector(actionSearchInFirefox), hasNavigation: false)
@@ -334,22 +332,6 @@ extension ShareViewController {
             profile._shutdown()
 
             addAppExtensionTelemetryEvent(forMethod: "bookmark-this-page")
-        }
-
-        finish()
-    }
-
-    @objc func actionAddToReadingList(gesture: UIGestureRecognizer) {
-        gesture.isEnabled = false
-        animateToActionDoneView(withTitle: Strings.ShareAddToReadingListDone)
-
-        if let shareItem = shareItem, case .shareItem(let item) = shareItem {
-            let profile = BrowserProfile(localName: "profile")
-            profile._reopen()
-            profile.readingList.createRecordWithURL(item.url, title: item.title ?? "", addedBy: UIDevice.current.name)
-            profile._shutdown()
-
-            addAppExtensionTelemetryEvent(forMethod: "add-to-reading-list")
         }
 
         finish()

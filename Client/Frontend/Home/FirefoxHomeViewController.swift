@@ -119,7 +119,6 @@ extension HomePanelContextMenu {
 class FirefoxHomeViewController: UICollectionViewController, HomePanel {
     weak var homePanelDelegate: HomePanelDelegate?
     fileprivate let profile: Profile
-    fileprivate let pocketAPI = Pocket()
     fileprivate let flowLayout = UICollectionViewFlowLayout()
 
     fileprivate lazy var topSitesManager: ASHorizontalScrollCellManager = {
@@ -137,8 +136,6 @@ class FirefoxHomeViewController: UICollectionViewController, HomePanel {
         customCell.delegate = self.topSitesManager
         return customCell
     }()
-
-    var pocketStories: [PocketStory] = []
 
     init(profile: Profile) {
         self.profile = profile
@@ -220,14 +217,12 @@ extension FirefoxHomeViewController {
     enum Section: Int {
         case topSites
         case libraryShortcuts
-        case pocket
 
-        static let count = 3
-        static let allValues = [topSites, libraryShortcuts, pocket]
+        static let count = 2
+        static let allValues = [topSites, libraryShortcuts]
 
         var title: String? {
             switch self {
-            case .pocket: return Strings.ASPocketTitle
             case .topSites: return Strings.ASTopSitesTitle
             case .libraryShortcuts: return Strings.AppMenuLibraryTitleString
             }
@@ -239,7 +234,6 @@ extension FirefoxHomeViewController {
 
         var headerImage: UIImage? {
             switch self {
-            case .pocket: return UIImage.templateImageNamed("menu-pocket")
             case .topSites: return UIImage.templateImageNamed("menu-panel-TopSites")
             case .libraryShortcuts: return UIImage.templateImageNamed("menu-library")
             }
@@ -247,14 +241,12 @@ extension FirefoxHomeViewController {
 
         var footerHeight: CGSize {
             switch self {
-            case .pocket: return .zero
             case .topSites, .libraryShortcuts: return CGSize(width: 50, height: 5)
             }
         }
 
         func cellHeight(_ traits: UITraitCollection, width: CGFloat) -> CGFloat {
             switch self {
-            case .pocket: return FirefoxHomeUX.highlightCellHeight
             case .topSites: return 0 //calculated dynamically
             case .libraryShortcuts: return FirefoxHomeUX.LibraryShortcutsHeight
             }
@@ -273,7 +265,7 @@ extension FirefoxHomeViewController {
             var insets = FirefoxHomeUX.sectionInsetsForSizeClass[currentTraits.horizontalSizeClass]
 
             switch self {
-            case .pocket, .libraryShortcuts:
+            case .libraryShortcuts:
                 let window = UIApplication.shared.keyWindow
                 let safeAreaInsets = window?.safeAreaInsets.left ?? 0
                 insets += FirefoxHomeUX.MinimumInsets + safeAreaInsets
@@ -286,15 +278,6 @@ extension FirefoxHomeViewController {
 
         func numberOfItemsForRow(_ traits: UITraitCollection) -> CGFloat {
             switch self {
-            case .pocket:
-                var numItems: CGFloat = FirefoxHomeUX.numberOfItemsPerRowForSizeClassIpad[traits.horizontalSizeClass]
-                if UIApplication.shared.statusBarOrientation.isPortrait {
-                    numItems = numItems - 1
-                }
-                if traits.horizontalSizeClass == .compact && UIApplication.shared.statusBarOrientation.isLandscape {
-                    numItems = numItems - 1
-                }
-                return numItems
             case .topSites, .libraryShortcuts:
                 return 1
             }
@@ -305,9 +288,6 @@ extension FirefoxHomeViewController {
             let inset = sectionInsets(traits, frameWidth: frameWidth) * 2
 
             switch self {
-            case .pocket:
-                let numItems = numberOfItemsForRow(traits)
-                return CGSize(width: floor(((frameWidth - inset) - (FirefoxHomeUX.MinimumInsets * (numItems - 1))) / numItems), height: height)
             case .topSites, .libraryShortcuts:
                 return CGSize(width: frameWidth - inset, height: height)
             }
@@ -322,7 +302,6 @@ extension FirefoxHomeViewController {
         var cellIdentifier: String {
             switch self {
             case .topSites: return "TopSiteCell"
-            case .pocket: return "PocketCell"
             case .libraryShortcuts: return  "LibraryShortcutsCell"
             }
         }
@@ -330,7 +309,6 @@ extension FirefoxHomeViewController {
         var cellType: UICollectionViewCell.Type {
             switch self {
             case .topSites: return ASHorizontalScrollCell.self
-            case .pocket: return FirefoxHomeHighlightCell.self
             case .libraryShortcuts: return ASLibraryCell.self
             }
         }
@@ -356,16 +334,6 @@ extension FirefoxHomeViewController: UICollectionViewDelegateFlowLayout {
                 view.iconView.image = Section(indexPath.section).headerImage
                 let title = Section(indexPath.section).title
                 switch Section(indexPath.section) {
-                case .pocket:
-                    view.title = title
-                    view.moreButton.isHidden = false
-                    view.moreButton.setTitle(Strings.PocketMoreStoriesText, for: .normal)
-                    view.moreButton.addTarget(self, action: #selector(showMorePocketStories), for: .touchUpInside)
-                    view.titleLabel.textColor = UIColor.Pocket.red
-                    view.titleLabel.accessibilityIdentifier = "pocketTitle"
-                    view.moreButton.setTitleColor(UIColor.Pocket.red, for: .normal)
-                    view.iconView.tintColor = UIColor.Pocket.red
-                    return view
                 case .topSites:
                     view.title = title
                     view.titleLabel.accessibilityIdentifier = "topSitesTitle"
@@ -383,7 +351,7 @@ extension FirefoxHomeViewController: UICollectionViewDelegateFlowLayout {
         case UICollectionView.elementKindSectionFooter:
                 let view = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: "Footer", for: indexPath) as! ASFooterView
                 switch Section(indexPath.section) {
-                case .topSites, .pocket:
+                case .topSites:
                     return view
                 case .libraryShortcuts:
                     view.separatorLineView?.isHidden = true
@@ -408,8 +376,6 @@ extension FirefoxHomeViewController: UICollectionViewDelegateFlowLayout {
             let layout = topSiteCell.collectionView.collectionViewLayout as! HorizontalFlowLayout
             let estimatedLayout = layout.calculateLayout(for: CGSize(width: cellSize.width, height: 0))
             return CGSize(width: cellSize.width, height: estimatedLayout.size.height)
-        case .pocket:
-            return cellSize
         case .libraryShortcuts:
             let numberofshortcuts: CGFloat = 4
             let titleSpacing: CGFloat = 10
@@ -420,8 +386,6 @@ extension FirefoxHomeViewController: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         switch Section(section) {
-        case .pocket:
-            return pocketStories.isEmpty ? .zero : Section(section).headerHeight
         case .topSites:
             return Section(section).headerHeight
         case .libraryShortcuts:
@@ -431,8 +395,6 @@ extension FirefoxHomeViewController: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
         switch Section(section) {
-        case .pocket:
-            return .zero
         case .topSites:
             return Section(section).footerHeight
         case .libraryShortcuts:
@@ -463,7 +425,7 @@ extension FirefoxHomeViewController: UICollectionViewDelegateFlowLayout {
 extension FirefoxHomeViewController {
 
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 3
+        return Section.count
     }
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -477,9 +439,6 @@ extension FirefoxHomeViewController {
         switch Section(section) {
         case .topSites:
             return topSitesManager.content.isEmpty ? 0 : 1
-        case .pocket:
-            // There should always be a full row of pocket stories (numItems) otherwise don't show them
-            return pocketStories.count
         case .libraryShortcuts:
             // disable the libary shortcuts on the ipad
             return UIDevice.current.userInterfaceIdiom == .pad ? 0 : 1
@@ -493,8 +452,6 @@ extension FirefoxHomeViewController {
         switch Section(indexPath.section) {
         case .topSites:
             return configureTopSitesCell(cell, forIndexPath: indexPath)
-        case .pocket:
-            return configurePocketItemCell(cell, forIndexPath: indexPath)
         case .libraryShortcuts:
             return configureLibraryShortcutsCell(cell, forIndexPath: indexPath)
         }
@@ -519,14 +476,6 @@ extension FirefoxHomeViewController {
         topSiteCell.collectionView.reloadData()
         return cell
     }
-
-    func configurePocketItemCell(_ cell: UICollectionViewCell, forIndexPath indexPath: IndexPath) -> UICollectionViewCell {
-        let pocketStory = pocketStories[indexPath.row]
-        let pocketItemCell = cell as! FirefoxHomeHighlightCell
-        pocketItemCell.configureWithPocketStory(pocketStory)
-        return pocketItemCell
-    }
-
 }
 
 // MARK: - Data Management
@@ -535,38 +484,12 @@ extension FirefoxHomeViewController: DataObserverDelegate {
     // Reloads both highlights and top sites data from their respective caches. Does not invalidate the cache.
     // See ActivityStreamDataObserver for invalidation logic.
     func reloadAll() {
-        // If the pocket stories are not availible for the Locale the PocketAPI will return nil
-        // So it is okay if the default here is true
-
         self.getTopSites().uponQueue(.main) { _ in
             // If there is no pending cache update and highlights are empty. Show the onboarding screen
             self.collectionView?.reloadData()
-
-            self.getPocketSites().uponQueue(.main) { _ in
-                if !self.pocketStories.isEmpty {
-                    self.collectionView?.reloadData()
-                }
-            }
             // Refresh the AS data in the background so we'll have fresh data next time we show.
             self.profile.panelDataObservers.activityStream.refreshIfNeeded(forceTopSites: false)
         }
-    }
-
-    func getPocketSites() -> Success {
-        let showPocket = (profile.prefs.boolForKey(PrefsKeys.ASPocketStoriesVisible) ?? Pocket.IslocaleSupported(Locale.current.identifier))
-        guard showPocket else {
-            self.pocketStories = []
-            return succeed()
-        }
-
-        return pocketAPI.globalFeed(items: 10).bindQueue(.main) { pStory in
-            self.pocketStories = pStory
-            return succeed()
-        }
-    }
-
-    @objc func showMorePocketStories() {
-        showSiteWithURLHandler(Pocket.MoreStoriesURL)
     }
 
     func getTopSites() -> Success {
@@ -680,8 +603,6 @@ extension FirefoxHomeViewController: DataObserverDelegate {
         guard let indexPath = self.collectionView?.indexPathForItem(at: point) else { return }
 
         switch Section(indexPath.section) {
-        case .pocket:
-            presentContextMenu(for: indexPath)
         case .topSites:
             let topSiteCell = self.collectionView?.cellForItem(at: indexPath) as! ASHorizontalScrollCell
             let pointInTopSite = longPressGestureRecognizer.location(in: topSiteCell.collectionView)
@@ -701,17 +622,11 @@ extension FirefoxHomeViewController: DataObserverDelegate {
     }
 
     func selectItemAtIndex(_ index: Int, inSection section: Section) {
-        let site: Site?
         switch section {
-        case .pocket:
-            site = Site(url: pocketStories[index].url.absoluteString, title: pocketStories[index].title)
         case .topSites:
             return
         case .libraryShortcuts:
             return
-        }
-        if let site = site {
-            showSiteWithURLHandler(URL(string: site.url)!)
         }
     }
 }
@@ -749,8 +664,6 @@ extension FirefoxHomeViewController: HomePanelContextMenu {
 
     func getSiteDetails(for indexPath: IndexPath) -> Site? {
         switch Section(indexPath.section) {
-        case .pocket:
-            return Site(url: pocketStories[indexPath.row].url.absoluteString, title: pocketStories[indexPath.row].title)
         case .topSites:
             return topSitesManager.content[indexPath.item]
         case .libraryShortcuts:
@@ -766,8 +679,6 @@ extension FirefoxHomeViewController: HomePanelContextMenu {
             if let topSiteCell = self.collectionView?.cellForItem(at: IndexPath(row: 0, section: 0)) as? ASHorizontalScrollCell {
                 sourceView = topSiteCell.collectionView.cellForItem(at: indexPath)
             }
-        case .pocket:
-            sourceView = self.collectionView?.cellForItem(at: indexPath)
         case .libraryShortcuts:
             return nil
         }
@@ -838,7 +749,6 @@ extension FirefoxHomeViewController: HomePanelContextMenu {
         var actions = [openInNewTabAction, bookmarkAction, shareAction]
 
         switch Section(indexPath.section) {
-            case .pocket: break
             case .topSites: actions.append(contentsOf: topSiteActions)
             case .libraryShortcuts: break
         }
