@@ -83,9 +83,6 @@ class CacheClearable: Clearable {
         let dataTypes = Set([WKWebsiteDataTypeDiskCache, WKWebsiteDataTypeMemoryCache])
         WKWebsiteDataStore.default().removeData(ofTypes: dataTypes, modifiedSince: .distantPast, completionHandler: {})
 
-        MemoryReaderModeCache.sharedInstance.clear()
-        DiskReaderModeCache.sharedInstance.clear()
-
         log.debug("CacheClearable succeeded.")
         return succeed()
     }

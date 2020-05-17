@@ -26,9 +26,6 @@ private struct URLBarViewUX {
 
 protocol URLBarDelegate: AnyObject {
     func urlBarDidPressTabs(_ urlBar: URLBarView)
-    func urlBarDidPressReaderMode(_ urlBar: URLBarView)
-    /// - returns: whether the long-press was handled by the delegate; i.e. return `false` when the conditions for even starting handling long-press were not satisfied
-    func urlBarDidLongPressReaderMode(_ urlBar: URLBarView) -> Bool
     func urlBarDidPressStop(_ urlBar: URLBarView)
     func urlBarDidPressReload(_ urlBar: URLBarView)
     func urlBarDidEnterOverlayMode(_ urlBar: URLBarView)
@@ -386,10 +383,6 @@ class URLBarView: UIView {
         progressBar.setProgress(0, animated: false)
     }
 
-    func updateReaderModeState(_ state: ReaderModeState) {
-        locationView.readerModeState = state
-    }
-
     func setAutocompleteSuggestion(_ suggestion: String?) {
         locationTextField?.setAutocompleteSuggestion(suggestion)
     }
@@ -610,10 +603,6 @@ extension URLBarView: TabToolbarProtocol {
 }
 
 extension URLBarView: TabLocationViewDelegate {
-    func tabLocationViewDidLongPressReaderMode(_ tabLocationView: TabLocationView) -> Bool {
-        return delegate?.urlBarDidLongPressReaderMode(self) ?? false
-    }
-
     func tabLocationViewDidTapLocation(_ tabLocationView: TabLocationView) {
         guard let (locationText, isSearchQuery) = delegate?.urlBarDisplayTextForURL(locationView.url as URL?) else { return }
 
@@ -635,10 +624,6 @@ extension URLBarView: TabLocationViewDelegate {
 
     func tabLocationViewDidTapStop(_ tabLocationView: TabLocationView) {
         delegate?.urlBarDidPressStop(self)
-    }
-
-    func tabLocationViewDidTapReaderMode(_ tabLocationView: TabLocationView) {
-        delegate?.urlBarDidPressReaderMode(self)
     }
 
     func tabLocationViewDidTapPageOptions(_ tabLocationView: TabLocationView, from button: UIButton) {

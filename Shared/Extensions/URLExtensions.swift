@@ -193,10 +193,6 @@ extension URL {
             return URL(string: "file://\(self.lastPathComponent)")
         }
 
-        if self.isReaderModeURL {
-            return self.decodeReaderModeURL?.havingRemovedAuthorisationComponents()
-        }
-
         if let internalUrl = InternalURL(self), internalUrl.isErrorPage {
             return internalUrl.originalURLFromErrorPage?.displayURL
         }
@@ -314,39 +310,6 @@ extension URL {
             return item.lowercased()
         }
         return urls[0] == urls[1]
-    }
-}
-
-// Extensions to deal with ReaderMode URLs
-
-extension URL {
-    public var isReaderModeURL: Bool {
-        let scheme = self.scheme, host = self.host, path = self.path
-        return scheme == "http" && host == "localhost" && path == "/reader-mode/page"
-    }
-
-    public var isSyncedReaderModeURL: Bool {
-        return self.absoluteString.hasPrefix("about:reader?url=")
-    }
-
-    public var decodeReaderModeURL: URL? {
-        if self.isReaderModeURL || self.isSyncedReaderModeURL {
-            if let components = URLComponents(url: self, resolvingAgainstBaseURL: false), let queryItems = components.queryItems {
-                if let queryItem = queryItems.find({ $0.name == "url"}), let value = queryItem.value {
-                    return URL(string: value)
-                }
-            }
-        }
-        return nil
-    }
-
-    public func encodeReaderModeURL(_ baseReaderModeURL: String) -> URL? {
-        if let encodedURL = absoluteString.addingPercentEncoding(withAllowedCharacters: .alphanumerics) {
-            if let aboutReaderURL = URL(string: "\(baseReaderModeURL)?url=\(encodedURL)") {
-                return aboutReaderURL
-            }
-        }
-        return nil
     }
 }
 

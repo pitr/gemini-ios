@@ -60,13 +60,6 @@ extension PhotonActionSheetProtocol {
             }
         }
 
-        let addReadingList = PhotonActionSheetItem(title: Strings.AppMenuAddToReadingListTitleString, iconString: "addToReadingList") { _, _ in
-            guard let url = tab.url?.displayURL else { return }
-
-            self.profile.readingList.createRecordWithURL(url.absoluteString, title: tab.title ?? "", addedBy: UIDevice.current.name)
-            success(Strings.AppMenuAddToReadingListConfirmMessage, .addToReadingList)
-        }
-
         let bookmarkPage = PhotonActionSheetItem(title: Strings.AppMenuAddBookmarkTitleString, iconString: "menu-Bookmark") { _, _ in
             guard let url = tab.canonicalURL?.displayURL,
                 let bvc = presentableVC as? BrowserViewController else {
@@ -140,10 +133,6 @@ extension PhotonActionSheetProtocol {
         // Disable bookmarking and reading list if the URL is too long.
         if !tab.urlIsTooLong {
             mainActions.append(isBookmarked ? removeBookmark : bookmarkPage)
-
-            if tab.readerModeAvailableOrActive {
-                mainActions.append(addReadingList)
-            }
         }
 
         mainActions.append(contentsOf: [copyURL])

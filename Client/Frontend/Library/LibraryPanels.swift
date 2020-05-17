@@ -88,15 +88,6 @@ class LibraryPanels {
 
         LibraryPanelDescriptor(
             makeViewController: { profile in
-                return ReadingListPanel(profile: profile)
-            },
-            profile: profile,
-            imageName: "ReadingList",
-            accessibilityLabel: NSLocalizedString("Reading list", comment: "Panel accessibility label"),
-            accessibilityIdentifier: "LibraryPanels.ReadingList"),
-
-        LibraryPanelDescriptor(
-            makeViewController: { profile in
                 return DownloadsPanel(profile: profile)
             },
             profile: profile,

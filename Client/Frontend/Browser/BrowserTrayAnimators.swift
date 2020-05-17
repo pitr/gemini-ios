@@ -39,9 +39,6 @@ private extension TrayToBrowserAnimator {
 
         bvc.webViewContainerBackdrop.isHidden = true
         bvc.statusBarOverlay.isHidden = false
-        if let url = selectedTab.url, !url.isReaderModeURL {
-            bvc.hideReaderModeBar(animated: false)
-        }
 
         // Take a snapshot of the collection view that we can scale/fade out. We don't need to wait for screen updates since it's already rendered on the screen
         let tabCollectionViewSnapshot = tabTray.collectionView.snapshotView(afterScreenUpdates: false)!
@@ -65,7 +62,7 @@ private extension TrayToBrowserAnimator {
         bvc.urlBar.isTransitioning = true
 
         // Re-calculate the starting transforms for header/footer views in case we switch orientation
-        resetTransformsForViews([bvc.header, bvc.readerModeBar, bvc.footer])
+        resetTransformsForViews([bvc.header, bvc.footer])
         transformHeaderFooterForBVC(bvc, toFrame: startingFrame, container: container)
         
         let frameResizeClosure = {
@@ -233,7 +230,7 @@ private extension BrowserToTrayAnimator {
                 toggleWebViewVisibility(true, usingTabManager: bvc.tabManager)
                 bvc.firefoxHomeViewController?.view.isHidden = false
 
-                resetTransformsForViews([bvc.header, bvc.readerModeBar, bvc.footer])
+                resetTransformsForViews([bvc.header, bvc.footer])
                 bvc.urlBar.isTransitioning = false
                 tabTray.toolbar.isUserInteractionEnabled = true
                 transitionContext.completeTransition(true)
@@ -248,7 +245,6 @@ private func transformHeaderFooterForBVC(_ bvc: BrowserViewController, toFrame f
 
     bvc.footer.transform = footerForTransform
     bvc.header.transform = headerForTransform
-    bvc.readerModeBar?.transform = headerForTransform
 }
 
 private func footerTransform( _ frame: CGRect, toFrame finalFrame: CGRect, container: UIView) -> CGAffineTransform {

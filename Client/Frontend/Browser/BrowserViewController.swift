@@ -38,8 +38,6 @@ class BrowserViewController: UIViewController {
     var webViewContainer: UIView!
     var urlBar: URLBarView!
     var clipboardBarDisplayHandler: ClipboardBarDisplayHandler?
-    var readerModeBar: ReaderModeBarView?
-    var readerModeCache: ReaderModeCache
     var statusBarOverlay: UIView = UIView()
     fileprivate(set) var toolbar: TabToolbar?
     var searchController: SearchViewController?
@@ -110,7 +108,6 @@ class BrowserViewController: UIViewController {
     init(profile: Profile, tabManager: TabManager) {
         self.profile = profile
         self.tabManager = tabManager
-        self.readerModeCache = DiskReaderModeCache.sharedInstance
         super.init(nibName: nil, bundle: nil)
         didInit()
     }
@@ -421,7 +418,6 @@ class BrowserViewController: UIViewController {
         clipboardBarDisplayHandler?.delegate = self
 
         scrollController.urlBar = urlBar
-        scrollController.readerModeBar = readerModeBar
         scrollController.header = header
         scrollController.footer = footer
         scrollController.snackBars = alertStackView
@@ -596,7 +592,7 @@ class BrowserViewController: UIViewController {
         urlBar.updateAlphaForSubviews(1)
         footer.alpha = 1
 
-        [header, footer, readerModeBar].forEach { view in
+        [header, footer].forEach { view in
                 view?.transform = .identity
         }
         statusBarOverlay.isHidden = false
@@ -610,20 +606,10 @@ class BrowserViewController: UIViewController {
             make.height.equalTo(BrowserViewControllerUX.ShowHeaderTapAreaHeight)
         }
 
-        readerModeBar?.snp.remakeConstraints { make in
-            make.top.equalTo(self.header.snp.bottom)
-            make.height.equalTo(UIConstants.ToolbarHeight)
-            make.leading.trailing.equalTo(self.view)
-        }
-
         webViewContainer.snp.remakeConstraints { make in
             make.left.right.equalTo(self.view)
 
-            if let readerModeBarBottom = readerModeBar?.snp.bottom {
-                make.top.equalTo(readerModeBarBottom)
-            } else {
-                make.top.equalTo(self.header.snp.bottom)
-            }
+            make.top.equalTo(self.header.snp.bottom)
 
             let findInPageHeight = (findInPageBar == nil) ? 0 : UIConstants.ToolbarHeight
             if let toolbar = self.toolbar {
@@ -713,11 +699,6 @@ class BrowserViewController: UIViewController {
             firefoxHomeViewController.removeFromParent()
             self.webViewContainer.accessibilityElementsHidden = false
             UIAccessibility.post(notification: UIAccessibility.Notification.screenChanged, argument: nil)
-
-            // Refresh the reading view toolbar since the article record may have changed
-            if let readerMode = self.tabManager.selectedTab?.getContentScript(name: ReaderMode.name()) as? ReaderMode, readerMode.state == .active {
-                self.showReaderModeBar(animated: false)
-            }
         })
     }
 
@@ -883,9 +864,6 @@ class BrowserViewController: UIViewController {
             if tab.url?.origin == webView.url?.origin {
                 tab.url = webView.url
 
-                if tab === tabManager.selectedTab && !tab.restoring {
-                    updateUIForReaderHomeStateForTab(tab)
-                }
                 // Catch history pushState navigation, but ONLY for same origin navigation,
                 // for reasons above about URL spoofing risk.
                 navigateInTab(tab: tab)
@@ -913,19 +891,11 @@ class BrowserViewController: UIViewController {
         }
     }
 
-    func updateUIForReaderHomeStateForTab(_ tab: Tab) {
+    func updateUIForTab(_ tab: Tab) {
         updateURLBarDisplayURL(tab)
         scrollController.showToolbars(animated: false)
 
         if let url = tab.url {
-            if url.isReaderModeURL {
-                showReaderModeBar(animated: false)
-                NotificationCenter.default.addObserver(self, selector: #selector(dynamicFontChanged), name: .DynamicFontChanged, object: nil)
-            } else {
-                hideReaderModeBar(animated: false)
-                NotificationCenter.default.removeObserver(self, name: .DynamicFontChanged, object: nil)
-            }
-
             updateInContentHomePanel(url as URL)
         }
     }
@@ -1079,10 +1049,8 @@ class BrowserViewController: UIViewController {
                 urlBar.locationView.showLockIcon(forSecureContent: webView.hasOnlySecureContent)
             }
 
-            if (!InternalURL.isValid(url: url) || url.isReaderModeURL), !url.isFileURL {
+            if (!InternalURL.isValid(url: url)), !url.isFileURL {
                 postLocationChangeNotificationForTab(tab, navigation: navigation)
-
-                webView.evaluateJavaScript("\(ReaderModeNamespace).checkReadability()", completionHandler: nil)
             }
 
             if urlBar.inOverlayMode, InternalURL.isValid(url: url), url.path.starts(with: "/\(AboutHomeHandler.path)") {
@@ -1245,43 +1213,6 @@ extension BrowserViewController: URLBarDelegate {
 
     func urlBarDidPressTabs(_ urlBar: URLBarView) {
         showTabTray()
-    }
-
-    func urlBarDidPressReaderMode(_ urlBar: URLBarView) {
-        libraryDrawerViewController?.close()
-
-        guard let tab = tabManager.selectedTab, let readerMode = tab.getContentScript(name: "ReaderMode") as? ReaderMode else {
-            return
-        }
-        switch readerMode.state {
-        case .available:
-            enableReaderMode()
-        case .active:
-            disableReaderMode()
-        case .unavailable:
-            break
-        }
-    }
-
-    func urlBarDidLongPressReaderMode(_ urlBar: URLBarView) -> Bool {
-        guard let tab = tabManager.selectedTab,
-               let url = tab.url?.displayURL
-            else {
-                UIAccessibility.post(notification: UIAccessibility.Notification.announcement, argument: NSLocalizedString("Could not add page to Reading list", comment: "Accessibility message e.g. spoken by VoiceOver after adding current webpage to the Reading List failed."))
-                return false
-        }
-
-        let result = profile.readingList.createRecordWithURL(url.absoluteString, title: tab.title ?? "", addedBy: UIDevice.current.name)
-
-        switch result.value {
-        case .success:
-            UIAccessibility.post(notification: UIAccessibility.Notification.announcement, argument: NSLocalizedString("Added page to Reading List", comment: "Accessibility message e.g. spoken by VoiceOver after the current page gets added to the Reading List using the Reader View button, e.g. by long-pressing it or by its accessibility custom action."))
-            SimpleToast().showAlertWithText(Strings.ShareAddToReadingListDone, bottomContainer: self.webViewContainer)
-        case .failure(let error):
-            UIAccessibility.post(notification: UIAccessibility.Notification.announcement, argument: NSLocalizedString("Could not add page to Reading List. Maybe it’s already there?", comment: "Accessibility message e.g. spoken by VoiceOver after the user wanted to add current page to the Reading List and this was not done, likely because it already was in the Reading List, but perhaps also because of real failures."))
-            print("readingList.createRecordWithURL(url: \"\(url.absoluteString)\", ...) failed with error: \(error)")
-        }
-        return true
     }
 
     func locationActionsForURLBar(_ urlBar: URLBarView) -> [AccessibleAction] {
@@ -1606,12 +1537,6 @@ extension BrowserViewController: TabManagerDelegate {
                 ui.forEach { $0?.applyUIMode(isPrivate: tab.isPrivate) }
             }
 
-            readerModeCache = tab.isPrivate ? MemoryReaderModeCache.sharedInstance : DiskReaderModeCache.sharedInstance
-            if let privateModeButton = topTabsViewController?.privateModeButton, previous != nil && previous?.isPrivate != tab.isPrivate {
-                privateModeButton.setSelected(tab.isPrivate, animated: true)
-            }
-            ReaderModeHandlers.readerModeCache = readerModeCache
-
             scrollController.tab = tab
             webViewContainer.addSubview(webView)
             webView.snp.makeConstraints { make in
@@ -1671,17 +1596,6 @@ extension BrowserViewController: TabManagerDelegate {
         navigationToolbar.updateForwardStatus(selected?.canGoForward ?? false)
         if let url = selected?.webView?.url, !InternalURL.isValid(url: url) {
             self.urlBar.updateProgressBar(Float(selected?.estimatedProgress ?? 0))
-        }
-
-        if let readerMode = selected?.getContentScript(name: ReaderMode.name()) as? ReaderMode {
-            urlBar.updateReaderModeState(readerMode.state)
-            if readerMode.state == .active {
-                showReaderModeBar(animated: false)
-            } else {
-                hideReaderModeBar(animated: false)
-            }
-        } else {
-            urlBar.updateReaderModeState(ReaderModeState.unavailable)
         }
 
         if topTabsVisible {
@@ -2011,7 +1925,7 @@ extension BrowserViewController: SessionRestoreHelperDelegate {
         tab.restoring = false
 
         if let tab = tabManager.selectedTab, tab.webView === tab.webView {
-            updateUIForReaderHomeStateForTab(tab)
+            updateUIForTab(tab)
         }
 
         clipboardBarDisplayHandler?.didRestoreSession()
@@ -2047,7 +1961,7 @@ extension BrowserViewController: TabTrayDelegate {
 extension BrowserViewController: Themeable {
     func applyTheme() {
         guard self.isViewLoaded else { return }
-        let ui: [Themeable?] = [urlBar, toolbar, readerModeBar, topTabsViewController, firefoxHomeViewController, searchController, libraryViewController, libraryDrawerViewController]
+        let ui: [Themeable?] = [urlBar, toolbar, topTabsViewController, firefoxHomeViewController, searchController, libraryViewController, libraryDrawerViewController]
         ui.forEach { $0?.applyTheme() }
         statusBarOverlay.backgroundColor = shouldShowTopTabsForTraitCollection(traitCollection) ? UIColor.Photon.Grey80 : urlBar.backgroundColor
         setNeedsStatusBarAppearanceUpdate()
@@ -2060,9 +1974,6 @@ extension BrowserViewController: Themeable {
 
         let tabs = tabManager.tabs
         tabs.forEach { $0.applyTheme() }
-        
-        guard let contentScript = self.tabManager.selectedTab?.getContentScript(name: ReaderMode.name()) else { return }
-        appyThemeForPreferences(profile.prefs, contentScript: contentScript)
     }
 }
 

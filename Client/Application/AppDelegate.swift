@@ -114,13 +114,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
 
         setupRootViewController()
 
-        NotificationCenter.default.addObserver(forName: .FSReadingListAddReadingListItem, object: nil, queue: nil) { (notification) -> Void in
-            if let userInfo = notification.userInfo, let url = userInfo["URL"] as? URL {
-                let title = (userInfo["Title"] as? String) ?? ""
-                profile.readingList.createRecordWithURL(url.absoluteString, title: title, addedBy: UIDevice.current.name)
-            }
-        }
-
         SystemUtils.onFirstRun()
 
         log.info("startApplication end")
@@ -298,8 +291,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
     fileprivate func setUpWebServer(_ profile: Profile) {
         let server = WebServer.sharedInstance
         guard !server.server.isRunning else { return }
-
-        ReaderModeHandlers.register(server, profile: profile)
 
         let responders: [(String, InternalSchemeResponse)] =
             [ (AboutHomeHandler.path, AboutHomeHandler()),

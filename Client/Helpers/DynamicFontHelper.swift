@@ -163,26 +163,6 @@ class DynamicFontHelper: NSObject {
         return UIFont.boldSystemFont(ofSize: defaultStandardFontSize)
     }
 
-    /**
-     * Reader mode
-     */
-    var ReaderStandardFontSize: CGFloat {
-        return defaultStandardFontSize - 2
-    }
-    var ReaderBigFontSize: CGFloat {
-        return defaultStandardFontSize + 5
-    }
-
-    /**
-     * Intro mode
-     */
-    var IntroStandardFontSize: CGFloat {
-        return min(defaultStandardFontSize - 1, 16)
-    }
-    var IntroBigFontSize: CGFloat {
-        return min(defaultStandardFontSize + 1, 18)
-    }
-
     func refreshFonts() {
         defaultStandardFontSize = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .body).pointSize
         deviceFontSize = defaultStandardFontSize * (UIDevice.current.userInterfaceIdiom == .pad ? iPadFactor : iPhoneFactor)

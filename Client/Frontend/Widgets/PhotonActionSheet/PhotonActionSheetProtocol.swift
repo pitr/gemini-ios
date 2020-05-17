@@ -68,7 +68,7 @@ extension PhotonActionSheetProtocol {
     }
 
     func getRefreshLongPressMenu(for tab: Tab) -> [PhotonActionSheetItem] {
-        guard tab.webView?.url != nil && (tab.getContentScript(name: ReaderMode.name()) as? ReaderMode)?.state != .active else {
+        guard tab.webView?.url != nil else {
             return []
         }
 

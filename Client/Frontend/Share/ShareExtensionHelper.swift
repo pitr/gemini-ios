@@ -90,9 +90,8 @@ extension ShareExtensionHelper: UIActivityItemSource {
             return url
         }
 
-        // Return the URL for the selected tab. If we are in reader view then decode
-        // it so that we copy the original and not the internal localhost one.
-        return url.isReaderModeURL ? url.decodeReaderModeURL : url
+        // Return the URL for the selected tab.
+        return url
     }
 
     func activityViewController(_ activityViewController: UIActivityViewController, dataTypeIdentifierForActivityType activityType: UIActivity.ActivityType?) -> String {

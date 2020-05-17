@@ -103,8 +103,6 @@ class ShareViewController: UIViewController {
         case .rawText(let text):
             self.pageInfoRowTitleLabel?.text = text.quoted
         }
-
-        let profile = BrowserProfile(localName: "profile")
     }
 
     private func setupRows() {
