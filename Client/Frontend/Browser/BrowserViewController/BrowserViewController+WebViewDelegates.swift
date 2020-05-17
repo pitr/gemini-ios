@@ -155,10 +155,6 @@ extension BrowserViewController: WKUIDelegate {
                 })
             }
 
-            actions.append(UIAction(title: Strings.ContextMenuOpenInNewPrivateTab, image: UIImage.templateImageNamed("menu-NewPrivateTab"), identifier: UIAction.Identifier("linkContextMenu.openInNewPrivateTab")) { _ in
-                addTab(url, true)
-            })
-
             actions.append(UIAction(title: Strings.ContextMenuBookmarkLink, image: UIImage.templateImageNamed("menu-Bookmark"), identifier: UIAction.Identifier("linkContextMenu.bookmarkLink")) { _ in
                 self.addBookmark(url: url.absoluteString, title: elements.title)
                 SimpleToast().showAlertWithText(Strings.AppMenuAddBookmarkConfirmMessage, bottomContainer: self.webViewContainer)

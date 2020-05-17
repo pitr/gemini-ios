@@ -51,7 +51,6 @@ class TabTrayController: UIViewController {
     lazy var toolbar: TrayToolbar = {
         let toolbar = TrayToolbar()
         toolbar.addTabButton.addTarget(self, action: #selector(didTapToolbarAddTab), for: .touchUpInside)
-        toolbar.maskButton.addTarget(self, action: #selector(didTogglePrivateMode), for: .touchUpInside)
         toolbar.deleteButton.addTarget(self, action: #selector(didTapToolbarDelete), for: .touchUpInside)
         return toolbar
     }()
@@ -303,7 +302,6 @@ class TabTrayController: UIViewController {
         // we clear out all of the private tabs
         let exitingPrivateMode = !tabDisplayManager.isPrivate && tabManager.shouldClearPrivateTabs()
 
-        toolbar.maskButton.setSelected(tabDisplayManager.isPrivate, animated: true)
         collectionView.layoutSubviews()
 
         let toView: UIView
@@ -938,8 +936,7 @@ class TrayToolbar: UIView, Themeable, PrivateModeUI {
         return button
     }()
 
-    lazy var maskButton = PrivateModeButton()
-    fileprivate let sideOffset: CGFloat = 32
+    fileprivate let sideOffset: CGFloat = 64
 
     fileprivate override init(frame: CGRect) {
         super.init(frame: frame)
@@ -949,24 +946,15 @@ class TrayToolbar: UIView, Themeable, PrivateModeUI {
         addSubview(deleteButton)
         buttonToCenter = deleteButton
 
-        maskButton.accessibilityIdentifier = "TabTrayController.maskButton"
-
         buttonToCenter?.snp.makeConstraints { make in
-            make.centerX.equalTo(self)
             make.top.equalTo(self)
+            make.leading.equalTo(self).offset(sideOffset)
             make.size.equalTo(toolbarButtonSize)
         }
 
         addTabButton.snp.makeConstraints { make in
             make.top.equalTo(self)
             make.trailing.equalTo(self).offset(-sideOffset)
-            make.size.equalTo(toolbarButtonSize)
-        }
-
-        addSubview(maskButton)
-        maskButton.snp.makeConstraints { make in
-            make.top.equalTo(self)
-            make.leading.equalTo(self).offset(sideOffset)
             make.size.equalTo(toolbarButtonSize)
         }
 
@@ -979,7 +967,6 @@ class TrayToolbar: UIView, Themeable, PrivateModeUI {
     }
 
     func applyUIMode(isPrivate: Bool) {
-        maskButton.applyUIMode(isPrivate: isPrivate)
     }
 
     func applyTheme() {
@@ -987,8 +974,6 @@ class TrayToolbar: UIView, Themeable, PrivateModeUI {
             $0.tintColor = UIColor.theme.tabTray.toolbarButtonTint
         }
         backgroundColor = UIColor.theme.tabTray.toolbar
-        maskButton.offTint = UIColor.theme.tabTray.privateModeButtonOffTint
-        maskButton.onTint = UIColor.theme.tabTray.privateModeButtonOnTint
     }
 }
 

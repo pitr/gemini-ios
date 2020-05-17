@@ -41,10 +41,6 @@ extension BrowserViewController {
         openBlankNewTab(focusLocationField: true, isPrivate: isPrivate)
     }
 
-    @objc private func newPrivateTabKeyCommand() {
-        openBlankNewTab(focusLocationField: true, isPrivate: true)
-    }
-
     @objc private func closeTabKeyCommand() {
         guard let currentTab = tabManager.selectedTab else {
             return
@@ -109,7 +105,6 @@ extension BrowserViewController {
             UIKeyCommand(input: "f", modifierFlags: .command, action: #selector(findInPageKeyCommand), discoverabilityTitle: Strings.FindTitle),
             UIKeyCommand(input: "l", modifierFlags: .command, action: #selector(selectLocationBarKeyCommand), discoverabilityTitle: Strings.SelectLocationBarTitle),
             UIKeyCommand(input: "t", modifierFlags: .command, action: #selector(newTabKeyCommand), discoverabilityTitle: Strings.NewTabTitle),
-            UIKeyCommand(input: "p", modifierFlags: [.command, .shift], action: #selector(newPrivateTabKeyCommand), discoverabilityTitle: Strings.NewPrivateTabTitle),
             UIKeyCommand(input: "w", modifierFlags: .command, action: #selector(closeTabKeyCommand), discoverabilityTitle: Strings.CloseTabTitle),
             UIKeyCommand(input: "\t", modifierFlags: .control, action: #selector(nextTabKeyCommand), discoverabilityTitle: Strings.ShowNextTabTitle),
             UIKeyCommand(input: "\t", modifierFlags: [.control, .shift], action: #selector(previousTabKeyCommand), discoverabilityTitle: Strings.ShowPreviousTabTitle),

@@ -63,14 +63,6 @@ class TopTabsViewController: UIViewController {
         return newTab
     }()
 
-    lazy var privateModeButton: PrivateModeButton = {
-        let privateModeButton = PrivateModeButton()
-        privateModeButton.semanticContentAttribute = .forceLeftToRight
-        privateModeButton.accessibilityIdentifier = "TopTabsViewController.privateModeButton"
-        privateModeButton.addTarget(self, action: #selector(TopTabsViewController.togglePrivateModeTapped), for: .touchUpInside)
-        return privateModeButton
-    }()
-
     fileprivate lazy var tabLayoutDelegate: TopTabsLayoutDelegate = {
         let delegate = TopTabsLayoutDelegate()
         delegate.tabSelectionDelegate = tabDisplayManager
@@ -117,7 +109,6 @@ class TopTabsViewController: UIViewController {
         topTabFader.addSubview(collectionView)
         view.addSubview(tabsButton)
         view.addSubview(newTab)
-        view.addSubview(privateModeButton)
 
         // Setup UIDropInteraction to handle dragging and dropping
         // links onto the "New Tab" button.
@@ -134,14 +125,9 @@ class TopTabsViewController: UIViewController {
             make.trailing.equalTo(view).offset(-10)
             make.size.equalTo(view.snp.height)
         }
-        privateModeButton.snp.makeConstraints { make in
-            make.centerY.equalTo(view)
-            make.leading.equalTo(view).offset(10)
-            make.size.equalTo(view.snp.height)
-        }
         topTabFader.snp.makeConstraints { make in
             make.top.bottom.equalTo(view)
-            make.leading.equalTo(privateModeButton.snp.trailing)
+            make.leading.equalTo(view.snp.trailing)
             make.trailing.equalTo(newTab.snp.leading)
         }
         collectionView.snp.makeConstraints { make in
@@ -180,7 +166,6 @@ class TopTabsViewController: UIViewController {
     @objc func togglePrivateModeTapped() {
         tabDisplayManager.togglePrivateMode(isOn: !tabDisplayManager.isPrivate, createTabOnEmptyPrivateMode: true)
         delegate?.topTabsDidTogglePrivateMode()
-        self.privateModeButton.setSelected(tabDisplayManager.isPrivate, animated: true)
     }
 
     func scrollToCurrentTab(_ animated: Bool = true, centerCell: Bool = false) {
@@ -232,10 +217,6 @@ extension TopTabsViewController: TopTabCellDelegate {
 extension TopTabsViewController: Themeable, PrivateModeUI {
     func applyUIMode(isPrivate: Bool) {
         tabDisplayManager.togglePrivateMode(isOn: isPrivate, createTabOnEmptyPrivateMode: true)
-
-        privateModeButton.onTint = UIColor.theme.topTabs.privateModeButtonOnTint
-        privateModeButton.offTint = UIColor.theme.topTabs.privateModeButtonOffTint
-        privateModeButton.applyUIMode(isPrivate: tabDisplayManager.isPrivate)
     }
 
     func applyTheme() {

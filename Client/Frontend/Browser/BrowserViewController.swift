@@ -1720,11 +1720,6 @@ extension BrowserViewController: ContextMenuHelperDelegate {
                 actionSheetController.addAction(openNewTabAction, accessibilityIdentifier: "linkContextMenu.openInNewTab")
             }
 
-            let openNewPrivateTabAction =  UIAlertAction(title: Strings.ContextMenuOpenInNewPrivateTab, style: .default) { _ in
-                addTab(url, true)
-            }
-            actionSheetController.addAction(openNewPrivateTabAction, accessibilityIdentifier: "linkContextMenu.openInNewPrivateTab")
-
             let bookmarkAction = UIAlertAction(title: Strings.ContextMenuBookmarkLink, style: .default) { _ in
                 self.addBookmark(url: url.absoluteString, title: elements.title)
                 SimpleToast().showAlertWithText(Strings.AppMenuAddBookmarkConfirmMessage, bottomContainer: self.webViewContainer)

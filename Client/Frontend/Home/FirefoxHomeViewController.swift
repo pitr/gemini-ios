@@ -112,11 +112,7 @@ extension HomePanelContextMenu {
             homePanelDelegate?.homePanelDidRequestToOpenInNewTab(siteURL, isPrivate: false)
         }
 
-        let openInNewPrivateTabAction = PhotonActionSheetItem(title: Strings.OpenInNewPrivateTabContextMenuTitle, iconString: "quick_action_new_private_tab") { _, _ in
-            homePanelDelegate?.homePanelDidRequestToOpenInNewTab(siteURL, isPrivate: true)
-        }
-
-        return [openInNewTabAction, openInNewPrivateTabAction]
+        return [openInNewTabAction]
     }
 }
 
@@ -780,10 +776,6 @@ extension FirefoxHomeViewController: HomePanelContextMenu {
             self.homePanelDelegate?.homePanelDidRequestToOpenInNewTab(siteURL, isPrivate: false)
         }
 
-        let openInNewPrivateTabAction = PhotonActionSheetItem(title: Strings.OpenInNewPrivateTabContextMenuTitle, iconString: "quick_action_new_private_tab") { _, _ in
-            self.homePanelDelegate?.homePanelDidRequestToOpenInNewTab(siteURL, isPrivate: true)
-        }
-
         let bookmarkAction: PhotonActionSheetItem
         if site.bookmarked ?? false {
             bookmarkAction = PhotonActionSheetItem(title: Strings.RemoveBookmarkContextMenuTitle, iconString: "action_bookmark_remove", handler: { _, _ in
@@ -843,7 +835,7 @@ extension FirefoxHomeViewController: HomePanelContextMenu {
             topSiteActions = [pinTopSite, removeTopSiteAction]
         }
 
-        var actions = [openInNewTabAction, openInNewPrivateTabAction, bookmarkAction, shareAction]
+        var actions = [openInNewTabAction, bookmarkAction, shareAction]
 
         switch Section(indexPath.section) {
             case .pocket: break
