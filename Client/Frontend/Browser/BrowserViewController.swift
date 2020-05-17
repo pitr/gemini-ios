@@ -203,13 +203,10 @@ class BrowserViewController: UIViewController {
     }
 
     @objc fileprivate func appMenuBadgeUpdate() {
-        let hideImagesOn = NoImageModeHelper.isActivated(profile.prefs)
-        let showMenuBadge = hideImagesOn
-
         urlBar.warningMenuBadge(setVisible: false)
-        urlBar.appMenuBadge(setVisible: showMenuBadge)
+        urlBar.appMenuBadge(setVisible: false)
         toolbar?.warningMenuBadge(setVisible: false)
-        toolbar?.appMenuBadge(setVisible: showMenuBadge)
+        toolbar?.appMenuBadge(setVisible: false)
     }
 
     func updateToolbarStateForTraitCollection(_ newCollection: UITraitCollection, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator? = nil) {

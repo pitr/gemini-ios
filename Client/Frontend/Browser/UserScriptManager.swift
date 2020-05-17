@@ -14,7 +14,6 @@ class UserScriptManager {
 
     private let compiledUserScripts: [String : WKUserScript]
 
-    private let noImageModeUserScript = WKUserScript(source: "window.__firefox__.NoImageMode.setEnabled(true)", injectionTime: .atDocumentStart, forMainFrameOnly: true)
     private let nightModeUserScript = WKUserScript(source: "window.__firefox__.NightMode.setEnabled(true)", injectionTime: .atDocumentStart, forMainFrameOnly: true)
 
     private init() {
@@ -39,7 +38,7 @@ class UserScriptManager {
         self.compiledUserScripts = compiledUserScripts
     }
 
-    public func injectUserScriptsIntoTab(_ tab: Tab, nightMode: Bool, noImageMode: Bool) {
+    public func injectUserScriptsIntoTab(_ tab: Tab, nightMode: Bool) {
         // Start off by ensuring that any previously-added user scripts are
         // removed to prevent the same script from being injected twice.
         tab.webView?.configuration.userContentController.removeAllUserScripts()
@@ -59,11 +58,6 @@ class UserScriptManager {
         // that it gets enabled immediately when the DOM loads.
         if nightMode {
             tab.webView?.configuration.userContentController.addUserScript(nightModeUserScript)
-        }
-        // If No Image Mode is enabled, inject a small user script to ensure
-        // that it gets enabled immediately when the DOM loads.
-        if noImageMode {
-            tab.webView?.configuration.userContentController.addUserScript(noImageModeUserScript)
         }
     }
 }

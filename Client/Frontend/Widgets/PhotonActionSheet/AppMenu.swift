@@ -31,13 +31,6 @@ extension PhotonActionSheetProtocol {
     func getOtherPanelActions(vcDelegate: PageOptionsVC) -> [PhotonActionSheetItem] {
         var items: [PhotonActionSheetItem] = []
 
-        let noImageEnabled = NoImageModeHelper.isActivated(profile.prefs)
-        let noImageMode = PhotonActionSheetItem(title: Strings.AppMenuNoImageMode, iconString: "menu-NoImageMode", isEnabled: noImageEnabled, accessory: .Switch, badgeIconNamed: "menuBadge") { action,_ in
-            NoImageModeHelper.toggle(isEnabled: action.isEnabled, profile: self.profile, tabManager: self.tabManager)
-        }
-
-        items.append(noImageMode)
-
         let nightModeEnabled = NightModeHelper.isActivated(profile.prefs)
         let nightMode = PhotonActionSheetItem(title: Strings.AppMenuNightMode, iconString: "menu-NightMode", isEnabled: nightModeEnabled, accessory: .Switch) { _, _ in
             NightModeHelper.toggle(self.profile.prefs, tabManager: self.tabManager)

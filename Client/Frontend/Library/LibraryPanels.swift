@@ -94,14 +94,5 @@ class LibraryPanels {
             imageName: "Downloads",
             accessibilityLabel: NSLocalizedString("Downloads", comment: "Panel accessibility label"),
             accessibilityIdentifier: "LibraryPanels.Downloads"),
-
-        LibraryPanelDescriptor(
-            makeViewController: { profile in
-                return RemoteTabsPanel(profile: profile)
-            },
-            profile: profile,
-            imageName: "SyncedTabs",
-            accessibilityLabel: NSLocalizedString("Synced Tabs", comment: "Panel accessibility label"),
-            accessibilityIdentifier: "LibraryPanels.SyncedTabs"),
     ]
 }

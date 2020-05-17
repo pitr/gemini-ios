@@ -66,28 +66,4 @@ extension PhotonActionSheetProtocol {
             return [copyAddressAction]
         }
     }
-
-    func getRefreshLongPressMenu(for tab: Tab) -> [PhotonActionSheetItem] {
-        guard tab.webView?.url != nil else {
-            return []
-        }
-
-        let defaultUAisDesktop = UserAgent.isDesktop(ua: UserAgent.getUserAgent())
-        let toggleActionTitle: String
-        if defaultUAisDesktop {
-            toggleActionTitle = tab.changedUserAgent ? Strings.AppMenuViewDesktopSiteTitleString : Strings.AppMenuViewMobileSiteTitleString
-        } else {
-            toggleActionTitle = tab.changedUserAgent ? Strings.AppMenuViewMobileSiteTitleString : Strings.AppMenuViewDesktopSiteTitleString
-        }
-        let toggleDesktopSite = PhotonActionSheetItem(title: toggleActionTitle, iconString: "menu-RequestDesktopSite") { _, _ in
-
-            if let url = tab.url {
-                tab.toggleChangeUserAgent()
-                Tab.ChangeUserAgent.updateDomainList(forUrl: url, isChangedUA: tab.changedUserAgent, isPrivate: tab.isPrivate)
-            }
-        }
-
-        return [toggleDesktopSite]
-    }
-
 }

@@ -46,20 +46,6 @@ extension PhotonActionSheetProtocol {
             return [[shareFile]]
         }
 
-        let defaultUAisDesktop = UserAgent.isDesktop(ua: UserAgent.getUserAgent())
-        let toggleActionTitle: String
-        if defaultUAisDesktop {
-            toggleActionTitle = tab.changedUserAgent ? Strings.AppMenuViewDesktopSiteTitleString : Strings.AppMenuViewMobileSiteTitleString
-        } else {
-            toggleActionTitle = tab.changedUserAgent ? Strings.AppMenuViewMobileSiteTitleString : Strings.AppMenuViewDesktopSiteTitleString
-        }
-        let toggleDesktopSite = PhotonActionSheetItem(title: toggleActionTitle, iconString: "menu-RequestDesktopSite", isEnabled: tab.changedUserAgent, badgeIconNamed: "menuBadge") { _, _ in
-            if let url = tab.url {
-                tab.toggleChangeUserAgent()
-                Tab.ChangeUserAgent.updateDomainList(forUrl: url, isChangedUA: tab.changedUserAgent, isPrivate: tab.isPrivate)
-            }
-        }
-
         let bookmarkPage = PhotonActionSheetItem(title: Strings.AppMenuAddBookmarkTitleString, iconString: "menu-Bookmark") { _, _ in
             guard let url = tab.canonicalURL?.displayURL,
                 let bvc = presentableVC as? BrowserViewController else {
@@ -138,7 +124,7 @@ extension PhotonActionSheetProtocol {
         mainActions.append(contentsOf: [copyURL])
 
         let pinAction = (isPinned ? removeTopSitesPin : pinToTopSites)
-        var commonActions = [toggleDesktopSite, pinAction]
+        var commonActions = [pinAction]
 
         // Disable find in page if document is pdf.
         if tab.mimeType != MIMEType.PDF {
