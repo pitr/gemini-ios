@@ -35,16 +35,14 @@ class AppSettingsTableViewController: SettingsTableViewController {
             HomeSetting(settings: self),
             OpenWithSetting(settings: self),
             ThemeSetting(settings: self),
-            BoolSetting(prefs: prefs, prefKey: "blockPopups", defaultValue: true,
-                        titleText: NSLocalizedString("Block Pop-up Windows", comment: "Block pop-up windows setting")),
            ]
 
         if #available(iOS 12.0, *) {
-            generalSettings.insert(SiriPageSetting(settings: self), at: 5)
+            generalSettings.insert(SiriPageSetting(settings: self), at: 4)
         }
 
         if AppConstants.MOZ_DOCUMENT_SERVICES {
-            generalSettings.insert(TranslationSetting(settings: self), at: 6)
+            generalSettings.insert(TranslationSetting(settings: self), at: 5)
         }
 
         // There is nothing to show in the Customize section if we don't include the compact tab layout
@@ -77,18 +75,7 @@ class AppSettingsTableViewController: SettingsTableViewController {
                 statusText: NSLocalizedString("When Leaving Private Browsing", tableName: "PrivateBrowsing", comment: "Will be displayed in Settings under 'Close Private Tabs'"))
         ]
 
-        settings += [
-            SettingSection(title: NSAttributedString(string: privacyTitle), children: privacySettings),
-            SettingSection(title: NSAttributedString(string: NSLocalizedString("Support", comment: "Support section title")), children: [
-                OpenSupportPageSetting(delegate: settingsDelegate),
-            ]),
-            SettingSection(title: NSAttributedString(string: NSLocalizedString("About", comment: "About settings section title")), children: [
-                VersionSetting(settings: self),
-                ExportBrowserDataSetting(settings: self),
-                ExportLogDataSetting(settings: self),
-                DeleteExportedDataSetting(settings: self),
-                SlowTheDatabase(settings: self)
-            ])]
+        settings += [SettingSection(title: NSAttributedString(string: privacyTitle), children: privacySettings)]
 
         return settings
     }

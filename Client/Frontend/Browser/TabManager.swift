@@ -63,10 +63,9 @@ class TabManager: NSObject {
 
     fileprivate let navDelegate: TabManagerNavDelegate
 
-    public static func makeWebViewConfig(isPrivate: Bool, blockPopups: Bool) -> WKWebViewConfiguration {
+    public static func makeWebViewConfig(isPrivate: Bool) -> WKWebViewConfiguration {
         let configuration = WKWebViewConfiguration()
         configuration.processPool = WKProcessPool()
-        configuration.preferences.javaScriptCanOpenWindowsAutomatically = !blockPopups
         // We do this to go against the configuration of the <meta name="viewport">
         // tag to behave the same way as Safari :-(
         configuration.ignoresViewportScaleLimits = true
@@ -79,14 +78,12 @@ class TabManager: NSObject {
 
     // A WKWebViewConfiguration used for normal tabs
     lazy fileprivate var configuration: WKWebViewConfiguration = {
-        let blockPopups = profile.prefs.boolForKey("blockPopups") ?? true
-        return TabManager.makeWebViewConfig(isPrivate: false, blockPopups: blockPopups)
+        return TabManager.makeWebViewConfig(isPrivate: false)
     }()
 
     // A WKWebViewConfiguration used for private mode tabs
     lazy fileprivate var privateConfiguration: WKWebViewConfiguration = {
-        let blockPopups = profile.prefs.boolForKey("blockPopups") ?? true
-        return TabManager.makeWebViewConfig(isPrivate: true, blockPopups: blockPopups)
+        return TabManager.makeWebViewConfig(isPrivate: true)
     }()
 
     var selectedIndex: Int { return _selectedIndex }
@@ -115,8 +112,6 @@ class TabManager: NSObject {
         super.init()
 
         addNavigationDelegate(self)
-
-        NotificationCenter.default.addObserver(self, selector: #selector(prefsDidChange), name: UserDefaults.didChangeNotification, object: nil)
     }
 
     func addNavigationDelegate(_ delegate: WKNavigationDelegate) {
@@ -542,19 +537,6 @@ class TabManager: NSObject {
     func getTabForURL(_ url: URL) -> Tab? {
         assert(Thread.isMainThread)
         return tabs.filter({ $0.webView?.url == url }).first
-    }
-
-    @objc func prefsDidChange() {
-        DispatchQueue.main.async {
-            let allowPopups = !(self.profile.prefs.boolForKey("blockPopups") ?? true)
-            // Each tab may have its own configuration, so we should tell each of them in turn.
-            for tab in self.tabs {
-                tab.webView?.configuration.preferences.javaScriptCanOpenWindowsAutomatically = allowPopups
-            }
-            // The default tab configurations also need to change.
-            self.configuration.preferences.javaScriptCanOpenWindowsAutomatically = allowPopups
-            self.privateConfiguration.preferences.javaScriptCanOpenWindowsAutomatically = allowPopups
-        }
     }
 
     func resetProcessPool() {

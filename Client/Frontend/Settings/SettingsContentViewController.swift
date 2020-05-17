@@ -107,7 +107,7 @@ class SettingsContentViewController: UIViewController, WKNavigationDelegate {
     }
 
     func makeWebView() -> WKWebView {
-        let config = TabManager.makeWebViewConfig(isPrivate: true, blockPopups: true)
+        let config = TabManager.makeWebViewConfig(isPrivate: true)
         let webView = WKWebView(
             frame: CGRect(width: 1, height: 1),
             configuration: config
