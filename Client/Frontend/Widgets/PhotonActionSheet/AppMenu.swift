@@ -31,22 +31,6 @@ extension PhotonActionSheetProtocol {
     func getOtherPanelActions(vcDelegate: PageOptionsVC) -> [PhotonActionSheetItem] {
         var items: [PhotonActionSheetItem] = []
 
-        let nightModeEnabled = NightModeHelper.isActivated(profile.prefs)
-        let nightMode = PhotonActionSheetItem(title: Strings.AppMenuNightMode, iconString: "menu-NightMode", isEnabled: nightModeEnabled, accessory: .Switch) { _, _ in
-            NightModeHelper.toggle(self.profile.prefs, tabManager: self.tabManager)
-            // If we've enabled night mode and the theme is normal, enable dark theme
-            if NightModeHelper.isActivated(self.profile.prefs), ThemeManager.instance.currentName == .normal {
-                ThemeManager.instance.current = DarkTheme()
-                NightModeHelper.setEnabledDarkTheme(self.profile.prefs, darkTheme: true)
-            }
-            // If we've disabled night mode and dark theme was activated by it then disable dark theme
-            if !NightModeHelper.isActivated(self.profile.prefs), NightModeHelper.hasEnabledDarkTheme(self.profile.prefs), ThemeManager.instance.currentName == .dark {
-                ThemeManager.instance.current = NormalTheme()
-                NightModeHelper.setEnabledDarkTheme(self.profile.prefs, darkTheme: false)
-            }
-        }
-        items.append(nightMode)
-
         let openSettings = PhotonActionSheetItem(title: Strings.AppMenuSettingsTitleString, iconString: "menu-Settings") { _, _ in
             let settingsTableViewController = AppSettingsTableViewController()
             settingsTableViewController.profile = self.profile

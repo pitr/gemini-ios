@@ -8,4 +8,3 @@ NSPhotoLibraryAddUsageDescription = "This lets you save photos.";
 NSCameraUsageDescription = "This lets you take and upload photos.";
 NSMicrophoneUsageDescription = "This lets you take and upload videos.";
 ShortcutItemTitleNewTab = "New Tab";
-ShortcutItemTitleQRCode = "Scan QR Code";

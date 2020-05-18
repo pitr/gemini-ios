@@ -129,14 +129,6 @@
 			<key>UIApplicationShortcutItemType</key>
 			<string>$(PRODUCT_BUNDLE_IDENTIFIER).NewTab</string>
 		</dict>
-		<dict>
-			<key>UIApplicationShortcutItemIconFile</key>
-			<string>menu-ScanQRCode</string>
-			<key>UIApplicationShortcutItemTitle</key>
-			<string>ShortcutItemTitleQRCode</string>
-			<key>UIApplicationShortcutItemType</key>
-			<string>$(PRODUCT_BUNDLE_IDENTIFIER).QRCode</string>
-		</dict>
 	</array>
 	<key>UIFileSharingEnabled</key>
 	<true/>

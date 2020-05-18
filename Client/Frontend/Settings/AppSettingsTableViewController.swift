@@ -27,8 +27,6 @@ class AppSettingsTableViewController: SettingsTableViewController {
     override func generateSettings() -> [SettingSection] {
         var settings = [SettingSection]()
 
-        let privacyTitle = NSLocalizedString("Privacy", comment: "Privacy section title")
-
         let prefs = profile.prefs
         var generalSettings: [Setting] = [
             NewTabPageSetting(settings: self),
@@ -58,24 +56,7 @@ class AppSettingsTableViewController: SettingsTableViewController {
                         statusText: Strings.SettingsShowLinkPreviewsStatus)
         ]
 
-        let accountSectionTitle = NSAttributedString(string: Strings.FxAFirefoxAccount)
-
-        settings += [
-            SettingSection(title: accountSectionTitle, footerTitle: nil, children: [])]
-
         settings += [ SettingSection(title: NSAttributedString(string: Strings.SettingsGeneralSectionTitle), children: generalSettings)]
-
-        var privacySettings = [Setting]()
-
-        privacySettings += [
-            BoolSetting(prefs: prefs,
-                prefKey: "settings.closePrivateTabs",
-                defaultValue: false,
-                titleText: NSLocalizedString("Close Private Tabs", tableName: "PrivateBrowsing", comment: "Setting for closing private tabs"),
-                statusText: NSLocalizedString("When Leaving Private Browsing", tableName: "PrivateBrowsing", comment: "Will be displayed in Settings under 'Close Private Tabs'"))
-        ]
-
-        settings += [SettingSection(title: NSAttributedString(string: privacyTitle), children: privacySettings)]
 
         return settings
     }
