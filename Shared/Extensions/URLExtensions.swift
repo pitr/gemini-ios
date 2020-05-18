@@ -268,7 +268,7 @@ extension URL {
     }
 
     public func isWebPage(includeDataURIs: Bool = true) -> Bool {
-        let schemes = includeDataURIs ? ["http", "https", "data"] : ["http", "https"]
+        let schemes = includeDataURIs ? ["http", "https", "gemini", "data"] : ["http", "https", "gemini"]
         return scheme.map { schemes.contains($0) } ?? false
     }
 

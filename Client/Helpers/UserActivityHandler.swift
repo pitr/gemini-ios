@@ -32,7 +32,9 @@ class UserActivityHandler {
         tab.userActivity?.invalidate()
 
         let userActivity = NSUserActivity(activityType: browsingActivityType)
-        userActivity.webpageURL = url
+        if url.scheme != "gemini" {
+            userActivity.webpageURL = url
+        }
         userActivity.becomeCurrent()
 
         tab.userActivity = userActivity
