@@ -35,11 +35,12 @@
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>org.mozilla.Client</string>
+			<string>com.pitr.Gemini</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>firefox</string>
 				<string>$(MOZ_INTERNAL_URL_SCHEME)</string>
+				<string>gemini</string>
 			</array>
 		</dict>
 	</array>

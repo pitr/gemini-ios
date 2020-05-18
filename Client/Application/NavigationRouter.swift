@@ -79,7 +79,9 @@ enum NavigationPath {
             return nil
         }
 
-        if urlString.starts(with: "\(scheme)://deep-link"), let deepURL = components.valueForQuery("url"), let link = DeepLink(urlString: deepURL.lowercased()) {
+        if urlString.starts(with: "gemini://") {
+            self = .url(webURL: url, isPrivate: false)
+        } else if urlString.starts(with: "\(scheme)://deep-link"), let deepURL = components.valueForQuery("url"), let link = DeepLink(urlString: deepURL.lowercased()) {
             self = .deepLink(link)
         } else if urlString.starts(with: "\(scheme)://open-url") {
             let url = components.valueForQuery("url")?.asURL
