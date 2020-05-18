@@ -73,6 +73,7 @@ class TabManager: NSObject {
             configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
         }
         configuration.setURLSchemeHandler(InternalSchemeHandler(), forURLScheme: InternalURL.scheme)
+        configuration.setURLSchemeHandler(GeminiSchemeHandler(), forURLScheme: GeminiSchemeHandler.scheme)
         return configuration
     }
 
