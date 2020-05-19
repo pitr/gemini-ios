@@ -227,6 +227,10 @@
 		7BF5A1EE1B429B3100EA9DD8 /* SyncCommandsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF5A1ED1B429B3100EA9DD8 /* SyncCommandsTests.swift */; };
 		802AEAA024715B0B00567181 /* GeminiClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802AEA9F24715B0B00567181 /* GeminiClient.swift */; };
 		802AEAA22471C4CC00567181 /* GeminiSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802AEAA12471C4CC00567181 /* GeminiSchemeHandler.swift */; };
+		80AD817724744E1600FAF049 /* AllFramesAtDocumentEnd.js in Resources */ = {isa = PBXBuildFile; fileRef = D0FCF8031FE4772C004A7995 /* AllFramesAtDocumentEnd.js */; };
+		80AD817824744E1600FAF049 /* AllFramesAtDocumentStart.js in Resources */ = {isa = PBXBuildFile; fileRef = D03F8F22200EAC1E003C2224 /* AllFramesAtDocumentStart.js */; };
+		80AD817924744E1600FAF049 /* MainFrameAtDocumentEnd.js in Resources */ = {isa = PBXBuildFile; fileRef = D0FCF8041FE4772D004A7995 /* MainFrameAtDocumentEnd.js */; };
+		80AD817A24744E1600FAF049 /* MainFrameAtDocumentStart.js in Resources */ = {isa = PBXBuildFile; fileRef = D0FCF8051FE4772D004A7995 /* MainFrameAtDocumentStart.js */; };
 		884CA7492344A301002E4711 /* TextContentDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884CA7482344A301002E4711 /* TextContentDetector.swift */; };
 		8DCD3BCD1ED5B7FA00446D38 /* FxADeepLinkingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DCD3BCC1ED5B7FA00446D38 /* FxADeepLinkingTests.swift */; };
 		A83E5AB71C1D993D0026D912 /* UIPasteboardExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83E5AB61C1D993D0026D912 /* UIPasteboardExtensions.swift */; };
@@ -2894,6 +2898,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				80AD817724744E1600FAF049 /* AllFramesAtDocumentEnd.js in Resources */,
+				80AD817824744E1600FAF049 /* AllFramesAtDocumentStart.js in Resources */,
+				80AD817924744E1600FAF049 /* MainFrameAtDocumentEnd.js in Resources */,
+				80AD817A24744E1600FAF049 /* MainFrameAtDocumentStart.js in Resources */,
 				D38A1EE01CB458EC0080C842 /* CertError.html in Resources */,
 				0BA1E0301B051A07007675AF /* NetError.css in Resources */,
 				3BC659491E5BA4AE006D560F /* TopSites in Resources */,
