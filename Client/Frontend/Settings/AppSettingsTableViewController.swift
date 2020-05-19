@@ -32,7 +32,6 @@ class AppSettingsTableViewController: SettingsTableViewController {
             NewTabPageSetting(settings: self),
             HomeSetting(settings: self),
             OpenWithSetting(settings: self),
-            ThemeSetting(settings: self),
            ]
 
         if #available(iOS 12.0, *) {
