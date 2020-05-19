@@ -113,8 +113,6 @@ class TabTrayColor {
     var toolbarButtonTint: UIColor { return defaultTextAndTint }
     var privateModeLearnMore: UIColor { return UIColor.Photon.Purple60 }
     var privateModePurple: UIColor { return UIColor.Photon.Purple60 }
-    var privateModeButtonOffTint: UIColor { return toolbarButtonTint }
-    var privateModeButtonOnTint: UIColor { return UIColor.Photon.Grey10 }
     var cellCloseButton: UIColor { return UIColor.Photon.Grey50 }
     var cellTitleBackground: UIColor { return UIColor.clear }
     var faviconTint: UIColor { return UIColor.Photon.White100 }
@@ -131,8 +129,6 @@ class TopTabsColor {
         return !isPrivate ? UIColor.Photon.Blue40 : UIColor.Photon.Purple60
     }
     var buttonTint: UIColor { return UIColor.Photon.Grey40 }
-    var privateModeButtonOffTint: UIColor { return buttonTint }
-    var privateModeButtonOnTint: UIColor { return UIColor.Photon.Grey10 }
     var closeButtonSelectedTab: UIColor { return tabBackgroundUnselected }
     var closeButtonUnselectedTab: UIColor { return tabBackgroundSelected }
     var separator: UIColor { return UIColor.Photon.Grey70 }

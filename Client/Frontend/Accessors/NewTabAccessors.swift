@@ -73,16 +73,5 @@ enum NewTabPage: String {
         return homePanel.internalUrl as URL
     }
 
-    static func fromAboutHomeURL(url: URL) -> NewTabPage? {
-        guard let internalUrl = InternalURL(url), internalUrl.isAboutHomeURL else { return nil}
-        guard let panelNumber = url.fragment?.split(separator: "=").last else { return nil }
-        switch panelNumber {
-        case "0":
-            return NewTabPage.topSites
-        default:
-            return nil
-        }
-    }
-
     static let allValues = [blankPage, topSites, homePage]
 }

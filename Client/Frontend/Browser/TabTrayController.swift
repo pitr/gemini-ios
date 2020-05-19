@@ -23,18 +23,9 @@ struct TabTrayControllerUX {
     static let MenuFixedWidth: CGFloat = 320
 }
 
-struct PrivateModeStrings {
-    static let toggleAccessibilityLabel = NSLocalizedString("Private Mode", tableName: "PrivateBrowsing", comment: "Accessibility label for toggling on/off private mode")
-    static let toggleAccessibilityHint = NSLocalizedString("Turns private mode on or off", tableName: "PrivateBrowsing", comment: "Accessiblity hint for toggling on/off private mode")
-    static let toggleAccessibilityValueOn = NSLocalizedString("On", tableName: "PrivateBrowsing", comment: "Toggled ON accessibility value")
-    static let toggleAccessibilityValueOff = NSLocalizedString("Off", tableName: "PrivateBrowsing", comment: "Toggled OFF accessibility value")
-}
-
 protocol TabTrayDelegate: AnyObject {
     func tabTrayDidDismiss(_ tabTray: TabTrayController)
-    func tabTrayDidAddTab(_ tabTray: TabTrayController, tab: Tab)
     func tabTrayDidAddBookmark(_ tab: Tab)
-    func tabTrayDidAddToReadingList(_ tab: Tab) -> ReadingListItem?
     func tabTrayRequestsPresentationOf(_ viewController: UIViewController)
 }
 
@@ -542,7 +533,7 @@ extension TabTrayController: TabSelectionDelegate {
 }
 
 extension TabTrayController: PresentingModalViewControllerDelegate {
-    func dismissPresentedModalViewController(_ modalViewController: UIViewController, animated: Bool) {
+    func dismissPresentedModalViewController(animated: Bool) {
         dismiss(animated: animated, completion: { self.collectionView.reloadData() })
     }
 }
@@ -607,10 +598,6 @@ extension TabTrayController: TabPeekDelegate {
 
     func tabPeekDidAddBookmark(_ tab: Tab) {
         delegate?.tabTrayDidAddBookmark(tab)
-    }
-
-    func tabPeekDidAddToReadingList(_ tab: Tab) -> ReadingListItem? {
-        return delegate?.tabTrayDidAddToReadingList(tab)
     }
 
     func tabPeekDidCloseTab(_ tab: Tab) {

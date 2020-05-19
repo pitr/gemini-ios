@@ -28,37 +28,5 @@ extension Tab {
             guard let baseDomain = url.baseDomain else { return false }
             return privateModeHostList.contains(baseDomain) || baseDomainList.contains(baseDomain)
         }
-
-        static func updateDomainList(forUrl url: URL, isChangedUA: Bool, isPrivate: Bool) {
-            guard let baseDomain = url.baseDomain, !baseDomain.isEmpty else { return }
-
-            if isPrivate {
-                if isChangedUA {
-                    ChangeUserAgent.privateModeHostList.insert(baseDomain)
-                    return
-                } else {
-                    ChangeUserAgent.privateModeHostList.remove(baseDomain)
-                    // Continue to next section and try remove it from `hostList` also.
-                }
-            }
-
-            if isChangedUA, !baseDomainList.contains(baseDomain) {
-                baseDomainList.insert(baseDomain)
-            } else if !isChangedUA, baseDomainList.contains(baseDomain) {
-                baseDomainList.remove(baseDomain)
-            } else {
-                // Don't save to disk, return early
-                return
-            }
-
-            // At this point, saving to disk takes place.
-            do {
-                let data = try NSKeyedArchiver.archivedData(withRootObject: baseDomainList, requiringSecureCoding: false)
-                try data.write(to: ChangeUserAgent.file)
-            } catch {
-                print("Couldn't write file: \(error)")
-            }
-        }
-
     }
 }

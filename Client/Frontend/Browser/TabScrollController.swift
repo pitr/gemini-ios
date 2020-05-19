@@ -73,7 +73,6 @@ class TabScrollingController: NSObject {
         return header?.frame.height ?? 0
     }
     fileprivate var bottomScrollHeight: CGFloat { return footer?.frame.height ?? 0 }
-    fileprivate var snackBarsFrame: CGRect { return snackBars?.frame ?? .zero }
 
     fileprivate var lastContentOffset: CGFloat = 0
     fileprivate var scrollDirection: ScrollDirection = .down

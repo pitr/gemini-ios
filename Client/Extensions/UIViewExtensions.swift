@@ -53,42 +53,4 @@ extension UIView {
         let data = NSKeyedArchiver.archivedData(withRootObject: self)
         return NSKeyedUnarchiver.unarchiveObject(with: data) as! UIView
     }
-
-    /**
-     * rounds the requested corners of a view with the provided radius
-     */
-    func addRoundedCorners(_ cornersToRound: UIRectCorner, cornerRadius: CGSize, color: UIColor) {
-        let rect = bounds
-        let maskPath = UIBezierPath(roundedRect: rect, byRoundingCorners: cornersToRound, cornerRadii: cornerRadius)
-
-        // Create the shape layer and set its path
-        let maskLayer = CAShapeLayer()
-        maskLayer.frame = rect
-        maskLayer.path = maskPath.cgPath
-
-        let roundedLayer = CALayer()
-        roundedLayer.backgroundColor = color.cgColor
-        roundedLayer.frame = rect
-        roundedLayer.mask = maskLayer
-
-        layer.insertSublayer(roundedLayer, at: 0)
-        backgroundColor = UIColor.clear
-    }
-
-    /**
-     This allows us to find the view in a current view hierarchy that is currently the first responder
-     */
-    static func findSubViewWithFirstResponder(_ view: UIView) -> UIView? {
-        let subviews = view.subviews
-        if subviews.count == 0 {
-            return nil
-        }
-        for subview: UIView in subviews {
-            if subview.isFirstResponder {
-                return subview
-            }
-            return findSubViewWithFirstResponder(subview)
-        }
-        return nil
-    }
 }

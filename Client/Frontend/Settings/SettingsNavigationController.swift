@@ -9,7 +9,7 @@ class ThemedNavigationController: UINavigationController {
 
     @objc func done() {
         if let delegate = presentingModalViewControllerDelegate {
-            delegate.dismissPresentedModalViewController(self, animated: true)
+            delegate.dismissPresentedModalViewController(animated: true)
         } else {
             self.dismiss(animated: true, completion: nil)
         }
@@ -40,7 +40,7 @@ extension ThemedNavigationController: Themeable {
 }
 
 protocol PresentingModalViewControllerDelegate: AnyObject {
-    func dismissPresentedModalViewController(_ modalViewController: UIViewController, animated: Bool)
+    func dismissPresentedModalViewController(animated: Bool)
 }
 
 class ModalSettingsNavigationController: UINavigationController {

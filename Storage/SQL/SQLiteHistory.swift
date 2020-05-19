@@ -93,10 +93,12 @@ fileprivate func escapeFTSSearchString(_ search: String) -> String {
             let titlePrefix = "title: \"^"
             let httpPrefix = "url: \"^http://"
             let httpsPrefix = "url: \"^https://"
+            let geminiPrefix = "url: \"^gemini://"
 
             return [titlePrefix,
                     httpPrefix,
                     httpsPrefix,
+                    geminiPrefix,
                     httpPrefix + "www.",
                     httpsPrefix + "www.",
                     httpPrefix + "m.",

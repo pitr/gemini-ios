@@ -20,20 +20,3 @@ extension UIEdgeInsets {
         self.init(top: inset, left: inset, bottom: inset, right: inset)
     }
 }
-
-/**
-Generates the affine transform for transforming the first CGRect into the second one
-
-- parameter frame:   CGRect to transform from
-- parameter toFrame: CGRect to transform to
-
-- returns: CGAffineTransform that transforms the first CGRect into the second
-*/
-func CGAffineTransformMakeRectToRect(_ frame: CGRect, toFrame: CGRect) -> CGAffineTransform {
-    let scale = toFrame.size.width / frame.size.width
-    let tx = toFrame.origin.x + toFrame.width / 2 - (frame.origin.x + frame.width / 2)
-    let ty = toFrame.origin.y - frame.origin.y * scale * 2
-    let translation = CGAffineTransform(translationX: tx, y: ty)
-    let scaledAndTranslated = translation.scaledBy(x: scale, y: scale)
-    return scaledAndTranslated
-}

@@ -12,7 +12,6 @@ struct SimpleToastUX {
     static let ToastFont = UIFont.systemFont(ofSize: 15)
     static let ToastDismissAfter = DispatchTimeInterval.milliseconds(4500) // 4.5 seconds.
     static let ToastDelayBefore = DispatchTimeInterval.milliseconds(0) // 0 seconds
-    static let ToastPrivateModeDelayBefore = DispatchTimeInterval.milliseconds(750)
     static let BottomToolbarHeight = CGFloat(45)
 }
 

@@ -20,10 +20,6 @@ import UserNotifications
 
 private let log = Logger.browserLogger
 
-let LatestAppVersionProfileKey = "latestAppVersion"
-let AllowThirdPartyKeyboardsKey = "settings.allowThirdPartyKeyboards"
-private let InitialPingSentKey = "initialPingSent"
-
 class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestoration {
     public static func viewController(withRestorationIdentifierPath identifierComponents: [String], coder: NSCoder) -> UIViewController? {
         return nil
@@ -401,11 +397,5 @@ extension AppDelegate: MFMailComposeViewControllerDelegate {
         // Dismiss the view controller and start the app up
         controller.dismiss(animated: true, completion: nil)
         _ = startApplication(application!, withLaunchOptions: self.launchOptions)
-    }
-}
-
-extension UIApplication {
-    static var isInPrivateMode: Bool {
-        return BrowserViewController.foregroundBVC().tabManager.selectedTab?.isPrivate ?? false
     }
 }

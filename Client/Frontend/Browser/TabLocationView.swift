@@ -24,9 +24,7 @@ private struct TabLocationViewUX {
     static let BaseURLFontColor = UIColor.Photon.Grey50
     static let Spacing: CGFloat = 8
     static let StatusIconSize: CGFloat = 18
-    static let TPIconSize: CGFloat = 44
     static let ButtonSize: CGFloat = 44
-    static let URLBarPadding = 4
 }
 
 class TabLocationView: UIView {

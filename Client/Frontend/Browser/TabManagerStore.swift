@@ -148,11 +148,3 @@ class TabManagerStore {
         }
     }
 }
-
-// Functions for testing
-extension TabManagerStore {
-    func testTabCountOnDisk() -> Int {
-        assert(AppConstants.IsRunningTest)
-        return tabsToRestore().count
-    }
-}

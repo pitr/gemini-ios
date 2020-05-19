@@ -368,27 +368,6 @@ class TabManager: NSObject {
         }
     }
 
-    enum SwitchPrivacyModeResult { case createdNewTab; case usedExistingTab }
-    func switchPrivacyMode() -> SwitchPrivacyModeResult {
-        var result = SwitchPrivacyModeResult.usedExistingTab
-        guard let selectedTab = selectedTab else { return result }
-        let nextSelectedTab: Tab?
-
-        if selectedTab.isPrivate {
-            nextSelectedTab = mostRecentTab(inTabs: normalTabs)
-        } else {
-            if privateTabs.isEmpty {
-                nextSelectedTab = addTab(isPrivate: true)
-                result = .createdNewTab
-            } else {
-                nextSelectedTab = mostRecentTab(inTabs: privateTabs)
-            }
-        }
-
-        selectTab(nextSelectedTab)
-        return result
-    }
-
     func removeTabAndUpdateSelectedIndex(_ tab: Tab) {
         guard let index = tabs.firstIndex(where: { $0 === tab }) else { return }
         removeTab(tab, flushToDisk: true, notify: true)
@@ -538,11 +517,6 @@ class TabManager: NSObject {
     func getTabForURL(_ url: URL) -> Tab? {
         assert(Thread.isMainThread)
         return tabs.filter({ $0.webView?.url == url }).first
-    }
-
-    func resetProcessPool() {
-        assert(Thread.isMainThread)
-        configuration.processPool = WKProcessPool()
     }
 }
 
@@ -736,24 +710,5 @@ class TabManagerNavDelegate: NSObject, WKNavigationDelegate {
         }
 
         decisionHandler(res)
-    }
-}
-
-// Helper functions for test cases
-extension TabManager {
-    func testTabCountOnDisk() -> Int {
-        assert(AppConstants.IsRunningTest)
-        return store.testTabCountOnDisk()
-    }
-
-    func testCountRestoredTabs() -> Int {
-        assert(AppConstants.IsRunningTest)
-        _ = store.restoreStartupTabs(clearPrivateTabs: true, tabManager: self)
-        return count
-    }
-
-    func testClearArchive() {
-        assert(AppConstants.IsRunningTest)
-        store.clearArchive()
     }
 }

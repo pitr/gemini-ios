@@ -18,10 +18,6 @@ class UserActivityHandler {
         register(self, forTabEvents: .didClose, .didLoseFocus, .didGainFocus, .didChangeURL, .didLoadPageMetadata) // .didLoadFavicon, // TODO: Bug 1390294
     }
 
-    class func clearSearchIndex(completionHandler: ((Error?) -> Void)? = nil) {
-        searchableIndex.deleteAllSearchableItems(completionHandler: completionHandler)
-    }
-
     fileprivate func setUserActivityForTab(_ tab: Tab, url: URL) {
         guard !tab.isPrivate, url.isWebPage(includeDataURIs: false), !InternalURL.isValid(url: url) else {
             tab.userActivity?.resignCurrent()

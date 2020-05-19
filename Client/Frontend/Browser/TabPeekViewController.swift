@@ -9,7 +9,6 @@ import WebKit
 
 protocol TabPeekDelegate: AnyObject {
     func tabPeekDidAddBookmark(_ tab: Tab)
-    @discardableResult func tabPeekDidAddToReadingList(_ tab: Tab) -> ReadingListItem?
     func tabPeekRequestsPresentationOf(_ viewController: UIViewController)
     func tabPeekDidCloseTab(_ tab: Tab)
 }
@@ -25,7 +24,6 @@ class TabPeekViewController: UIViewController, WKNavigationDelegate {
     fileprivate weak var delegate: TabPeekDelegate?
     fileprivate var fxaDevicePicker: UINavigationController?
     fileprivate var isBookmarked: Bool = false
-    fileprivate var isInReadingList: Bool = false
     fileprivate var hasRemoteClients: Bool = false
     fileprivate var ignoreURL: Bool = false
 
@@ -178,9 +176,6 @@ class TabPeekViewController: UIViewController, WKNavigationDelegate {
             self.isBookmarked = isBookmarked
         }
 
-        let result = browserProfile.readingList.getRecordWithURL(displayURL).value.successValue
-
-        self.isInReadingList = !(result?.url.isEmpty ?? true)
         self.ignoreURL = isIgnoredURL(displayURL)
     }
 

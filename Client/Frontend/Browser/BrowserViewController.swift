@@ -27,8 +27,6 @@ private let ActionSheetTitleMaxLength = 120
 
 private struct BrowserViewControllerUX {
     fileprivate static let ShowHeaderTapAreaHeight: CGFloat = 32
-    fileprivate static let BookmarkStarAnimationDuration: Double = 0.5
-    fileprivate static let BookmarkStarAnimationOffset: CGFloat = 80
 }
 
 class BrowserViewController: UIViewController {
@@ -48,13 +46,9 @@ class BrowserViewController: UIViewController {
     var findInPageBar: FindInPageBar?
     lazy var mailtoLinkHandler = MailtoLinkHandler()
 
-    fileprivate var customSearchBarButton: UIBarButtonItem?
-
     // popover rotation handling
     var displayedPopoverController: UIViewController?
     var updateDisplayedPopoverProperties: (() -> Void)?
-
-    var openInHelper: OpenInHelper?
 
     // location label actions
     fileprivate var pasteGoAction: AccessibleAction!
@@ -79,7 +73,6 @@ class BrowserViewController: UIViewController {
     var scrollController = TabScrollingController()
 
     fileprivate var keyboardState: KeyboardState?
-    fileprivate var hasTriedToPresentETPAlready = false
     var pendingToast: Toast? // A toast that might be waiting for BVC to appear before displaying
     var downloadToast: DownloadToast? // A toast that is showing the combined download progress
 
@@ -171,7 +164,7 @@ class BrowserViewController: UIViewController {
         }
     }
 
-    @objc func displayThemeChanged(notification: Notification) {
+    @objc func displayThemeChanged() {
         applyTheme()
     }
 
@@ -1095,7 +1088,7 @@ extension BrowserViewController: SettingsDelegate {
 }
 
 extension BrowserViewController: PresentingModalViewControllerDelegate {
-    func dismissPresentedModalViewController(_ modalViewController: UIViewController, animated: Bool) {
+    func dismissPresentedModalViewController(animated: Bool) {
         self.dismiss(animated: animated, completion: nil)
     }
 }
@@ -1105,10 +1098,6 @@ extension BrowserViewController: PresentingModalViewControllerDelegate {
  * TODO: this should be expanded to track various visit types; see Bug 1166084.
  */
 extension BrowserViewController {
-    func ignoreNavigationInTab(_ tab: Tab, navigation: WKNavigation) {
-        self.ignoredNavigation.insert(navigation)
-    }
-
     func recordNavigationInTab(_ tab: Tab, navigation: WKNavigation, visitType: VisitType) {
         self.typedNavigation[navigation] = visitType
     }
@@ -1361,14 +1350,6 @@ extension BrowserViewController: TabDelegate {
         webView.uiDelegate = nil
         webView.scrollView.delegate = nil
         webView.removeFromSuperview()
-    }
-
-    fileprivate func findSnackbar(_ barToFind: SnackBar) -> Int? {
-        let bars = alertStackView.arrangedSubviews
-        for (index, bar) in bars.enumerated() where bar === barToFind {
-            return index
-        }
-        return nil
     }
 
     func showBar(_ bar: SnackBar, animated: Bool) {
@@ -1871,14 +1852,6 @@ extension BrowserViewController: ContextMenuHelperDelegate {
 extension BrowserViewController {
     @objc func image(_ image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: UnsafeRawPointer) {
     }
-    
-    func presentThemedViewController(navItemLocation: NavigationItemLocation, navItemText: NavigationItemText, vcBeingPresented: UIViewController) {
-        let vcToPresent = vcBeingPresented
-        let themedNavigationController = ThemedNavigationController(rootViewController: vcToPresent)
-        themedNavigationController.navigationBar.isTranslucent = false
-        themedNavigationController.modalPresentationStyle = .fullScreen
-        self.present(themedNavigationController, animated: true, completion: nil)
-    }
 }
 
 extension BrowserViewController: KeyboardHelperDelegate {
@@ -1926,17 +1899,10 @@ extension BrowserViewController: TabTrayDelegate {
         resetBrowserChrome()
     }
 
-    func tabTrayDidAddTab(_ tabTray: TabTrayController, tab: Tab) {}
-
     func tabTrayDidAddBookmark(_ tab: Tab) {
         guard let url = tab.url?.absoluteString, !url.isEmpty else { return }
         let tabState = tab.tabState
         addBookmark(url: url, title: tabState.title, favicon: tabState.favicon)
-    }
-
-    func tabTrayDidAddToReadingList(_ tab: Tab) -> ReadingListItem? {
-        guard let url = tab.url?.absoluteString, !url.isEmpty else { return nil }
-        return profile.readingList.createRecordWithURL(url, title: tab.title ?? url, addedBy: UIDevice.current.name).value.successValue
     }
 
     func tabTrayRequestsPresentationOf(_ viewController: UIViewController) {
@@ -1993,12 +1959,6 @@ extension BrowserViewController: TopTabsDelegate {
     func topTabsDidChangeTab() {
         libraryDrawerViewController?.close()
         urlBar.leaveOverlayMode(didCancel: true)
-    }
-}
-
-extension BrowserViewController: InstructionsViewControllerDelegate {
-    func instructionsViewControllerDidClose(_ instructionsViewController: InstructionsViewController) {
-        self.popToBVC()
     }
 }
 

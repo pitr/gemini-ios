@@ -5,18 +5,12 @@
 import Foundation
 import Shared
 
-struct FxALaunchParams {
-    var query: [String: String]
-}
-
 // An enum to route to HomePanels
 enum HomePanelPath: String {
     case bookmarks = "bookmarks"
     case topSites = "top-sites"
-    case readingList = "reading-list"
     case history = "history"
     case downloads = "downloads"
-    case newPrivateTab = "new-private-tab"
 }
 
 // An enum to route to a settings page.
@@ -125,10 +119,8 @@ enum NavigationPath {
         switch panel {
         case .bookmarks: bvc.showLibrary(panel: .bookmarks)
         case .history: bvc.showLibrary(panel: .history)
-        case .readingList: bvc.showLibrary(panel: .readingList)
         case .downloads: bvc.showLibrary(panel: .downloads)
         case .topSites: bvc.openURLInNewTab(HomePanelType.topSites.internalUrl)
-        case .newPrivateTab: bvc.openBlankNewTab(focusLocationField: false, isPrivate: true)
         }
     }
 

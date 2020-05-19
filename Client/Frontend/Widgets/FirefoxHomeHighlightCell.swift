@@ -88,9 +88,6 @@ class FirefoxHomeHighlightCell: UICollectionViewCell {
         return view
     }()
 
-    fileprivate lazy var pocketTrendingIconNormal = UIImage(named: "context_pocket")?.tinted(withColor: UIColor.Photon.Grey90)
-    fileprivate lazy var pocketTrendingIconDark = UIImage(named: "context_pocket")?.tinted(withColor: UIColor.Photon.Grey10)
-
     override var isSelected: Bool {
         didSet {
             self.selectedOverlay.isHidden = !isSelected

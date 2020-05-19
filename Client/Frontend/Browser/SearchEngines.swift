@@ -11,7 +11,6 @@ private let log = Logger.browserLogger
 
 private let OrderedEngineNames = "search.orderedEngineNames"
 private let DisabledEngineNames = "search.disabledEngineNames"
-private let ShowSearchSuggestionsOptIn = "search.suggestions.showOptIn"
 private let ShowSearchSuggestions = "search.suggestions.show"
 private let customSearchEnginesFileName = "customEngines.plist"
 

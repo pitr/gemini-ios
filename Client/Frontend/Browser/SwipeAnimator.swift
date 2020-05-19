@@ -53,11 +53,6 @@ class SwipeAnimator: NSObject {
         animatingView.addGestureRecognizer(self.panGestureRecogniser)
         self.panGestureRecogniser.delegate = self
     }
-
-    func cancelExistingGestures() {
-        self.panGestureRecogniser.isEnabled = false
-        self.panGestureRecogniser.isEnabled = true
-    }
 }
 
 //MARK: Private Helpers

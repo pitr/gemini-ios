@@ -10,7 +10,6 @@ import XCGLogger
 
 enum ShortcutType: String {
     case newTab = "NewTab"
-    case newPrivateTab = "NewPrivateTab"
     case openLastBookmark = "OpenLastBookmark"
 
     init?(fullType: String) {
@@ -24,10 +23,6 @@ enum ShortcutType: String {
     }
 }
 
-protocol QuickActionHandlerDelegate {
-    func handleShortCutItemType(_ type: ShortcutType, userData: [String: NSSecureCoding]?)
-}
-
 class QuickActions: NSObject {
 
     fileprivate let log = Logger.browserLogger
@@ -39,7 +34,6 @@ class QuickActions: NSObject {
     static let TabTitleKey = "title"
 
     fileprivate let lastBookmarkTitle = NSLocalizedString("Open Last Bookmark", tableName: "3DTouchActions", comment: "String describing the action of opening the last added bookmark from the home screen Quick Actions via 3D Touch")
-    fileprivate let _lastTabTitle = NSLocalizedString("Open Last Tab", tableName: "3DTouchActions", comment: "String describing the action of opening the last tab sent to Firefox from the home screen Quick Actions via 3D Touch")
 
     static var sharedInstance = QuickActions()
 
@@ -105,10 +99,6 @@ class QuickActions: NSObject {
         switch type {
         case .newTab:
             handleOpenNewTab(withBrowserViewController: browserViewController, isPrivate: false)
-        case .newPrivateTab:
-            handleOpenNewTab(withBrowserViewController: browserViewController, isPrivate: true)
-        // even though we're removing OpenLastTab, it's possible that someone will use an existing last tab quick action to open the app
-        // the first time after upgrading, so we should still handle it
         case .openLastBookmark:
             if let urlToOpen = (userData?[QuickActions.TabURLKey] as? String)?.asURL {
                 handleOpenURL(withBrowserViewController: browserViewController, urlToOpen: urlToOpen)
