@@ -35,11 +35,11 @@ class AppSettingsTableViewController: SettingsTableViewController {
            ]
 
         if #available(iOS 12.0, *) {
-            generalSettings.insert(SiriPageSetting(settings: self), at: 4)
+            generalSettings.append(SiriPageSetting(settings: self))
         }
 
         if AppConstants.MOZ_DOCUMENT_SERVICES {
-            generalSettings.insert(TranslationSetting(settings: self), at: 5)
+            generalSettings.append(TranslationSetting(settings: self))
         }
 
         // There is nothing to show in the Customize section if we don't include the compact tab layout

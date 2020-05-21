@@ -177,7 +177,7 @@ extension GeminiClient: StreamDelegate {
                 urlSchemeTask.didFailWithError(GeminiClientError.responderUnableToHandle)
                 return
             }
-            urlSchemeTask.didReceive(URLResponse(url: url, mimeType: "text/html", expectedContentLength: -1, textEncodingName: "utf-8"))
+            urlSchemeTask.didReceive(HTTPURLResponse(url: url, statusCode: 302, httpVersion: nil, headerFields: ["Location" : to])!)
             urlSchemeTask.didReceive(data)
             urlSchemeTask.didFinish()
         case .input(let question):
@@ -252,17 +252,20 @@ extension GeminiClient: StreamDelegate {
             var pre = false
             for line in content.components(separatedBy: "\n") {
                 let range = NSRange(line.startIndex..<line.endIndex, in: line)
-                if line == "```" {
+                if line.contains("```") {
                     pre = !pre
                     if pre {
-                        body.append("<pre><code>\n")
+                        let l = line.replaceFirstOccurrence(of: "```", with: "<pre><code>")
+                        body.append("\(l)\n")
                     } else {
-                        body.append("</code></pre>\n")
+                        let l = line.replaceFirstOccurrence(of: "```", with: "</code></pre>")
+                        body.append("\(l)\n")
                     }
                     continue
                 }
                 if pre {
                     body.append("\(line)\n")
+                    continue
                 }
                 if let m = h1Regex.firstMatch(in: line, options: [], range: range),
                     let range = Range(m.range(at: 1), in: line) {
