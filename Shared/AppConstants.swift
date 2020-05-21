@@ -53,35 +53,6 @@ public struct AppConstants {
         return scheme
     }()
 
-    public static let PrefSendUsageData = "settings.sendUsageData"
-
-    /// Enables support for International Domain Names (IDN)
-    /// Disabled because of https://bugzilla.mozilla.org/show_bug.cgi?id=1312294
-    public static let MOZ_PUNYCODE: Bool = {
-        #if MOZ_CHANNEL_RELEASE
-            return false
-        #elseif MOZ_CHANNEL_BETA
-            return false
-        #elseif MOZ_CHANNEL_FENNEC
-            return true
-        #else
-            return true
-        #endif
-    }()
-
-    /// Toggle the use of Leanplum.
-    public static let MOZ_ENABLE_LEANPLUM: Bool = {
-        #if MOZ_CHANNEL_RELEASE
-            return true
-        #elseif MOZ_CHANNEL_BETA
-            return true
-        #elseif MOZ_CHANNEL_FENNEC
-            return true
-        #else
-            return false
-        #endif
-    }()
-
     /// The maximum length of a URL stored by Firefox. Shared with Places on desktop.
     public static let DB_URL_LENGTH_MAX = 65536
 
@@ -90,44 +61,4 @@ public struct AppConstants {
 
     /// The maximum length of a bookmark description stored by Firefox. Shared with Places on desktop.
     public static let DB_DESCRIPTION_LENGTH_MAX = 1024
-
-    ///  Toggle FxA Leanplum A/B test for prompting push permissions
-    public static let MOZ_FXA_LEANPLUM_AB_PUSH_TEST: Bool = {
-        #if MOZ_CHANNEL_RELEASE
-            return true
-        #elseif MOZ_CHANNEL_BETA
-            return true
-        #elseif MOZ_CHANNEL_FENNEC
-            return true
-        #else
-            return false
-        #endif
-    }()
-
-    ///  Toggle use of Document Services — initially language detection.
-    public static let MOZ_DOCUMENT_SERVICES: Bool = {
-        #if MOZ_CHANNEL_RELEASE
-        return false
-        #elseif MOZ_CHANNEL_BETA
-        return true
-        #elseif MOZ_CHANNEL_FENNEC
-        return true
-        #else
-        return true
-        #endif
-    }()
-    
-    /// Put it behind a feature flag as the strings didn't land in time
-    public static let MOZ_SHAKE_TO_RESTORE: Bool = {
-        #if MOZ_CHANNEL_RELEASE
-        return false
-        #elseif MOZ_CHANNEL_BETA
-        return true
-        #elseif MOZ_CHANNEL_FENNEC
-        return true
-        #else
-        return true
-        #endif
-    }()
-
 }
