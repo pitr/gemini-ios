@@ -177,7 +177,7 @@ extension GeminiClient: StreamDelegate {
                 urlSchemeTask.didFailWithError(GeminiClientError.responderUnableToHandle)
                 return
             }
-            urlSchemeTask.didReceive(HTTPURLResponse(url: url, statusCode: 302, httpVersion: nil, headerFields: ["Location" : to])!)
+            urlSchemeTask.didReceive(URLResponse(url: url, mimeType: "text/html", expectedContentLength: -1, textEncodingName: "utf-8"))
             urlSchemeTask.didReceive(data)
             urlSchemeTask.didFinish()
         case .input(let question):
