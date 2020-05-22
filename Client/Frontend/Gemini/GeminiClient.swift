@@ -33,12 +33,14 @@ let htmlFooter = """
 
 class GeminiClient: NSObject {
     var inputStream: InputStream!
-    var urlSchemeTask: WKURLSchemeTask
-    var url: URL
+    let urlSchemeTask: WKURLSchemeTask
+    let url: URL
+    var data: Data
 
     init(url: URL, urlSchemeTask: WKURLSchemeTask) {
         self.urlSchemeTask = urlSchemeTask
         self.url = url
+        self.data = Data()
     }
 
     func load() {
@@ -97,13 +99,13 @@ extension GeminiClient: StreamDelegate {
             break
         case .endEncountered:
             log.debug("EndEncountered")
-            break
-        case .hasBytesAvailable:
-            log.debug("HasBytesAvailable")
-            var data = Data()
+            parseResponse(data: data)
             defer {
                 inputStream.close()
             }
+            break
+        case .hasBytesAvailable:
+            log.debug("HasBytesAvailable")
             let bufferSize = 1024
             let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
             defer {
@@ -125,7 +127,6 @@ extension GeminiClient: StreamDelegate {
                 data.append(buffer, count: read)
             }
             log.debug("read \(data.count) bytes")
-            parseResponse(data: data)
             break
         case .errorOccurred:
             if let error = inputStream.streamError {
@@ -133,9 +134,15 @@ extension GeminiClient: StreamDelegate {
             } else {
                 renderError(error: "Received error reading from server", for: url, to: urlSchemeTask)
             }
+            defer {
+                inputStream.close()
+            }
             break
         default:
             renderError(error: "Unknown error while reading from server", for: url, to: urlSchemeTask)
+            defer {
+                inputStream.close()
+            }
             break
         }
     }
