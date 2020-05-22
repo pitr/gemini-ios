@@ -50,9 +50,6 @@ protocol SearchViewControllerDelegate: AnyObject {
 class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, LoaderListener {
     var searchDelegate: SearchViewControllerDelegate?
 
-    fileprivate let isPrivate: Bool
-    fileprivate var suggestClient: SearchSuggestClient?
-
     // Views for displaying the bottom scrollable search engine list. searchEngineScrollView is the
     // scrollable container; searchEngineScrollViewContent contains the actual set of search engine buttons.
     fileprivate let searchEngineContainerView = UIView()
@@ -70,7 +67,6 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
     static var userAgent: String?
 
     init(profile: Profile, isPrivate: Bool) {
-        self.isPrivate = isPrivate
         super.init(profile: profile)
     }
 
@@ -156,16 +152,8 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
 
     var searchEngines: SearchEngines! {
         didSet {
-            suggestClient?.cancelPendingRequest()
-
             // Query and reload the table with new search suggestions.
             querySuggestClient()
-
-            // Show the default search engine first.
-            if !isPrivate {
-                let ua = SearchViewController.userAgent ?? "FxSearch"
-                suggestClient = SearchSuggestClient(searchEngine: searchEngines.defaultEngine, userAgent: ua)
-            }
 
             // Reload the footer list of search engines.
             reloadSearchEngines()
@@ -175,11 +163,7 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
     fileprivate var quickSearchEngines: [OpenSearchEngine] {
         var engines = searchEngines.quickSearchEngines
 
-        // If we're not showing search suggestions, the default search engine won't be visible
-        // at the top of the table. Show it with the others in the bottom search bar.
-        if isPrivate || !searchEngines.shouldShowSearchSuggestions {
-            engines?.insert(searchEngines.defaultEngine, at: 0)
-        }
+        engines?.insert(searchEngines.defaultEngine, at: 0)
 
         return engines!
     }
@@ -306,42 +290,12 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
     }
 
     fileprivate func querySuggestClient() {
-        suggestClient?.cancelPendingRequest()
-
-        if searchQuery.isEmpty || !searchEngines.shouldShowSearchSuggestions || searchQuery.looksLikeAURL() {
+        if searchQuery.isEmpty || searchQuery.looksLikeAURL() {
             suggestionCell.suggestions = []
-            tableView.reloadData()
-            return
+        } else {
+            suggestionCell.suggestions = [searchQuery]
         }
-
-        suggestClient?.query(searchQuery, callback: { suggestions, error in
-            if let error = error {
-                let isSuggestClientError = error.domain == SearchSuggestClientErrorDomain
-
-                switch error.code {
-                case NSURLErrorCancelled where error.domain == NSURLErrorDomain:
-                    // Request was cancelled. Do nothing.
-                    break
-                case SearchSuggestClientErrorInvalidEngine where isSuggestClientError:
-                    // Engine does not support search suggestions. Do nothing.
-                    break
-                case SearchSuggestClientErrorInvalidResponse where isSuggestClientError:
-                    print("Error: Invalid search suggestion data")
-                default:
-                    print("Error: \(error.description)")
-                }
-            } else {
-                self.suggestionCell.suggestions = suggestions!
-            }
-
-            // If there are no suggestions, just use whatever the user typed.
-            if suggestions?.isEmpty ?? true {
-                self.suggestionCell.suggestions = [self.searchQuery]
-            }
-
-            // Reload the tableView to show the new list of search suggestions.
-            self.tableView.reloadData()
-        })
+        tableView.reloadData()
     }
 
     func loader(dataLoaded data: Cursor<Site>) {
@@ -410,7 +364,7 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch SearchListSection(rawValue: section)! {
         case .searchSuggestions:
-            return searchEngines.shouldShowSearchSuggestions && !searchQuery.looksLikeAURL() && !isPrivate ? 1 : 0
+            return !searchQuery.looksLikeAURL() ? 1 : 0
         case .bookmarksAndHistory:
             return data.count
         }

@@ -13,9 +13,8 @@ protocol SearchEnginePickerDelegate: AnyObject {
 class SearchSettingsTableViewController: ThemedTableViewController {
     fileprivate let SectionDefault = 0
     fileprivate let ItemDefaultEngine = 0
-    fileprivate let ItemDefaultSuggestions = 1
     fileprivate let ItemAddCustomSearch = 2
-    fileprivate let NumberOfItemsInSectionDefault = 2
+    fileprivate let NumberOfItemsInSectionDefault = 1
     fileprivate let SectionOrder = 1
     fileprivate let NumberOfSections = 2
     fileprivate let IconSize = CGSize(width: OpenSearchEngine.PreferredIconSize, height: OpenSearchEngine.PreferredIconSize)
@@ -84,14 +83,6 @@ class SearchSettingsTableViewController: ThemedTableViewController {
                 cell.imageView?.image = engine.image.createScaled(IconSize)
                 cell.imageView?.layer.cornerRadius = 4
                 cell.imageView?.layer.masksToBounds = true
-            case ItemDefaultSuggestions:
-                cell.textLabel?.text = NSLocalizedString("Show Search Suggestions", comment: "Label for show search suggestions setting.")
-                let toggle = UISwitchThemed()
-                toggle.onTintColor = UIColor.theme.tableView.controlTint
-                toggle.addTarget(self, action: #selector(didToggleSearchSuggestions), for: .valueChanged)
-                toggle.isOn = model.shouldShowSearchSuggestions
-                cell.editingAccessoryView = toggle
-                cell.selectionStyle = .none
             default:
                 // Should not happen.
                 break
@@ -308,11 +299,6 @@ extension SearchSettingsTableViewController {
         } else {
             model.disableEngine(engine)
         }
-    }
-
-    @objc func didToggleSearchSuggestions(_ toggle: UISwitch) {
-        // Setting the value in settings dismisses any opt-in.
-        model.shouldShowSearchSuggestions = toggle.isOn
     }
 
     func cancel() {

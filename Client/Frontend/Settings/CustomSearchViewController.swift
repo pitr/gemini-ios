@@ -90,14 +90,14 @@ class CustomSearchViewController: SettingsTableViewController {
             return deferred
         }
 
-        FaviconFetcher.fetchFavImageForURL(forURL: url, profile: profile).uponQueue(.main) { result in
-            let image = result.successValue ?? FaviconFetcher.letter(forUrl: url)
-            let engine = OpenSearchEngine(engineID: nil, shortName: name, image: image, searchTemplate: template, suggestTemplate: nil, isCustomEngine: true)
+        let image = FaviconFetcher.letter(forUrl: url)
+        let engine = OpenSearchEngine(engineID: nil, shortName: name, image: image, searchTemplate: template, isCustomEngine: true)
 
-            //Make sure a valid scheme is used
-            let url = engine.searchURLForQuery("test")
-            let maybe = (url == nil) ? Maybe(failure: CustomSearchError(.FormInput)) : Maybe(success: engine)
-            deferred.fill(maybe)
+        //Make sure a valid scheme is used
+        if engine.searchURLForQuery("test") == nil {
+            deferred.fill(Maybe(failure: CustomSearchError(.FormInput)))
+        } else {
+            deferred.fill(Maybe(success: engine))
         }
         return deferred
     }
@@ -152,7 +152,7 @@ class CustomSearchViewController: SettingsTableViewController {
 
         let settings: [SettingSection] = [
             SettingSection(title: NSAttributedString(string: Strings.SettingsAddCustomEngineTitleLabel), children: [titleField]),
-            SettingSection(title: NSAttributedString(string: Strings.SettingsAddCustomEngineURLLabel), footerTitle: NSAttributedString(string: "https://youtube.com/search?q=%s"), children: [urlField])
+            SettingSection(title: NSAttributedString(string: Strings.SettingsAddCustomEngineURLLabel), footerTitle: NSAttributedString(string: "gemini://gus.guru/search?q=%s"), children: [urlField])
         ]
 
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(self.addCustomSearchEngine))

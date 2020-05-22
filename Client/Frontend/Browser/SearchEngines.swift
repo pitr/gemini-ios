@@ -11,7 +11,6 @@ private let log = Logger.browserLogger
 
 private let OrderedEngineNames = "search.orderedEngineNames"
 private let DisabledEngineNames = "search.disabledEngineNames"
-private let ShowSearchSuggestions = "search.suggestions.show"
 private let customSearchEnginesFileName = "customEngines.plist"
 
 /**
@@ -39,7 +38,6 @@ class SearchEngines {
     init(prefs: Prefs, files: FileAccessor) {
         self.prefs = prefs
         // By default, show search suggestions
-        self.shouldShowSearchSuggestions = prefs.boolForKey(ShowSearchSuggestions) ?? true
         self.fileAccessor = files
         self.disabledEngineNames = getDisabledEngineNames()
         self.orderedEngines = getOrderedEngines()
@@ -80,12 +78,6 @@ class SearchEngines {
     var quickSearchEngines: [OpenSearchEngine]! {
         get {
             return self.orderedEngines.filter({ (engine) in !self.isEngineDefault(engine) && self.isEngineEnabled(engine) })
-        }
-    }
-
-    var shouldShowSearchSuggestions: Bool {
-        didSet {
-            self.prefs.setObject(shouldShowSearchSuggestions, forKey: ShowSearchSuggestions)
         }
     }
 

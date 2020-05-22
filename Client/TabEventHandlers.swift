@@ -8,7 +8,6 @@ import Shared
 class TabEventHandlers {
     static func create(with prefs: Prefs) -> [TabEventHandler] {
         return [
-            FaviconHandler(),
             UserActivityHandler(),
             MetadataParserHelper(),
             MediaImageLoader(prefs),

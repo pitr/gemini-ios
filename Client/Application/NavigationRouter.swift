@@ -21,7 +21,6 @@ enum SettingsPage: String {
     case homepage = "homepage"
     case mailto = "mailto"
     case search = "search"
-    case theme = "theme"
 }
 
 // Used by the App to navigate to different views.
@@ -167,8 +166,6 @@ enum NavigationPath {
             viewController.model = profile.searchEngines
             viewController.profile = profile
             controller.pushViewController(viewController, animated: true)
-        case .theme:
-            controller.pushViewController(ThemeSettingsController(), animated: true)
         }
     }
 }

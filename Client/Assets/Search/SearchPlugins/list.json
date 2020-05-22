@@ -1,6 +1,6 @@
 {
   "default": {
-    "searchDefault": "google-b-m",
+    "searchDefault": "gus",
     "visibleDefaultEngines": [
       "gus"
     ]

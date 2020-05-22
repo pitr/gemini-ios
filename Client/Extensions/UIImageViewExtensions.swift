@@ -33,19 +33,14 @@ public extension UIImageView {
         backgroundColor = nil
         sd_setImage(with: nil) // cancels any pending SDWebImage operations.
 
-        if let url = website, let bundledIcon = FaviconFetcher.getBundledIcon(forUrl: url) {
-            self.image = UIImage(contentsOfFile: bundledIcon.filePath)
-            finish(bgColor: bundledIcon.bgcolor)
-        } else {
-            let imageURL = URL(string: icon?.url ?? "")
-            let defaults = fallbackFavicon(forUrl: website)
-            self.sd_setImage(with: imageURL, placeholderImage: defaults.image, options: []) {(img, err, _, _) in
-                guard err == nil else {
-                    finish(bgColor: defaults.color)
-                    return
-                }
-                finish(bgColor: nil)
+        let imageURL = URL(string: icon?.url ?? "")
+        let defaults = fallbackFavicon(forUrl: website)
+        self.sd_setImage(with: imageURL, placeholderImage: defaults.image, options: []) {(img, err, _, _) in
+            guard err == nil else {
+                finish(bgColor: defaults.color)
+                return
             }
+            finish(bgColor: nil)
         }
     }
 

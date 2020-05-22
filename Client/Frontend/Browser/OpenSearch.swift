@@ -7,7 +7,6 @@ import Shared
 import Fuzi
 
 private let TypeSearch = "text/html"
-private let TypeSuggest = "application/x-suggestions+json"
 
 class OpenSearchEngine: NSObject, NSCoding {
     static let PreferredIconSize = 30
@@ -17,18 +16,16 @@ class OpenSearchEngine: NSObject, NSCoding {
     let image: UIImage
     let isCustomEngine: Bool
     let searchTemplate: String
-    fileprivate let suggestTemplate: String?
 
     fileprivate let SearchTermComponent = "{searchTerms}"
     fileprivate let LocaleTermComponent = "{moz:locale}"
 
     fileprivate lazy var searchQueryComponentKey: String? = self.getQueryArgFromTemplate()
 
-    init(engineID: String?, shortName: String, image: UIImage, searchTemplate: String, suggestTemplate: String?, isCustomEngine: Bool) {
+    init(engineID: String?, shortName: String, image: UIImage, searchTemplate: String, isCustomEngine: Bool) {
         self.shortName = shortName
         self.image = image
         self.searchTemplate = searchTemplate
-        self.suggestTemplate = suggestTemplate
         self.isCustomEngine = isCustomEngine
         self.engineID = engineID
     }
@@ -50,7 +47,6 @@ class OpenSearchEngine: NSObject, NSCoding {
         self.isCustomEngine = isCustomEngine
         self.image = image
         self.engineID = aDecoder.decodeObject(forKey: "engineID") as? String
-        self.suggestTemplate = nil
     }
 
     func encode(with aCoder: NSCoder) {
@@ -125,16 +121,6 @@ class OpenSearchEngine: NSObject, NSCoding {
         }
     }
 
-    /**
-     * Returns the search suggestion URL for the given query.
-     */
-    func suggestURLForQuery(_ query: String) -> URL? {
-        if let suggestTemplate = suggestTemplate {
-            return getURLFromTemplate(suggestTemplate, query: query)
-        }
-        return nil
-    }
-
     fileprivate func getURLFromTemplate(_ searchTemplate: String, query: String) -> URL? {
         if let escapedQuery = query.addingPercentEncoding(withAllowedCharacters: .SearchTermsAllowed) {
             // Escape the search template as well in case it contains not-safe characters like symbols
@@ -203,7 +189,6 @@ class OpenSearchParser {
         }
 
         var searchTemplate: String!
-        var suggestTemplate: String?
         for urlIndexer in urlIndexers {
             let type = urlIndexer.attributes["type"]
             if type == nil {
@@ -211,7 +196,7 @@ class OpenSearchParser {
                 return nil
             }
 
-            if type != TypeSearch && type != TypeSuggest {
+            if type != TypeSearch {
                 // Not a supported search type.
                 continue
             }
@@ -246,11 +231,7 @@ class OpenSearchParser {
                 }
             }
 
-            if type == TypeSearch {
-                searchTemplate = template
-            } else {
-                suggestTemplate = template
-            }
+            searchTemplate = template
         }
 
         if searchTemplate == nil {
@@ -291,6 +272,6 @@ class OpenSearchParser {
             return nil
         }
 
-        return OpenSearchEngine(engineID: engineID, shortName: shortName, image: uiImage, searchTemplate: searchTemplate, suggestTemplate: suggestTemplate, isCustomEngine: false)
+        return OpenSearchEngine(engineID: engineID, shortName: shortName, image: uiImage, searchTemplate: searchTemplate, isCustomEngine: false)
     }
 }
