@@ -5,6 +5,8 @@ This is a fork of an open source [Firefox Browser for iOS](https://github.com/mo
 
 Download on the [App Store](https://itunes.apple.com/app/FIXME).
 
+![Gemini screenshot](https://raw.githubusercontent.com/pitr/gemini-ios/master/screenshot.png)
+
 Requirements
 ------------
 
