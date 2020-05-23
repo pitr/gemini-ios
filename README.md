@@ -1,16 +1,14 @@
 Gemini for iOS
 ===============
 
+This is a fork of an open source [Firefox Browser for iOS](https://github.com/mozilla-mobile/firefox-ios)
+
 Download on the [App Store](https://itunes.apple.com/app/FIXME).
 
-This branch (master)
------------
+Requirements
+------------
 
 This branch only works with [Xcode 11.4](https://apps.apple.com/app/xcode/id497799835), Swift 5.2 and supports iOS 12.0 and above.
-
-Please make sure you aim your pull requests in the right direction.
-
-For bug fixes and features for a specific release use the version branch.
 
 Building the code
 -----------------
