@@ -173,6 +173,9 @@ class BookmarksPanel: SiteTableViewController, LibraryPanel {
             self.bookmarkNodes = folder.children ?? []
 
             if folder.guid == BookmarkRoots.RootGUID {
+                if let mobile = folder.children?.last {
+                    self.bookmarkNodes = [mobile]
+                }
                 self.profile.places.getRecentBookmarks(limit: 20).uponQueue(.main) { result in
                     self.recentBookmarks = result.successValue ?? []
                     self.tableView.reloadData()

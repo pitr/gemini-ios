@@ -341,11 +341,8 @@ extension FirefoxHomeViewController: UICollectionViewDelegateFlowLayout {
                     return view
                 case .libraryShortcuts:
                     view.title = title
-                    view.moreButton.isHidden = false
-                    view.moreButton.setTitle(Strings.AppMenuLibrarySeeAllTitleString, for: .normal)
-                    view.moreButton.addTarget(self, action: #selector(openHistory), for: .touchUpInside)
-                    view.moreButton.accessibilityIdentifier = "libraryMoreButton"
                     view.titleLabel.accessibilityIdentifier = "libraryTitle"
+                    view.moreButton.isHidden = true
                     return view
             }
         case UICollectionView.elementKindSectionFooter:
@@ -459,7 +456,7 @@ extension FirefoxHomeViewController {
 
     func configureLibraryShortcutsCell(_ cell: UICollectionViewCell, forIndexPath indexPath: IndexPath) -> UICollectionViewCell {
         let libraryCell = cell as! ASLibraryCell
-        let targets = [#selector(openBookmarks), #selector(openReadingList), #selector(openDownloads), #selector(openSyncedTabs)]
+        let targets = [#selector(openBookmarks), #selector(openHistory), #selector(openDownloads)]
         libraryCell.libraryButtons.map({ $0.button }).zip(targets).forEach { (button, selector) in
             button.removeTarget(nil, action: nil, for: .allEvents)
             button.addTarget(self, action: selector, for: .touchUpInside)
@@ -638,14 +635,6 @@ extension FirefoxHomeViewController {
 
     @objc func openHistory() {
         homePanelDelegate?.homePanelDidRequestToOpenLibrary(panel: .history)
-    }
-
-    @objc func openSyncedTabs() {
-        homePanelDelegate?.homePanelDidRequestToOpenLibrary(panel: .syncedTabs)
-    }
-
-    @objc func openReadingList() {
-        homePanelDelegate?.homePanelDidRequestToOpenLibrary(panel: .readingList)
     }
 
     @objc func openDownloads() {
@@ -983,7 +972,7 @@ class ASLibraryCell: UICollectionViewCell, Themeable {
             make.edges.equalTo(self)
         }
 
-        [bookmarks, downloads].forEach { item in
+        [bookmarks, history, downloads].forEach { item in
             let view = LibraryShortcutView()
             view.button.setImage(item.image, for: .normal)
             view.title.text = item.title

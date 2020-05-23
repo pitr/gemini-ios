@@ -137,7 +137,7 @@ class BookmarkDetailPanel: SiteTableViewController {
         }
 
         if isNew, bookmarkNodeType == .bookmark {
-            bookmarkItemURL = "https://"
+            bookmarkItemURL = "gemini://"
         }
 
         updateSaveButton()
@@ -192,6 +192,10 @@ class BookmarkDetailPanel: SiteTableViewController {
                     // Any "root" folders (i.e. "Mobile Bookmarks") should
                     // have an indentation of 0.
                     if childFolder.isRoot {
+                        if childFolder.guid != BookmarkRoots.MobileFolderGUID {
+                            // skip non-mobile root folders
+                            continue
+                        }
                         addFolder(childFolder)
                     }
                     // Otherwise, all non-root folder should increase the
