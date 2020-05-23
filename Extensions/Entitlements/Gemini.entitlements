@@ -4,7 +4,7 @@
 <dict>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.pitr.ios.Gemini</string>
+		<string>group.com.pitr.Gemini</string>
 	</array>
 	<key>keychain-access-groups</key>
 	<array>
