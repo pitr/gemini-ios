@@ -23,9 +23,7 @@ protocol LibraryPanelDelegate: AnyObject {
 enum LibraryPanelType: Int {
     case bookmarks = 0
     case history = 1
-    case readingList = 2
-    case downloads = 3
-    case syncedTabs = 4
+    case downloads = 2
 }
 
 /**
