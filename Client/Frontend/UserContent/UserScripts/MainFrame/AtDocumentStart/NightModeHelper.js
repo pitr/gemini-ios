@@ -5,7 +5,7 @@
 
 "use strict";
 
-Object.defineProperty(window.__firefox__, "NightMode", {
+Object.defineProperty(window.__gemini__, "NightMode", {
   enumerable: false,
   configurable: false,
   writable: false,
@@ -46,13 +46,13 @@ function applyInvertFilterToChildBackgroundImageElements(parentNode) {
 
 function applyInvertFilterToElement(el) {
   invertedBackgroundImageElements.push(el);
-  el.__firefox__NightMode_originalFilter = el.style.webkitFilter;
+  el.__gemini__NightMode_originalFilter = el.style.webkitFilter;
   el.style.webkitFilter = NIGHT_MODE_INVERT_FILTER_CSS;
 }
 
 function removeInvertFilterFromElement(el) {
-  el.style.webkitFilter = el.__firefox__NightMode_originalFilter;
-  delete el.__firefox__NightMode_originalFilter;
+  el.style.webkitFilter = el.__gemini__NightMode_originalFilter;
+  delete el.__gemini__NightMode_originalFilter;
 }
 
 var invertedBackgroundImageElements = null;
@@ -70,16 +70,16 @@ var observer = new MutationObserver(function(mutations) {
   });
 });
 
-Object.defineProperty(window.__firefox__.NightMode, "setEnabled", {
+Object.defineProperty(window.__gemini__.NightMode, "setEnabled", {
   enumerable: false,
   configurable: false,
   writable: false,
   value: function(enabled) {
-    if (enabled === window.__firefox__.NightMode.enabled) {
+    if (enabled === window.__gemini__.NightMode.enabled) {
       return;
     }
 
-    window.__firefox__.NightMode.enabled = enabled;
+    window.__gemini__.NightMode.enabled = enabled;
 
     var styleElement = getStyleElement();
 
@@ -130,5 +130,5 @@ Object.defineProperty(window.__firefox__.NightMode, "setEnabled", {
 });
 
 window.addEventListener("DOMContentLoaded", function() {
-  window.__firefox__.NightMode.setEnabled(window.__firefox__.NightMode.enabled);
+  window.__gemini__.NightMode.setEnabled(window.__gemini__.NightMode.enabled);
 });

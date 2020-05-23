@@ -7,7 +7,7 @@
 
 // Ensure this module only gets included once. This is
 // required for user scripts injected into all frames.
-window.__firefox__.includeOnce("PrintHandler", function() {
+window.__gemini__.includeOnce("PrintHandler", function() {
   window.print = function() {
     webkit.messageHandlers.printHandler.postMessage({});
   };

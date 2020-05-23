@@ -4,8 +4,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 "use strict";
-if (typeof window.__firefox__.download == "undefined") {
-Object.defineProperty(window.__firefox__, "download", {
+if (typeof window.__gemini__.download == "undefined") {
+Object.defineProperty(window.__gemini__, "download", {
   enumerable: false,
   configurable: false,
   writable: false,

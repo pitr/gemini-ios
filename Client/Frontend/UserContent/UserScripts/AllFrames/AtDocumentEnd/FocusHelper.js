@@ -7,7 +7,7 @@
 
 // Ensure this module only gets included once. This is
 // required for user scripts injected into all frames.
-window.__firefox__.includeOnce("FocusHelper", function() {
+window.__gemini__.includeOnce("FocusHelper", function() {
   const isButton = (element) => {
     if (element.nodeName !== "INPUT") {
       return false;

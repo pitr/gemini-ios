@@ -30,7 +30,7 @@ function MetadataWrapper() {
   };
 }
 
-Object.defineProperty(window.__firefox__, "metadata", {
+Object.defineProperty(window.__gemini__, "metadata", {
   enumerable: false,
   configurable: false,
   writable: false,

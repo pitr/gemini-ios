@@ -5,16 +5,16 @@
 
 "use strict";
 
-if (!window.__firefox__) {
-  Object.defineProperty(window, "__firefox__", {
+if (!window.__gemini__) {
+  Object.defineProperty(window, "__gemini__", {
     enumerable: false,
     configurable: false,
     writable: false,
     value: {
       userScripts: {},
       includeOnce: function(userScript, initializer) {
-        if (!__firefox__.userScripts[userScript]) {
-          __firefox__.userScripts[userScript] = true;
+        if (!__gemini__.userScripts[userScript]) {
+          __gemini__.userScripts[userScript] = true;
           if (typeof initializer === 'function') {
             initializer();
           }

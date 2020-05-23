@@ -7,7 +7,7 @@
 
 // Ensure this module only gets included once. This is
 // required for user scripts injected into all frames.
-window.__firefox__.includeOnce("ContextMenu", function() {
+window.__gemini__.includeOnce("ContextMenu", function() {
   window.addEventListener("touchstart", function(evt) {
     var target = evt.target;
 

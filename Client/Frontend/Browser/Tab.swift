@@ -130,7 +130,7 @@ class Tab: NSObject {
                 return
             }
 
-            webView?.evaluateJavaScript("window.__firefox__.NightMode.setEnabled(\(nightMode))")
+            webView?.evaluateJavaScript("window.__gemini__.NightMode.setEnabled(\(nightMode))")
             // For WKWebView background color to take effect, isOpaque must be false,
             // which is counter-intuitive. Default is true. The color is previously
             // set to black in the WKWebView init.
@@ -430,7 +430,7 @@ class Tab: NSObject {
             webView?.replaceLocation(with: page)
             return
         }
-        
+
         if let _ = webView?.reloadFromOrigin() {
             print("reloaded zombified tab from origin")
             return

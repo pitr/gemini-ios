@@ -26,7 +26,7 @@ class MetadataParserHelper: TabEventHandler {
                 return
         }
 
-        webView.evaluateJavaScript("__firefox__.metadata && __firefox__.metadata.getMetadata()") { (result, error) in
+        webView.evaluateJavaScript("__gemini__.metadata && __gemini__.metadata.getMetadata()") { (result, error) in
             guard error == nil else {
                 TabEvent.post(.pageMetadataNotAvailable, for: tab)
                 tab.pageMetadata = nil

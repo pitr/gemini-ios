@@ -14,7 +14,7 @@ class UserScriptManager {
 
     private let compiledUserScripts: [String : WKUserScript]
 
-    private let nightModeUserScript = WKUserScript(source: "window.__firefox__.NightMode.setEnabled(true)", injectionTime: .atDocumentStart, forMainFrameOnly: true)
+    private let nightModeUserScript = WKUserScript(source: "window.__gemini__.NightMode.setEnabled(true)", injectionTime: .atDocumentStart, forMainFrameOnly: true)
 
     private init() {
         var compiledUserScripts: [String : WKUserScript] = [:]

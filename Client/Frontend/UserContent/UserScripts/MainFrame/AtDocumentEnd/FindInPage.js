@@ -9,8 +9,8 @@ const MAXIMUM_HIGHLIGHT_COUNT = 500;
 const SCROLL_OFFSET_Y = 40;
 const SCROLL_DURATION = 100;
 
-const HIGHLIGHT_CLASS_NAME = "__firefox__find-highlight";
-const HIGHLIGHT_CLASS_NAME_ACTIVE = "__firefox__find-highlight-active";
+const HIGHLIGHT_CLASS_NAME = "__gemini__find-highlight";
+const HIGHLIGHT_CLASS_NAME_ACTIVE = "__gemini__find-highlight-active";
 
 const HIGHLIGHT_COLOR = "#ffde49";
 const HIGHLIGHT_COLOR_ACTIVE = "#f19750";
@@ -350,28 +350,28 @@ Operation.prototype.complete = function() {
   }
 };
 
-Object.defineProperty(window.__firefox__, "find", {
+Object.defineProperty(window.__gemini__, "find", {
   enumerable: false,
   configurable: false,
   writable: false,
   value: find
 });
 
-Object.defineProperty(window.__firefox__, "findNext", {
+Object.defineProperty(window.__gemini__, "findNext", {
   enumerable: false,
   configurable: false,
   writable: false,
   value: findNext
 });
 
-Object.defineProperty(window.__firefox__, "findPrevious", {
+Object.defineProperty(window.__gemini__, "findPrevious", {
   enumerable: false,
   configurable: false,
   writable: false,
   value: findPrevious
 });
 
-Object.defineProperty(window.__firefox__, "findDone", {
+Object.defineProperty(window.__gemini__, "findDone", {
   enumerable: false,
   configurable: false,
   writable: false,
