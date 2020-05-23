@@ -2,17 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>AdjustAppToken</key>
-	<string>$(ADJUST_APP_TOKEN)</string>
-	<key>AdjustEnvironment</key>
-	<string>$(ADJUST_ENVIRONMENT)</string>
+	<key>DevelopmentTeam</key>
+	<string>$(DEVELOPMENT_TEAM)</string>
 	<key>AppIdentifierPrefix</key>
 	<string>$(APP_IDENTIFIER_PREFIX)</string>
-	<key>BGTaskSchedulerPermittedIdentifiers</key>
-	<array>
-		<string>org.mozilla.ios.sync.part1</string>
-		<string>org.mozilla.ios.sync.part2</string>
-	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -24,7 +17,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>$(MOZ_PRODUCT_NAME)</string>
+	<string>Gemini</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -38,8 +31,6 @@
 			<string>com.pitr.Gemini</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>firefox</string>
-				<string>$(MOZ_INTERNAL_URL_SCHEME)</string>
 				<string>gemini</string>
 			</array>
 		</dict>
@@ -50,9 +41,6 @@
 	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
-		<string>pocket</string>
-		<string>firefox-focus</string>
-		<string>firefox-klar</string>
 		<string>ymail</string>
 		<string>ms-outlook</string>
 		<string>airmail</string>
@@ -61,7 +49,6 @@
 		<string>mymail-mailto</string>
 		<string>readdle-spark</string>
 		<string>itms-books</string>
-		<string>org-appextension-feature-password-management</string>
 		<string>googlegmail</string>
 		<string>fastmail</string>
 	</array>
@@ -69,16 +56,6 @@
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<true/>
-	<key>LeanplumAppId</key>
-	<string></string>
-	<key>LeanplumDevelopmentKey</key>
-	<string></string>
-	<key>LeanplumProductionKey</key>
-	<string></string>
-	<key>MozDevelopmentTeam</key>
-	<string>$(DEVELOPMENT_TEAM)</string>
-	<key>MozWhatsNewTopic</key>
-	<string>whats-new-ios-18</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -86,10 +63,6 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>This lets you take and upload photos.</string>
-	<key>NSFaceIDUsageDescription</key>
-	<string>Firefox requires Face ID to access your saved logins.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Websites you visit may request your location.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This lets you take and upload videos.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
@@ -98,12 +71,8 @@
 	<string>This lets you save and upload photos.</string>
 	<key>NSUserActivityTypes</key>
 	<array>
-		<string>org.mozilla.ios.firefox.browsing</string>
+		<string>com.pitr.gemini.browsing</string>
 	</array>
-	<key>PocketEnvironmentAPIKey</key>
-	<string>$(POCKET_API_KEY)</string>
-	<key>SentryDSN</key>
-	<string>$(SENTRY_DSN)</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>CharisSILB.ttf</string>

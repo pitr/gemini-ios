@@ -101,7 +101,6 @@ open class BrowserProfile: Profile {
     internal let files: FileAccessor
 
     let db: BrowserDB
-    let readingListDB: BrowserDB
 
     private let loginsSaltKeychainKey = "sqlcipher.key.logins.salt"
     private let loginsUnlockKeychainKey = "sqlcipher.key.logins.db"
@@ -151,7 +150,6 @@ open class BrowserProfile: Profile {
 
         // Set up our database handles.
         self.db = BrowserDB(filename: "browser.db", schema: BrowserSchema(), files: files)
-        self.readingListDB = BrowserDB(filename: "ReadingList.db", schema: ReadingListSchema(), files: files)
 
         if isNewProfile {
             log.info("New profile. Removing old Keychain/Prefs data.")
@@ -204,16 +202,6 @@ open class BrowserProfile: Profile {
         // Remove the default homepage. This does not change the user's preference,
         // just the behaviour when there is no homepage.
         prefs.removeObjectForKey(PrefsKeys.KeyDefaultHomePageURL)
-
-        // Hide the "__leanplum.sqlite" file in the documents directory.
-        if var leanplumFile = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false).appendingPathComponent("__leanplum.sqlite"), FileManager.default.fileExists(atPath: leanplumFile.path) {
-            let isHidden = (try? leanplumFile.resourceValues(forKeys: [.isHiddenKey]))?.isHidden ?? false
-            if !isHidden {
-                var resourceValues = URLResourceValues()
-                resourceValues.isHidden = true
-                try? leanplumFile.setResourceValues(resourceValues)
-            }
-        }
 
         // Create the "Downloads" folder in the documents directory.
         if let downloadsPath = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false).appendingPathComponent("Downloads").path {

@@ -163,12 +163,12 @@ extension URL {
     public var absoluteDisplayString: String {
         var urlString = self.absoluteString
         // For http URLs, get rid of the trailing slash if the path is empty or '/'
-        if (self.scheme == "http" || self.scheme == "https") && (self.path == "/") && urlString.hasSuffix("/") {
+        if (self.scheme == "gemini") && (self.path == "/") && urlString.hasSuffix("/") {
             urlString = String(urlString[..<urlString.index(urlString.endIndex, offsetBy: -1)])
         }
         // If it's basic http, strip out the string but leave anything else in
-        if urlString.hasPrefix("http://") {
-            return String(urlString[urlString.index(urlString.startIndex, offsetBy: 7)...])
+        if urlString.hasPrefix("gemini://") {
+            return String(urlString[urlString.index(urlString.startIndex, offsetBy: 9)...])
         } else {
             return urlString
         }
@@ -181,10 +181,6 @@ extension URL {
     }
 
     public var displayURL: URL? {
-        if AppConstants.IsRunningTest, path.contains("test-fixture/") {
-            return self
-        }
-
         if self.absoluteString.starts(with: "blob:") {
             return URL(string: "blob:")
         }

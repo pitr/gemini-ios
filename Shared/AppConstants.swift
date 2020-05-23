@@ -4,12 +4,6 @@
 
 import UIKit
 
-public enum AppBuildChannel: String {
-    case release = "release"
-    case beta = "beta"
-    case developer = "developer"
-}
-
 public enum KVOConstants: String {
     case loading = "loading"
     case estimatedProgress = "estimatedProgress"
@@ -26,21 +20,6 @@ public struct KeychainKey {
 }
 
 public struct AppConstants {
-    public static let IsRunningTest = NSClassFromString("XCTestCase") != nil || ProcessInfo.processInfo.arguments.contains(LaunchArguments.Test)
-
-    public static let FxAiOSClientId = "1b1a3e44c54fbb58"
-
-    /// Build Channel.
-    public static let BuildChannel: AppBuildChannel = {
-        #if MOZ_CHANNEL_RELEASE
-            return AppBuildChannel.release
-        #elseif MOZ_CHANNEL_BETA
-            return AppBuildChannel.beta
-        #elseif MOZ_CHANNEL_FENNEC
-            return AppBuildChannel.developer
-        #endif
-    }()
-
     public static let scheme: String = {
         guard let identifier = Bundle.main.bundleIdentifier else {
             return "unknown"

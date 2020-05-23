@@ -297,10 +297,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             InternalSchemeHandler.responders[path] = responder
         }
 
-        if AppConstants.IsRunningTest {
-            registerHandlersForTestMethods(server: server.server)
-        }
-
         // Bug 1223009 was an issue whereby CGDWebserver crashed when moving to a background task
         // catching and handling the error seemed to fix things, but we're not sure why.
         // Either way, not implicitly unwrapping a try is not a great way of doing things

@@ -17,13 +17,7 @@ if [ "$1" == "--force" ]; then
     rm -rf ~/Library/Caches/org.carthage.CarthageKit
 fi
 
-# Only enable this on the Xcode Server because it times out if it does not
-# get any output for some time while building the dependencies.
-
-CARTHAGE_VERBOSE=""
-if [ ! -z "$XCS_BOT_ID"  ]; then
-  CARTHAGE_VERBOSE="--verbose"
-fi
+CARTHAGE_VERBOSE="--verbose"
 
 carthage bootstrap $CARTHAGE_VERBOSE --platform ios --color auto --cache-builds
 
@@ -31,5 +25,3 @@ carthage bootstrap $CARTHAGE_VERBOSE --platform ios --color auto --cache-builds
 
 npm install
 npm run build
-
-(cd content-blocker-lib-ios/ContentBlockerGen && swift run)
