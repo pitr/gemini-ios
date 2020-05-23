@@ -162,7 +162,6 @@
 		D057B2AB220103BC000614E0 /* RustLogins.swift in Sources */ = {isa = PBXBuildFile; fileRef = D057B2AA220103BC000614E0 /* RustLogins.swift */; };
 		D0625C98208E87F10081F3B2 /* DownloadQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0625C97208E87F10081F3B2 /* DownloadQueue.swift */; };
 		D0625CA8208FC47A0081F3B2 /* BrowserViewController+DownloadQueueDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0625CA7208FC47A0081F3B2 /* BrowserViewController+DownloadQueueDelegate.swift */; };
-		D07696F820697F9C00FACFD8 /* ReadingListSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = D07696F720697F9C00FACFD8 /* ReadingListSchema.swift */; };
 		D09A0CD81FAA23F6009A0273 /* Shared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288A2D861AB8B3260023ABC3 /* Shared.framework */; };
 		D0A627642270C682006AFA2E /* SQLiteHistoryFavicons.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0A627632270C682006AFA2E /* SQLiteHistoryFavicons.swift */; };
 		D0A627662270C982006AFA2E /* photon-colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C49854D206173C800893DAE /* photon-colors.swift */; };
@@ -342,8 +341,6 @@
 		EBC4869F2195F58300CDA48D /* SessionRestoreHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBC4869C2195F58300CDA48D /* SessionRestoreHandler.swift */; };
 		EBCF403B221CBC5B00B38F28 /* SwiftProtobuf.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBCF403A221CBC5B00B38F28 /* SwiftProtobuf.framework */; };
 		EBE26B57220C959D00D1D99A /* BrowserViewController+TabToolbarDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBE26B4E220C959D00D1D99A /* BrowserViewController+TabToolbarDelegate.swift */; };
-		EBE7635820ADCB7600E27F2D /* SendTo.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EBE7634F20ADCB7500E27F2D /* SendTo.xcassets */; };
-		EBE7635920ADCB7600E27F2D /* SendTo.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EBE7634F20ADCB7500E27F2D /* SendTo.xcassets */; };
 		EBFDB790211C83A5005CCA2F /* BrowserViewController+FindInPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBFDB787211C83A5005CCA2F /* BrowserViewController+FindInPage.swift */; };
 		F35B8D2B1D6380EA008E3D61 /* SessionRestore.html in Resources */ = {isa = PBXBuildFile; fileRef = F35B8D2A1D6380EA008E3D61 /* SessionRestore.html */; };
 		F35B8D2D1D6383E9008E3D61 /* SessionRestoreHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35B8D2C1D6383E9008E3D61 /* SessionRestoreHelper.swift */; };
@@ -579,7 +576,6 @@
 		D057B2AA220103BC000614E0 /* RustLogins.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RustLogins.swift; sourceTree = "<group>"; };
 		D0625C97208E87F10081F3B2 /* DownloadQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadQueue.swift; sourceTree = "<group>"; };
 		D0625CA7208FC47A0081F3B2 /* BrowserViewController+DownloadQueueDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+DownloadQueueDelegate.swift"; sourceTree = "<group>"; };
-		D07696F720697F9C00FACFD8 /* ReadingListSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingListSchema.swift; sourceTree = "<group>"; };
 		D0A627632270C682006AFA2E /* SQLiteHistoryFavicons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SQLiteHistoryFavicons.swift; sourceTree = "<group>"; };
 		D0B9483322A03468002F4AA1 /* BookmarkDetailPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkDetailPanel.swift; sourceTree = "<group>"; };
 		D0B9483C22A18B78002F4AA1 /* TextFieldTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldTableViewCell.swift; sourceTree = "<group>"; };
@@ -771,7 +767,6 @@
 		EBCF403A221CBC5B00B38F28 /* SwiftProtobuf.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftProtobuf.framework; path = Carthage/Build/iOS/SwiftProtobuf.framework; sourceTree = "<group>"; };
 		EBCF403C221CBC9A00B38F28 /* MozillaAppServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MozillaAppServices.framework; path = Carthage/Build/iOS/MozillaAppServices.framework; sourceTree = "<group>"; };
 		EBE26B4E220C959D00D1D99A /* BrowserViewController+TabToolbarDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+TabToolbarDelegate.swift"; sourceTree = "<group>"; };
-		EBE7634F20ADCB7500E27F2D /* SendTo.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = SendTo.xcassets; sourceTree = "<group>"; };
 		EBFDB787211C83A5005CCA2F /* BrowserViewController+FindInPage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+FindInPage.swift"; sourceTree = "<group>"; };
 		F35B8D2A1D6380EA008E3D61 /* SessionRestore.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = SessionRestore.html; sourceTree = "<group>"; };
 		F35B8D2C1D6383E9008E3D61 /* SessionRestoreHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionRestoreHelper.swift; sourceTree = "<group>"; };
@@ -967,7 +962,6 @@
 			children = (
 				2FCAE24B1ABB531100877008 /* BrowserDB.swift */,
 				282915E51AF1A7920006EEB5 /* BrowserSchema.swift */,
-				D07696F720697F9C00FACFD8 /* ReadingListSchema.swift */,
 				D018F93D1F44A7190098F8CA /* Schema.swift */,
 				D0131B4C1F3CF7D8000CDE86 /* SQLiteFavicons.swift */,
 				2FCAE2551ABB531100877008 /* SQLiteHistory.swift */,
@@ -1572,7 +1566,6 @@
 		F8708D241A0970990051AB07 /* ShareTo */ = {
 			isa = PBXGroup;
 			children = (
-				EBE7634F20ADCB7500E27F2D /* SendTo.xcassets */,
 				F8708D251A0970990051AB07 /* Images.xcassets */,
 				F8708D261A0970990051AB07 /* Info.plist */,
 				E41A7D4A1A1BE04500245963 /* InitialViewController.swift */,
@@ -1816,7 +1809,6 @@
 				E4B7B7681A793CF20022C5E0 /* FiraSans-Bold.ttf in Resources */,
 				E4B7B7781A793CF20022C5E0 /* FiraSans-Italic.ttf in Resources */,
 				0BA1E00E1B03FB0B007675AF /* NetError.html in Resources */,
-				EBE7635820ADCB7600E27F2D /* SendTo.xcassets in Resources */,
 				E4ECCDAE1AB131770005E717 /* FiraSans-Medium.ttf in Resources */,
 				E4424B3C1AC71FB400F44C38 /* FiraSans-Book.ttf in Resources */,
 				39A35AED1C0662A3006B9E87 /* SpotlightHelper.js in Resources */,
@@ -1831,7 +1823,6 @@
 			files = (
 				E487B24F1AC1CC9200F3E86F /* FiraSans-Medium.ttf in Resources */,
 				E487B2331AC1C64300F3E86F /* FiraSans-Regular.ttf in Resources */,
-				EBE7635920ADCB7600E27F2D /* SendTo.xcassets in Resources */,
 				F8708D2E1A0970B70051AB07 /* Images.xcassets in Resources */,
 				E487B2501AC1CC9800F3E86F /* FiraSans-Light.ttf in Resources */,
 				E487B24E1AC1C66400F3E86F /* FiraSans-SemiBold.ttf in Resources */,
@@ -1962,7 +1953,6 @@
 				D0131B4D1F3CF7D8000CDE86 /* SQLiteFavicons.swift in Sources */,
 				28B62ACE1BC745E7004A585A /* Syncable.swift in Sources */,
 				74B195441CF503FC007F36EF /* RecentlyClosedTabs.swift in Sources */,
-				D07696F820697F9C00FACFD8 /* ReadingListSchema.swift in Sources */,
 				E65075C21E37F956006961AC /* ExtensionUtils.swift in Sources */,
 				D057B2AB220103BC000614E0 /* RustLogins.swift in Sources */,
 				7BF5A1EA1B41640500EA9DD8 /* SyncQueue.swift in Sources */,

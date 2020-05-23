@@ -168,9 +168,7 @@ open class BrowserProfile: Profile {
 
             switch level {
             case .trace:
-                if Logger.logPII {
-                    log.verbose(logString)
-                }
+                break
             case .debug:
                 log.debug(logString)
             case .info:
@@ -251,11 +249,6 @@ open class BrowserProfile: Profile {
 
     @objc
     func onPageMetadataFetched(notification: NSNotification) {
-        let isPrivate = notification.userInfo?["isPrivate"] as? Bool ?? true
-        guard !isPrivate else {
-            log.debug("Private mode - Ignoring page metadata.")
-            return
-        }
         guard let pageURL = notification.userInfo?["tabURL"] as? URL,
               let pageMetadata = notification.userInfo?["pageMetadata"] as? PageMetadata else {
             log.debug("Metadata notification doesn't contain any metadata!")

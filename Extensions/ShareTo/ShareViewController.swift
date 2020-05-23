@@ -345,9 +345,9 @@ extension ShareViewController {
        func firefoxUrl(_ url: String) -> String {
             let encoded = url.addingPercentEncoding(withAllowedCharacters: NSCharacterSet.alphanumerics) ?? ""
             if isSearch {
-                return "firefox://open-text?text=\(encoded)"
+                return "gemini://open-text?text=\(encoded)"
             }
-            return "firefox://open-url?url=\(encoded)"
+            return "gemini://open-url?url=\(encoded)"
         }
 
         guard let url = URL(string: firefoxUrl(url)) else { return }

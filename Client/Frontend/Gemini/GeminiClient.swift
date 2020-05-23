@@ -329,9 +329,7 @@ extension GeminiClient: StreamDelegate {
                 }
             }
             let title = pageTitle ?? self.url.absoluteDisplayString
-            let res = htmlHeader+"<title>\(title)</title></head><body>\n\(body)"
-            log.debug(res)
-            return res
+            return htmlHeader+"<title>\(title)</title></head><body>\n\(body)"
         } catch let err as NSError {
             return "Error: \(err)"
         }

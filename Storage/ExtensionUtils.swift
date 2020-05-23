@@ -24,8 +24,8 @@ public struct ExtensionUtils {
         case rawText(String)
 
         public func isUrlType() -> Bool {
-            if case .shareItem(_) = self {
-                return true
+            if case .shareItem(let item) = self {
+                return item.url.starts(with: "gemini://")
             } else {
                 return false
             }

@@ -538,9 +538,6 @@ extension SQLiteHistory: BrowserHistory {
 
         let update = "UPDATE history SET title = ?, local_modified = ?, should_upload = 1, domain_id = (SELECT id FROM domains where domain = ?) WHERE url = ?"
         let updateArgs: Args? = [site.title, time, host, site.url]
-        if Logger.logPII {
-            log.debug("Setting title to \(site.title) for URL \(site.url)")
-        }
         do {
             try conn.executeChange(update, withArgs: updateArgs)
             return conn.numberOfRowsModified
@@ -575,10 +572,6 @@ extension SQLiteHistory: BrowserHistory {
             }
 
             return 1
-        }
-
-        if Logger.logPII {
-            log.warning("Invalid URL \(site.url). Not stored in history.")
         }
         return 0
     }
@@ -807,10 +800,6 @@ extension SQLiteHistory: SyncableHistory {
             // The record doesn't exist locally. Insert it.
             log.verbose("Inserting remote history item for guid \(place.guid).")
             if let host = place.url.asURL?.normalizedHost {
-                if Logger.logPII {
-                    log.debug("Inserting: \(place.url).")
-                }
-
                 let insertDomain = "INSERT OR IGNORE INTO domains (domain) VALUES (?)"
                 let insertHistory = """
                     INSERT INTO history (
@@ -824,10 +813,6 @@ extension SQLiteHistory: SyncableHistory {
                 ]) >>> always(place.guid)
             } else {
                 // This is a URL with no domain. Insert it directly.
-                if Logger.logPII {
-                    log.debug("Inserting: \(place.url) with no domain.")
-                }
-
                 let insertHistory = """
                     INSERT INTO history (
                         guid, url, title, server_modified, is_deleted, should_upload, domain_id

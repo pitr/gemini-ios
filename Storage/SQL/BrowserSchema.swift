@@ -213,18 +213,12 @@ open class BrowserSchema: Schema {
         let localArgs: Args = [
             0, BookmarkRoots.RootGUID, type, now, BookmarkRoots.RootGUID, status, now,
             1, BookmarkRoots.MobileFolderGUID, type, now, BookmarkRoots.RootGUID, status, now,
-            2, BookmarkRoots.MenuFolderGUID, type, now, BookmarkRoots.RootGUID, status, now,
-            3, BookmarkRoots.ToolbarFolderGUID, type, now, BookmarkRoots.RootGUID, status, now,
-            4, BookmarkRoots.UnfiledFolderGUID, type, now, BookmarkRoots.RootGUID, status, now,
         ]
 
         // Compute these args using the sequence in RootChildren, rather than hard-coding.
         var idx = 0
         var structureArgs = Args()
         let rootChildren: [GUID] = [
-            BookmarkRoots.MenuFolderGUID,
-            BookmarkRoots.ToolbarFolderGUID,
-            BookmarkRoots.UnfiledFolderGUID,
             BookmarkRoots.MobileFolderGUID,
         ]
         structureArgs.reserveCapacity(rootChildren.count * 3)

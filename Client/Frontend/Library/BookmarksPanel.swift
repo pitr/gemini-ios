@@ -19,9 +19,6 @@ private struct BookmarksPanelUX {
 }
 
 let LocalizedRootBookmarkFolderStrings = [
-    BookmarkRoots.MenuFolderGUID: Strings.BookmarksFolderTitleMenu,
-    BookmarkRoots.ToolbarFolderGUID: Strings.BookmarksFolderTitleToolbar,
-    BookmarkRoots.UnfiledFolderGUID: Strings.BookmarksFolderTitleUnsorted,
     BookmarkRoots.MobileFolderGUID: Strings.BookmarksFolderTitleMobile
 ]
 
