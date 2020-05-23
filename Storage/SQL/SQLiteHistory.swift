@@ -363,7 +363,7 @@ fileprivate struct SQLiteFrecentHistory: FrecentHistory {
                     domains.id = history.domain_id
                 INNER JOIN visits ON
                     visits.siteID = history.id
-            WHERE (history.is_deleted = 0) AND ((domains.showOnTopSites IS 1) AND (domains.domain NOT LIKE 'r.%') AND (domains.domain NOT LIKE 'google.%')) AND (history.url LIKE 'http%')
+            WHERE (history.is_deleted = 0) AND ((domains.showOnTopSites IS 1) AND (domains.domain NOT LIKE 'r.%') AND (domains.domain NOT LIKE 'google.%')) AND (history.url LIKE 'gemini%')
             GROUP BY historyID
             """
 
