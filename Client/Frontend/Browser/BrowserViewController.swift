@@ -1341,6 +1341,32 @@ extension BrowserViewController: TabDelegate {
         KVOs.forEach { webView.addObserver(self, forKeyPath: $0.rawValue, options: .new, context: nil) }
         webView.scrollView.addObserver(self.scrollController, forKeyPath: KVOConstants.contentSize.rawValue, options: .new, context: nil)
         webView.uiDelegate = self
+
+        let contextMenuHelper = ContextMenuHelper(tab: tab)
+        contextMenuHelper.delegate = self
+        tab.addContentScript(contextMenuHelper, name: ContextMenuHelper.name())
+
+        let errorHelper = ErrorPageHelper(certStore: profile.certStore)
+        tab.addContentScript(errorHelper, name: ErrorPageHelper.name())
+
+        let sessionRestoreHelper = SessionRestoreHelper(tab: tab)
+        sessionRestoreHelper.delegate = self
+        tab.addContentScript(sessionRestoreHelper, name: SessionRestoreHelper.name())
+
+        let findInPageHelper = FindInPageHelper(tab: tab)
+        findInPageHelper.delegate = self
+        tab.addContentScript(findInPageHelper, name: FindInPageHelper.name())
+
+        let downloadContentScript = DownloadContentScript(tab: tab)
+        tab.addContentScript(downloadContentScript, name: DownloadContentScript.name())
+
+        let printHelper = PrintHelper(tab: tab)
+        tab.addContentScript(printHelper, name: PrintHelper.name())
+
+        tab.addContentScript(LocalRequestHelper(), name: LocalRequestHelper.name())
+
+        tab.addContentScript(FocusHelper(tab: tab), name: FocusHelper.name())
+
     }
 
     func tab(_ tab: Tab, willDeleteWebView webView: WKWebView) {
