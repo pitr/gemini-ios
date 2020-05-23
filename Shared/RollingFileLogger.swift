@@ -12,7 +12,7 @@ open class RollingFileLogger: XCGLogger {
     fileprivate let sizeLimit: Int64
     fileprivate let logDirectoryPath: String?
 
-    let fileLogIdentifierPrefix = "com.mozilla.firefox.filelogger."
+    let fileLogIdentifierPrefix = "com.pitr.gemini.filelogger."
 
     fileprivate static let DateFormatter: DateFormatter = {
         let formatter = Foundation.DateFormatter()

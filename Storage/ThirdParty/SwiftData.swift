@@ -173,7 +173,7 @@ open class SwiftData {
                 do {
                     _ = try callback(FailedSQLiteDBConnection())
 
-                    deferred.fill(Maybe(failure: NSError(domain: "mozilla", code: 0, userInfo: [NSLocalizedDescriptionKey: "Could not create a connection"])))
+                    deferred.fill(Maybe(failure: NSError(domain: "com.pitr", code: 0, userInfo: [NSLocalizedDescriptionKey: "Could not create a connection"])))
                 } catch let err as NSError {
                     deferred.fill(Maybe(failure: DatabaseError(err: err)))
                 }
@@ -381,7 +381,7 @@ class FailedSQLiteDBConnection: SQLiteDBConnection {
     var version: Int = 0
 
     fileprivate func fail(_ str: String) -> NSError {
-        return NSError(domain: "mozilla", code: 0, userInfo: [NSLocalizedDescriptionKey: str])
+        return NSError(domain: "com.pitr", code: 0, userInfo: [NSLocalizedDescriptionKey: str])
     }
 
     func executeChange(_ sqlStr: String, withArgs args: Args?) throws -> Void {
@@ -546,7 +546,7 @@ open class ConcreteSQLiteDBConnection: SQLiteDBConnection {
         let cursorResult = self.pragma(pragma, factory: factory)
         if cursorResult != expected {
             log.error("\(message): \(cursorResult.debugDescription), \(expected.debugDescription)")
-            throw NSError(domain: "mozilla", code: 0, userInfo: [NSLocalizedDescriptionKey: "PRAGMA didn't return expected output: \(message)."])
+            throw NSError(domain: "com.pitr", code: 0, userInfo: [NSLocalizedDescriptionKey: "PRAGMA didn't return expected output: \(message)."])
         }
     }
 
@@ -917,7 +917,7 @@ open class ConcreteSQLiteDBConnection: SQLiteDBConnection {
             }
         }
 
-        return NSError(domain: "org.mozilla", code: status, userInfo: [NSLocalizedDescriptionKey: msg])
+        return NSError(domain: "com.pitr", code: status, userInfo: [NSLocalizedDescriptionKey: msg])
     }
 
     /// Open the connection. This is called when the db is created. You should not call it yourself.

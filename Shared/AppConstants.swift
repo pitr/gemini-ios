@@ -25,10 +25,7 @@ public struct AppConstants {
             return "unknown"
         }
 
-        let scheme = identifier.replacingOccurrences(of: "org.mozilla.ios.", with: "")
-        if scheme == "FirefoxNightly.enterprise" {
-            return "FirefoxNightly"
-        }
+        let scheme = identifier.replacingOccurrences(of: "com.pitr.ios.", with: "")
         return scheme
     }()
 

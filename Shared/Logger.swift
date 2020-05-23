@@ -78,7 +78,7 @@ public extension Logger {
             let fileDestination = FileDestination(
                 owner: log,
                 writeToFile: logFileURL.absoluteString,
-                identifier: "com.mozilla.firefox.filelogger.\(name)"
+                identifier: "com.pitr.gemini.filelogger.\(name)"
             )
             log.add(destination: fileDestination)
         }
