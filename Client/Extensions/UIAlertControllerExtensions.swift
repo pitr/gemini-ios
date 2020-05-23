@@ -21,7 +21,7 @@ extension UIAlertController {
     class func restoreTabsAlert(okayCallback: @escaping UIAlertActionCallback, noCallback: @escaping UIAlertActionCallback) -> UIAlertController {
         let alert = UIAlertController(
             title: NSLocalizedString("Well, this is embarrassing.", comment: "Restore Tabs Prompt Title"),
-            message: NSLocalizedString("Looks like Firefox crashed previously. Would you like to restore your tabs?", comment: "Restore Tabs Prompt Description"),
+            message: NSLocalizedString("Looks like Gemini crashed previously. Would you like to restore your tabs?", comment: "Restore Tabs Prompt Description"),
             preferredStyle: .alert
         )
 

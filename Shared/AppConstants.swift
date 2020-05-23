@@ -20,6 +20,8 @@ public struct KeychainKey {
 }
 
 public struct AppConstants {
+    public static let IsRunningTest = NSClassFromString("XCTestCase") != nil
+
     public static let scheme: String = {
         guard let identifier = Bundle.main.bundleIdentifier else {
             return "unknown"
