@@ -143,15 +143,6 @@ class Tab: NSObject {
     /// The last title shown by this tab. Used by the tab tray to show titles for zombie tabs.
     var lastTitle: String?
 
-    /// Whether or not the desktop site was requested with the last request, reload or navigation.
-    var changedUserAgent: Bool = false {
-        didSet {
-            if changedUserAgent != oldValue {
-                TabEvent.post(.didToggleDesktopMode, for: self)
-            }
-        }
-    }
-
     fileprivate(set) var screenshot: UIImage?
     var screenshotUUID: UUID?
 
@@ -504,12 +495,6 @@ class Tab: NSObject {
         if revUUID {
             self.screenshotUUID = UUID()
         }
-    }
-
-    func toggleChangeUserAgent() {
-        changedUserAgent = !changedUserAgent
-        reload()
-        TabEvent.post(.didToggleDesktopMode, for: self)
     }
 
     func queueJavascriptAlertPrompt(_ alert: JSAlertInfo) {

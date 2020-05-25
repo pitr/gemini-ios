@@ -446,19 +446,8 @@ extension BrowserViewController: WKNavigationDelegate {
         // always allow this. Additionally, data URIs are also handled just like normal web pages.
 
         if ["gemini", "blob", "file"].contains(url.scheme) {
-            if navigationAction.targetFrame?.isMainFrame ?? false {
-                tab.changedUserAgent = Tab.ChangeUserAgent.contains(url: url)
-            }
-
             pendingRequests[url.absoluteString] = navigationAction.request
 
-            if tab.changedUserAgent {
-                let platformSpecificUserAgent = UserAgent.oppositeUserAgent(domain: url.baseDomain ?? "")
-                webView.customUserAgent = platformSpecificUserAgent
-            } else {
-                webView.customUserAgent = UserAgent.getUserAgent(domain: url.baseDomain ?? "")
-            }
-            
             decisionHandler(.allow)
             return
         }

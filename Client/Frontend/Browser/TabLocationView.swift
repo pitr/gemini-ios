@@ -13,8 +13,6 @@ protocol TabLocationViewDelegate {
     func tabLocationViewDidTapLocation(_ tabLocationView: TabLocationView)
     func tabLocationViewDidLongPressLocation(_ tabLocationView: TabLocationView)
     func tabLocationViewDidTapShield(_ tabLocationView: TabLocationView)
-    func tabLocationViewDidTapPageOptions(_ tabLocationView: TabLocationView, from button: UIButton)
-    func tabLocationViewDidLongPressPageOptions(_ tabLocationVIew: TabLocationView)
     func tabLocationViewDidBeginDragInteraction(_ tabLocationView: TabLocationView)
     func tabLocationViewLocationAccessibilityActions(_ tabLocationView: TabLocationView) -> [UIAccessibilityCustomAction]?
 }
@@ -33,8 +31,6 @@ class TabLocationView: UIView {
     var tapRecognizer: UITapGestureRecognizer!
     var contentView: UIStackView!
 
-    fileprivate let menuBadge = BadgeWithBackdrop(imageName: "menuBadge", backdropCircleSize: 32)
-
     @objc dynamic var baseURLFontColor: UIColor = TabLocationViewUX.BaseURLFontColor {
         didSet { updateTextWithURL() }
     }
@@ -42,7 +38,6 @@ class TabLocationView: UIView {
     var url: URL? {
         didSet {
             updateTextWithURL()
-            pageOptionsButton.isHidden = (url == nil)
             setNeedsUpdateConstraints()
         }
     }
@@ -73,33 +68,16 @@ class TabLocationView: UIView {
         return urlTextField
     }()
 
-    lazy var pageOptionsButton: ToolbarButton = {
-        let pageOptionsButton = ToolbarButton(frame: .zero)
-        pageOptionsButton.setImage(UIImage.templateImageNamed("menu-More-Options"), for: .normal)
-        pageOptionsButton.addTarget(self, action: #selector(didPressPageOptionsButton), for: .touchUpInside)
-        pageOptionsButton.isAccessibilityElement = true
-        pageOptionsButton.isHidden = true
-        pageOptionsButton.imageView?.contentMode = .left
-        pageOptionsButton.accessibilityLabel = NSLocalizedString("Page Options Menu", comment: "Accessibility label for the Page Options menu button")
-        pageOptionsButton.accessibilityIdentifier = "TabLocationView.pageOptionsButton"
-        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(didLongPressPageOptionsButton))
-        pageOptionsButton.addGestureRecognizer(longPressGesture)
-        return pageOptionsButton
-    }()
-
     private func makeSeparator() -> UIView {
         let line = UIView()
         line.layer.cornerRadius = 2
         return line
     }
 
-    // A vertical separator next to the page options button.
-    lazy var separatorLineForPageOptions: UIView = makeSeparator()
-
     override init(frame: CGRect) {
         super.init(frame: frame)
 
-        register(self, forTabEvents: .didGainFocus, .didToggleDesktopMode, .didChangeContentBlocking)
+        register(self, forTabEvents: .didGainFocus)
 
         longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(longPressLocation))
         longPressRecognizer.delegate = self
@@ -115,9 +93,7 @@ class TabLocationView: UIView {
             make.width.equalTo(10)
         }
 
-        pageOptionsButton.separatorLine = separatorLineForPageOptions
-
-        let subviews = [space10px, urlTextField, separatorLineForPageOptions, pageOptionsButton]
+        let subviews = [space10px, urlTextField]
         contentView = UIStackView(arrangedSubviews: subviews)
         contentView.distribution = .fill
         contentView.alignment = .center
@@ -127,30 +103,18 @@ class TabLocationView: UIView {
             make.edges.equalTo(self)
         }
 
-        pageOptionsButton.snp.makeConstraints { make in
-            make.size.equalTo(TabLocationViewUX.ButtonSize)
-        }
-        separatorLineForPageOptions.snp.makeConstraints { make in
-            make.width.equalTo(1)
-            make.height.equalTo(26)
-        }
-
         // Setup UIDragInteraction to handle dragging the location
         // bar for dropping its URL into other apps.
         let dragInteraction = UIDragInteraction(delegate: self)
         dragInteraction.allowsSimultaneousRecognitionDuringLift = true
         self.addInteraction(dragInteraction)
-
-        menuBadge.add(toParent: contentView)
-        menuBadge.layout(onButton: pageOptionsButton)
-        menuBadge.show(false)
     }
 
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private lazy var _accessibilityElements = [urlTextField, pageOptionsButton]
+    private lazy var _accessibilityElements = [urlTextField]
 
     override var accessibilityElements: [Any]? {
         get {
@@ -165,14 +129,6 @@ class TabLocationView: UIView {
         _accessibilityElements.forEach {
             $0.isAccessibilityElement = enabled
         }
-    }
-
-    @objc func didPressPageOptionsButton(_ button: UIButton) {
-        delegate?.tabLocationViewDidTapPageOptions(self, from: button)
-    }
-
-    @objc func didLongPressPageOptionsButton(_ recognizer: UILongPressGestureRecognizer) {
-        delegate?.tabLocationViewDidLongPressPageOptions(self)
     }
 
     @objc func longPressLocation(_ recognizer: UITapGestureRecognizer) {
@@ -241,27 +197,11 @@ extension TabLocationView: Themeable {
     func applyTheme() {
         backgroundColor = UIColor.theme.textField.background
         urlTextField.textColor = UIColor.theme.textField.textAndTint
-        
-        pageOptionsButton.selectedTintColor = UIColor.theme.urlbar.pageOptionsSelected
-        pageOptionsButton.unselectedTintColor = UIColor.theme.urlbar.pageOptionsUnselected
-        pageOptionsButton.tintColor = pageOptionsButton.unselectedTintColor
-        separatorLineForPageOptions.backgroundColor = UIColor.Photon.Grey40
-
-        let color = ThemeManager.instance.currentName == .dark ? UIColor(white: 0.3, alpha: 0.6): UIColor.theme.textField.background
-        menuBadge.badge.tintBackground(color: color)
     }
 }
 
 extension TabLocationView: TabEventHandler {
-    func tabDidChangeContentBlocking(_ tab: Tab) {
-    }
-
     func tabDidGainFocus(_ tab: Tab) {
-        menuBadge.show(tab.changedUserAgent)
-    }
-
-    func tabDidToggleDesktopMode(_ tab: Tab) {
-        menuBadge.show(tab.changedUserAgent)
     }
 }
 

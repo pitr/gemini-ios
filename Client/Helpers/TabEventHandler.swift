@@ -58,7 +58,6 @@ protocol TabEventHandler: AnyObject {
     func tabDidLoseFocus(_ tab: Tab)
     func tabDidClose(_ tab: Tab)
     func tab(_ tab: Tab, didDeriveMetadata metadata: DerivedMetadata)
-    func tabDidToggleDesktopMode(_ tab: Tab)
 }
 
 // Provide default implmentations, because we don't want to litter the code with
@@ -72,7 +71,6 @@ extension TabEventHandler {
     func tabDidLoseFocus(_ tab: Tab) {}
     func tabDidClose(_ tab: Tab) {}
     func tab(_ tab: Tab, didDeriveMetadata metadata: DerivedMetadata) {}
-    func tabDidToggleDesktopMode(_ tab: Tab) {}
 }
 
 enum TabEventLabel: String {
@@ -84,8 +82,6 @@ enum TabEventLabel: String {
     case didLoseFocus
     case didClose
     case didDeriveMetadata
-    case didToggleDesktopMode
-    case didChangeContentBlocking
 }
 
 // Names of events must be unique!
@@ -98,7 +94,6 @@ enum TabEvent {
     case didLoseFocus
     case didClose
     case didDeriveMetadata(DerivedMetadata)
-    case didToggleDesktopMode
 
     var label: TabEventLabel {
         let str = "\(self)".components(separatedBy: "(")[0] // Will grab just the name from 'didChangeURL(...)'
@@ -126,8 +121,6 @@ enum TabEvent {
             handler.tabDidClose(tab)
         case .didDeriveMetadata(let metadata):
             handler.tab(tab, didDeriveMetadata: metadata)
-        case .didToggleDesktopMode:
-            handler.tabDidToggleDesktopMode(tab)
         }
     }
 }
