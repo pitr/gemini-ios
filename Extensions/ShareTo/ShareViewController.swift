@@ -53,16 +53,6 @@ protocol ShareControllerDelegate: AnyObject {
     func hidePopupWhenShowingAlert()
 }
 
-// Telemetry events are written to NSUserDefaults, and then the host app reads and clears this list.
-func addAppExtensionTelemetryEvent(forMethod method: String) {
-    let profile = BrowserProfile(localName: "profile")
-    var events = profile.prefs.arrayForKey(PrefsKeys.AppExtensionTelemetryEventArray) ?? [[String]]()
-    // Currently, only URL objects are shared.
-    let event = ["method": method, "object": "url"]
-    events.append(event)
-    profile.prefs.setObject(events, forKey: PrefsKeys.AppExtensionTelemetryEventArray)
-}
-
 class ShareViewController: UIViewController {
     var shareItem: ExtensionUtils.ExtractedShareItem?
     private var viewsShownDuringDoneAnimation = [UIView]()
@@ -314,8 +304,6 @@ extension ShareViewController {
             profile.queue.addToQueue(item).uponQueue(.main) { _ in
                 profile._shutdown()
             }
-
-            addAppExtensionTelemetryEvent(forMethod: "load-in-background")
         }
 
         finish()
@@ -330,18 +318,12 @@ extension ShareViewController {
             profile._reopen()
             _ = profile.places.createBookmark(parentGUID: BookmarkRoots.MobileFolderGUID, url: item.url, title: item.title).value // Intentionally block thread with database call.
             profile._shutdown()
-
-            addAppExtensionTelemetryEvent(forMethod: "bookmark-this-page")
         }
 
         finish()
     }
 
     func openFirefox(withUrl url: String, isSearch: Bool) {
-        // Telemetry is handled in the app delegate that receives this event.
-        let profile = BrowserProfile(localName: "profile")
-        profile.prefs.setBool(true, forKey: PrefsKeys.AppExtensionTelemetryOpenUrl)
-
        func firefoxUrl(_ url: String) -> String {
             let encoded = url.addingPercentEncoding(withAllowedCharacters: NSCharacterSet.alphanumerics) ?? ""
             if isSearch {

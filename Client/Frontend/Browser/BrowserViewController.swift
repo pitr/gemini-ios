@@ -510,7 +510,7 @@ class BrowserViewController: UIViewController {
         // not flash before we present. This change of alpha also participates in the animation when
         // the intro view is dismissed.
         if UIDevice.current.userInterfaceIdiom == .phone {
-            self.view.alpha = 1.0
+            self.view.alpha = (profile.prefs.intForKey(PrefsKeys.IntroSeen) != nil) ? 1.0 : 0.0
         }
 
         if !displayedRestoreTabsAlert && !cleanlyBackgrounded() {
@@ -540,6 +540,8 @@ class BrowserViewController: UIViewController {
     }
 
     override func viewDidAppear(_ animated: Bool) {
+        presentIntroViewController()
+
         screenshotHelper.viewIsVisible = true
         screenshotHelper.takePendingScreenshots(tabManager.tabs)
 
@@ -1676,6 +1678,42 @@ extension BrowserViewController: UIAdaptivePresentationControllerDelegate {
         return .none
     }
 }
+
+extension BrowserViewController: IntroViewControllerDelegate {
+    @discardableResult func presentIntroViewController(_ force: Bool = false, animated: Bool = true) -> Bool {
+        if force || profile.prefs.intForKey(PrefsKeys.IntroSeen) == nil {
+            let introViewController = IntroViewController()
+            introViewController.delegate = self
+            // On iPad we present it modally in a controller
+            if topTabsVisible {
+                introViewController.preferredContentSize = CGSize(width: ViewControllerConsts.PreferredSize.IntroViewController.width, height: ViewControllerConsts.PreferredSize.IntroViewController.height)
+                introViewController.modalPresentationStyle = .formSheet
+            } else {
+                introViewController.modalPresentationStyle = .fullScreen
+            }
+            present(introViewController, animated: animated) {
+                // On first run (and forced) open up the homepage in the background.
+                if let homePageURL = NewTabHomePageAccessors.getHomePage(self.profile.prefs), let tab = self.tabManager.selectedTab, DeviceInfo.hasConnectivity() {
+                    tab.loadRequest(URLRequest(url: homePageURL))
+                }
+            }
+
+            return true
+        }
+
+        return false
+    }
+
+    func introViewControllerDidFinish(_ introViewController: IntroViewController) {
+        self.profile.prefs.setInt(1, forKey: PrefsKeys.IntroSeen)
+        introViewController.dismiss(animated: true) {
+            if self.navigationController?.viewControllers.count ?? 0 > 1 {
+                _ = self.navigationController?.popToRootViewController(animated: true)
+            }
+        }
+    }
+}
+
 
 extension BrowserViewController: ContextMenuHelperDelegate {
     func contextMenuHelper(_ contextMenuHelper: ContextMenuHelper, didLongPressElements elements: ContextMenuHelper.Elements, gestureRecognizer: UIGestureRecognizer) {

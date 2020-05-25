@@ -118,6 +118,8 @@
 		7BF5A1EA1B41640500EA9DD8 /* SyncQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF5A1E91B41640500EA9DD8 /* SyncQueue.swift */; };
 		802AEAA024715B0B00567181 /* GeminiClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802AEA9F24715B0B00567181 /* GeminiClient.swift */; };
 		802AEAA22471C4CC00567181 /* GeminiSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802AEAA12471C4CC00567181 /* GeminiSchemeHandler.swift */; };
+		8084B731247C2F8C002C42DC /* IntroViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8084B72F247C2F8B002C42DC /* IntroViewController.swift */; };
+		8084B732247C2F8C002C42DC /* Intro.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8084B730247C2F8B002C42DC /* Intro.xcassets */; };
 		80AD817724744E1600FAF049 /* AllFramesAtDocumentEnd.js in Resources */ = {isa = PBXBuildFile; fileRef = D0FCF8031FE4772C004A7995 /* AllFramesAtDocumentEnd.js */; };
 		80AD817824744E1600FAF049 /* AllFramesAtDocumentStart.js in Resources */ = {isa = PBXBuildFile; fileRef = D03F8F22200EAC1E003C2224 /* AllFramesAtDocumentStart.js */; };
 		80AD817924744E1600FAF049 /* MainFrameAtDocumentEnd.js in Resources */ = {isa = PBXBuildFile; fileRef = D0FCF8041FE4772D004A7995 /* MainFrameAtDocumentEnd.js */; };
@@ -529,6 +531,8 @@
 		7BF5A1E91B41640500EA9DD8 /* SyncQueue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncQueue.swift; sourceTree = "<group>"; };
 		802AEA9F24715B0B00567181 /* GeminiClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiClient.swift; sourceTree = "<group>"; };
 		802AEAA12471C4CC00567181 /* GeminiSchemeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiSchemeHandler.swift; sourceTree = "<group>"; };
+		8084B72F247C2F8B002C42DC /* IntroViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntroViewController.swift; sourceTree = "<group>"; };
+		8084B730247C2F8B002C42DC /* Intro.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Intro.xcassets; sourceTree = "<group>"; };
 		884CA7482344A301002E4711 /* TextContentDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextContentDetector.swift; sourceTree = "<group>"; };
 		A83E5AB61C1D993D0026D912 /* UIPasteboardExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UIPasteboardExtensions.swift; path = Extensions/UIPasteboardExtensions.swift; sourceTree = "<group>"; };
 		A93067E71D0FE18E00C49C6E /* NightModeHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NightModeHelper.swift; sourceTree = "<group>"; };
@@ -1041,6 +1045,15 @@
 			path = Gemini;
 			sourceTree = "<group>";
 		};
+		8084B72E247C2F8B002C42DC /* Intro */ = {
+			isa = PBXGroup;
+			children = (
+				8084B72F247C2F8B002C42DC /* IntroViewController.swift */,
+				8084B730247C2F8B002C42DC /* Intro.xcassets */,
+			);
+			path = Intro;
+			sourceTree = "<group>";
+		};
 		C8F457A61F1FD75A000CB895 /* BrowserViewController */ = {
 			isa = PBXGroup;
 			children = (
@@ -1452,6 +1465,7 @@
 		F84B21F11A0910F600AAB793 /* Frontend */ = {
 			isa = PBXGroup;
 			children = (
+				8084B72E247C2F8B002C42DC /* Intro */,
 				802AEAA32471DC3500567181 /* Gemini */,
 				2816EFFF1B33E05400522243 /* UIConstants.swift */,
 				2C49854D206173C800893DAE /* photon-colors.swift */,
@@ -1734,6 +1748,7 @@
 				80AD817924744E1600FAF049 /* MainFrameAtDocumentEnd.js in Resources */,
 				80AD817A24744E1600FAF049 /* MainFrameAtDocumentStart.js in Resources */,
 				D38A1EE01CB458EC0080C842 /* CertError.html in Resources */,
+				8084B732247C2F8C002C42DC /* Intro.xcassets in Resources */,
 				0BA1E0301B051A07007675AF /* NetError.css in Resources */,
 				E4B7B77E1A793CF20022C5E0 /* FiraSans-SemiBold.ttf in Resources */,
 				F84B220B1A0910F600AAB793 /* Images.xcassets in Resources */,
@@ -2084,6 +2099,7 @@
 				D3972BF31C22412B00035B87 /* ShareExtensionHelper.swift in Sources */,
 				F35B8D2D1D6383E9008E3D61 /* SessionRestoreHelper.swift in Sources */,
 				744ED5611DBFEB8D00A2B5BE /* MailtoLinkHandler.swift in Sources */,
+				8084B731247C2F8C002C42DC /* IntroViewController.swift in Sources */,
 				59A68E0B4ABBF55E14819668 /* BookmarksPanel.swift in Sources */,
 				D04D1B862097859B0074B35F /* DownloadToast.swift in Sources */,
 				884CA7492344A301002E4711 /* TextContentDetector.swift in Sources */,

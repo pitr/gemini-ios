@@ -392,6 +392,19 @@ extension Strings {
     public static let SettingsDoNotTrackOptionAlwaysOn = NSLocalizedString("Settings.DNT.OptionAlwaysOn", value: "Always", comment: "DNT Settings option for always on")
 }
 
+// Intro Onboarding slides
+extension Strings {
+    // First Card
+    public static let CardTitleWelcome = NSLocalizedString("Intro.Slides.Welcome.Title", tableName: "Intro", value: "gemini://", comment: "Title for the first panel 'Welcome' in the intro tour.")
+    public static let CardTextWelcome = NSLocalizedString("Intro.Slides.Welcome.Description", tableName: "Intro", value: "A new internet protocol.", comment: "Description for the 'Welcome' panel in the intro tour.")
+    public static let IntroNextButtonTitle = NSLocalizedString("Intro.Slides.Welcome.Next", tableName: "Intro", value: "Next", comment: "Next button on the first intro panel.")
+
+    // Second Card
+    public static let CardTitleNext = NSLocalizedString("Intro.Slides.Next.Title", tableName: "Intro", value: "Web, but stripped to its essence", comment: "Title for the second intro panel in the intro tour.")
+    public static let CardTextNext = NSLocalizedString("Intro.Slides.Next.Description", tableName: "Intro", value: "No banner ads, slow pages, gunk.", comment: "Description second panel in the intro tour.")
+    public static let StartBrowsingButtonTitle = NSLocalizedString("Start Browsing", tableName: "Intro", comment: "Start browsing button to finish intro.")
+}
+
 // Keyboard short cuts
 extension Strings {
     public static let ShowTabTrayFromTabKeyCodeTitle = NSLocalizedString("Tab.ShowTabTray.KeyCodeTitle", value: "Show All Tabs", comment: "Hardware shortcut to open the tab tray from a tab. Shown in the Discoverability overlay when the hardware Command Key is held down.")

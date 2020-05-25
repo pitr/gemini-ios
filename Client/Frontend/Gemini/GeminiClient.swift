@@ -36,11 +36,13 @@ class GeminiClient: NSObject {
     let urlSchemeTask: WKURLSchemeTask
     let url: URL
     var data: Data
+    let start: DispatchTime
 
     init(url: URL, urlSchemeTask: WKURLSchemeTask) {
         self.urlSchemeTask = urlSchemeTask
         self.url = url
         self.data = Data()
+        self.start = DispatchTime.now()
     }
 
     func load() {
@@ -99,7 +101,12 @@ extension GeminiClient: StreamDelegate {
             break
         case .endEncountered:
             log.debug("EndEncountered")
+            let endReceive = DispatchTime.now()
+            var ms = (endReceive.uptimeNanoseconds - start.uptimeNanoseconds) / 1_000_000
+            log.info("Received data in: \(ms)ms")
             parseResponse(data: data)
+            ms = (DispatchTime.now().uptimeNanoseconds - endReceive.uptimeNanoseconds) / 1_000_000
+            log.info("Parsed in: \(ms)ms")
             defer {
                 inputStream.close()
             }
