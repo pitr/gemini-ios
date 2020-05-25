@@ -536,15 +536,7 @@ class BrowserViewController: UIViewController {
             tabManager.selectTab(tabManager.addTab())
             return
         }
-        let alert = UIAlertController.restoreTabsAlert(
-            okayCallback: { _ in
-                self.tabManager.restoreTabs()
-            },
-            noCallback: { _ in
-                self.tabManager.selectTab(self.tabManager.addTab())
-            }
-        )
-        self.present(alert, animated: true, completion: nil)
+        tabManager.restoreTabs()
     }
 
     override func viewDidAppear(_ animated: Bool) {

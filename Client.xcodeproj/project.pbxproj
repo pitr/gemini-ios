@@ -252,7 +252,6 @@
 		E6231C011B90A44F005ABB0D /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = E6231C001B90A44F005ABB0D /* libz.tbd */; };
 		E6231C051B90A472005ABB0D /* libxml2.2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = E6231C041B90A472005ABB0D /* libxml2.2.tbd */; };
 		E6327A641BF6438E008D12E0 /* DebugSettingsBundleOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6327A631BF6438E008D12E0 /* DebugSettingsBundleOptions.swift */; };
-		E64ED8FA1BC55AE300DAF864 /* UIAlertControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E64ED8F91BC55AE300DAF864 /* UIAlertControllerExtensions.swift */; };
 		E650754E1E37F6AE006961AC /* GeometryExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E650754D1E37F6AE006961AC /* GeometryExtensions.swift */; };
 		E65075511E37F6D1006961AC /* NSURLExtensionsMailTo.swift in Sources */ = {isa = PBXBuildFile; fileRef = E650754F1E37F6D1006961AC /* NSURLExtensionsMailTo.swift */; };
 		E65075521E37F6D1006961AC /* UIViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65075501E37F6D1006961AC /* UIViewExtensions.swift */; };
@@ -658,7 +657,6 @@
 		E6231C001B90A44F005ABB0D /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		E6231C041B90A472005ABB0D /* libxml2.2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.2.tbd; path = usr/lib/libxml2.2.tbd; sourceTree = SDKROOT; };
 		E6327A631BF6438E008D12E0 /* DebugSettingsBundleOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DebugSettingsBundleOptions.swift; sourceTree = "<group>"; };
-		E64ED8F91BC55AE300DAF864 /* UIAlertControllerExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UIAlertControllerExtensions.swift; path = Extensions/UIAlertControllerExtensions.swift; sourceTree = "<group>"; };
 		E650754D1E37F6AE006961AC /* GeometryExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GeometryExtensions.swift; path = Extensions/GeometryExtensions.swift; sourceTree = "<group>"; };
 		E650754F1E37F6D1006961AC /* NSURLExtensionsMailTo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NSURLExtensionsMailTo.swift; path = Extensions/NSURLExtensionsMailTo.swift; sourceTree = "<group>"; };
 		E65075501E37F6D1006961AC /* UIViewExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UIViewExtensions.swift; path = Extensions/UIViewExtensions.swift; sourceTree = "<group>"; };
@@ -881,7 +879,6 @@
 				D8D33A7C1FBD080300A20A28 /* SnapKitExtensions.swift */,
 				E689C72F1E0C7617008BAADB /* NSAttributedStringExtensions.swift */,
 				28EADE381AFC3898007FB2FB /* UIImageViewExtensions.swift */,
-				E64ED8F91BC55AE300DAF864 /* UIAlertControllerExtensions.swift */,
 				A83E5AB61C1D993D0026D912 /* UIPasteboardExtensions.swift */,
 				E650754F1E37F6D1006961AC /* NSURLExtensionsMailTo.swift */,
 				E65075501E37F6D1006961AC /* UIViewExtensions.swift */,
@@ -2008,7 +2005,6 @@
 				D0EAE0E2228B3762001C875A /* DrawerViewController.swift in Sources */,
 				E689C7301E0C7617008BAADB /* NSAttributedStringExtensions.swift in Sources */,
 				D0C95E0E200FD3B200E4E51C /* PrintHelper.swift in Sources */,
-				E64ED8FA1BC55AE300DAF864 /* UIAlertControllerExtensions.swift in Sources */,
 				282DA4731A68C1E700A406E2 /* OpenSearch.swift in Sources */,
 				D0625CA8208FC47A0081F3B2 /* BrowserViewController+DownloadQueueDelegate.swift in Sources */,
 				2F44FCC71A9E8CF500FD20CC /* SearchSettingsTableViewController.swift in Sources */,
