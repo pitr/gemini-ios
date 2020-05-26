@@ -10,7 +10,7 @@ import Foundation
     @objc optional func menuHelperReveal()
     @objc optional func menuHelperSecure()
     @objc optional func menuHelperFindInPage()
-    @objc optional func menuHelperSearchWithFirefox()
+    @objc optional func menuHelperSearchWithGemini()
     @objc optional func menuHelperPasteAndGo()
 }
 
@@ -20,7 +20,7 @@ open class MenuHelper: NSObject {
     public static let SelectorOpenAndFill: Selector = #selector(MenuHelperInterface.menuHelperOpenAndFill)
     public static let SelectorReveal: Selector = #selector(MenuHelperInterface.menuHelperReveal)
     public static let SelectorFindInPage: Selector = #selector(MenuHelperInterface.menuHelperFindInPage)
-    public static let SelectorSearchWithFirefox: Selector = #selector(MenuHelperInterface.menuHelperSearchWithFirefox)
+    public static let SelectorSearchWithGemini: Selector = #selector(MenuHelperInterface.menuHelperSearchWithGemini)
     public static let SelectorPasteAndGo: Selector = #selector(MenuHelperInterface.menuHelperPasteAndGo)
 
     open class var defaultHelper: MenuHelper {
@@ -49,8 +49,8 @@ open class MenuHelper: NSObject {
         let findInPageTitle = NSLocalizedString("Find in Page", tableName: "FindInPage", comment: "Text selection menu item")
         let findInPageItem = UIMenuItem(title: findInPageTitle, action: MenuHelper.SelectorFindInPage)
 
-        let searchTitle = NSLocalizedString("UIMenuItem.SearchWithFirefox", value: "Search with Firefox", comment: "Search in New Tab Text selection menu item")
-        let searchItem = UIMenuItem(title: searchTitle, action: MenuHelper.SelectorSearchWithFirefox)
+        let searchTitle = NSLocalizedString("UIMenuItem.SearchWithFirefox", value: "Search with Gemini", comment: "Search in New Tab Text selection menu item")
+        let searchItem = UIMenuItem(title: searchTitle, action: MenuHelper.SelectorSearchWithGemini)
       
         UIMenuController.shared.menuItems = [pasteAndGoItem, copyItem, revealPasswordItem, hidePasswordItem, openAndFillItem, findInPageItem, searchItem]
     }

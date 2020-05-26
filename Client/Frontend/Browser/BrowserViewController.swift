@@ -1362,7 +1362,7 @@ extension BrowserViewController: TabDelegate {
         findInPageBar?.text = selection
     }
 
-    func tab(_ tab: Tab, didSelectSearchWithFirefoxForSelection selection: String) {
+    func tab(_ tab: Tab, didSelectSearchWithGeminiForSelection selection: String) {
         openSearchNewTab(isPrivate: tab.isPrivate, selection)
     }
 }
