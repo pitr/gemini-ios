@@ -148,27 +148,9 @@ class SearchEngines {
         NSKeyedArchiver.archiveRootObject(customEngines, toFile: self.customEngineFilePath())
     }
 
-    /// Return all possible language identifiers in the order of most specific to least specific.
-    /// For example, zh-Hans-CN will return [zh-Hans-CN, zh-CN, zh].
-    class func possibilitiesForLanguageIdentifier(_ languageIdentifier: String) -> [String] {
-        var possibilities: [String] = []
-        let components = languageIdentifier.components(separatedBy: "-")
-        possibilities.append(languageIdentifier)
-
-        if components.count == 3, let first = components.first, let last = components.last {
-            possibilities.append("\(first)-\(last)")
-        }
-        if components.count >= 2, let first = components.first {
-            possibilities.append("\(first)")
-        }
-        return possibilities
-    }
-
     /// Get all bundled (not custom) search engines, with the default search engine first,
     /// but the others in no particular order.
     class func getUnorderedBundledEnginesFor(locale: Locale) -> [OpenSearchEngine] {
-        let languageIdentifier = locale.identifier
-        let region = locale.regionCode ?? "US"
         let parser = OpenSearchParser(pluginMode: true)
 
         guard let pluginDirectory = Bundle.main.resourceURL?.appendingPathComponent("SearchPlugins") else {
@@ -180,9 +162,8 @@ class SearchEngines {
             assertionFailure("Failed to parse List.json")
             return []
         }
-        let possibilities = possibilitiesForLanguageIdentifier(languageIdentifier)
-        let engineNames = defaultSearchPrefs.visibleDefaultEngines(for: possibilities, and: region)
-        let defaultEngineName = defaultSearchPrefs.searchDefault(for: possibilities, and: region)
+        let engineNames = defaultSearchPrefs.visibleDefaultEngines()
+        let defaultEngineName = defaultSearchPrefs.searchDefault()
         assert(engineNames.count > 0, "No search engines")
 
         return engineNames.map({ (name: $0, path: pluginDirectory.appendingPathComponent("\($0).xml").path) })

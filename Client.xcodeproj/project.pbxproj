@@ -71,10 +71,8 @@
 		3B4988CE1E42B01800A12FDA /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B4988CD1E42B01800A12FDA /* SwiftyJSON.framework */; };
 		3B6889C51D66950E002AC85E /* UIImageColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B6889C41D66950E002AC85E /* UIImageColors.swift */; };
 		3BA9A0231D2C208C00BD418C /* Fuzi.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BA9A0221D2C208C00BD418C /* Fuzi.framework */; };
-		3BA9A0321D2C2C0500BD418C /* Fuzi.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BA9A0221D2C208C00BD418C /* Fuzi.framework */; };
 		3BB50E111D6274CD004B33DF /* FirefoxHomeTopSitesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BB50E101D6274CD004B33DF /* FirefoxHomeTopSitesCell.swift */; };
 		3BB50E201D627539004B33DF /* FirefoxHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BB50E1F1D627539004B33DF /* FirefoxHomeViewController.swift */; };
-		3BC659591E5BA505006D560F /* top_sites.json in Resources */ = {isa = PBXBuildFile; fileRef = 3BC659581E5BA505006D560F /* top_sites.json */; };
 		3BCE6D3C1CEB9E4D0080928C /* ThirdPartySearchAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BCE6D3B1CEB9E4D0080928C /* ThirdPartySearchAlerts.swift */; };
 		3BF56D271CDBBE1F00AC4D75 /* SimpleToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BF56D261CDBBE1F00AC4D75 /* SimpleToast.swift */; };
 		43B137F223A181A200CB7FA0 /* NSUserDefaultsPrefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B137F123A181A200CB7FA0 /* NSUserDefaultsPrefs.swift */; };
@@ -166,7 +164,6 @@
 		D09A0CD81FAA23F6009A0273 /* Shared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288A2D861AB8B3260023ABC3 /* Shared.framework */; };
 		D0A627642270C682006AFA2E /* SQLiteHistoryFavicons.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0A627632270C682006AFA2E /* SQLiteHistoryFavicons.swift */; };
 		D0A627662270C982006AFA2E /* photon-colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C49854D206173C800893DAE /* photon-colors.swift */; };
-		D0A6276C2270F111006AFA2E /* Fuzi.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BA9A0221D2C208C00BD418C /* Fuzi.framework */; };
 		D0A6277122723172006AFA2E /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B4988CD1E42B01800A12FDA /* SwiftyJSON.framework */; };
 		D0B9483422A03468002F4AA1 /* BookmarkDetailPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0B9483322A03468002F4AA1 /* BookmarkDetailPanel.swift */; };
 		D0B9483D22A18B78002F4AA1 /* TextFieldTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0B9483C22A18B78002F4AA1 /* TextFieldTableViewCell.swift */; };
@@ -486,7 +483,6 @@
 		3BA9A0221D2C208C00BD418C /* Fuzi.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Fuzi.framework; path = Carthage/Build/iOS/Fuzi.framework; sourceTree = "<group>"; };
 		3BB50E101D6274CD004B33DF /* FirefoxHomeTopSitesCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirefoxHomeTopSitesCell.swift; sourceTree = "<group>"; };
 		3BB50E1F1D627539004B33DF /* FirefoxHomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirefoxHomeViewController.swift; sourceTree = "<group>"; };
-		3BC659581E5BA505006D560F /* top_sites.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = top_sites.json; sourceTree = "<group>"; };
 		3BCE6D3B1CEB9E4D0080928C /* ThirdPartySearchAlerts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThirdPartySearchAlerts.swift; sourceTree = "<group>"; };
 		3BF56D261CDBBE1F00AC4D75 /* SimpleToast.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleToast.swift; sourceTree = "<group>"; };
 		43B137F123A181A200CB7FA0 /* NSUserDefaultsPrefs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSUserDefaultsPrefs.swift; sourceTree = "<group>"; };
@@ -808,7 +804,6 @@
 				7B604FBD1C495E31006EEEC3 /* XCGLogger.framework in Frameworks */,
 				DABDA4AF20DA0FE400FBB0BD /* ObjcExceptionBridging.framework in Frameworks */,
 				C8E18F22222EE11B00E30E52 /* MozillaAppServices.framework in Frameworks */,
-				D0A6276C2270F111006AFA2E /* Fuzi.framework in Frameworks */,
 				D0A6277122723172006AFA2E /* SwiftyJSON.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -819,7 +814,6 @@
 			files = (
 				28C8D1391AD4CE9100F62011 /* Shared.framework in Frameworks */,
 				28C8D11D1AD4CE8900F62011 /* Storage.framework in Frameworks */,
-				3BA9A0321D2C2C0500BD418C /* Fuzi.framework in Frameworks */,
 				0B75AEA91AC20FB20015E5DC /* ImageIO.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1441,7 +1435,6 @@
 				D03F8F22200EAC1E003C2224 /* AllFramesAtDocumentStart.js */,
 				D0FCF8041FE4772D004A7995 /* MainFrameAtDocumentEnd.js */,
 				D0FCF8051FE4772D004A7995 /* MainFrameAtDocumentStart.js */,
-				3BC659581E5BA505006D560F /* top_sites.json */,
 				D30684F01C84F12A002D8D82 /* SearchPlugins */,
 				D308EE551CBF0BF5006843F2 /* CertError.css */,
 				0BA1E02F1B051A07007675AF /* NetError.css */,
@@ -1748,7 +1741,6 @@
 				F84B220B1A0910F600AAB793 /* Images.xcassets in Resources */,
 				F35B8D2B1D6380EA008E3D61 /* SessionRestore.html in Resources */,
 				7B42406E1CA04CAC009B5C28 /* Menu.xcassets in Resources */,
-				3BC659591E5BA505006D560F /* top_sites.json in Resources */,
 				E4B7B7631A793CF20022C5E0 /* CharisSILI.ttf in Resources */,
 				7B2142FE1E5E055000CDD3FC /* InfoPlist.strings in Resources */,
 				E4B7B7611A793CF20022C5E0 /* CharisSILB.ttf in Resources */,

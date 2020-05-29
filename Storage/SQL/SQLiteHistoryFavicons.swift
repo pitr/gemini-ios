@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import Foundation
-import Fuzi
 import SwiftyJSON
 import Shared
 import XCGLogger
