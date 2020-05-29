@@ -52,7 +52,7 @@ extension PhotonActionSheetProtocol {
                 let bvc = presentableVC as? BrowserViewController else {
                     return
             }
-            bvc.addBookmark(url: url.absoluteString, title: tab.title, favicon: tab.displayFavicon)
+            bvc.addBookmark(url: url.absoluteString, title: tab.title)
             success(Strings.AppMenuAddBookmarkConfirmMessage, .bookmarkPage)
         }
 

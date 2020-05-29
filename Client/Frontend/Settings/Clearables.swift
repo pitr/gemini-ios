@@ -5,7 +5,6 @@
 import Foundation
 import Shared
 import WebKit
-import SDWebImage
 import CoreSpotlight
 
 private let log = Logger.browserLogger

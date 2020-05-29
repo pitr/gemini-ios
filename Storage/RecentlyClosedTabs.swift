@@ -20,8 +20,8 @@ open class ClosedTabsStore {
         self.prefs = prefs
     }
 
-    open func addTab(_ url: URL, title: String?, faviconURL: String?) {
-        let recentlyClosedTab = ClosedTab(url: url, title: title ?? "", faviconURL: faviconURL ?? "")
+    open func addTab(_ url: URL, title: String?) {
+        let recentlyClosedTab = ClosedTab(url: url, title: title ?? "")
         tabs.insert(recentlyClosedTab, at: 0)
         if tabs.count > 5 {
             tabs.removeLast()
@@ -39,38 +39,29 @@ open class ClosedTabsStore {
 open class ClosedTab: NSObject, NSCoding {
     public let url: URL
     public let title: String?
-    public let faviconURL: String?
 
     var jsonDictionary: [String: Any] {
         let title = (self.title ?? "")
-        let faviconURL = (self.faviconURL ?? "")
-        let json: [String: Any] = ["title": title, "url": url, "faviconURL": faviconURL]
+        let json: [String: Any] = ["title": title, "url": url]
         return json
     }
 
-    init(url: URL, title: String?, faviconURL: String?) {
+    init(url: URL, title: String?) {
         assert(Thread.isMainThread)
         self.title = title
         self.url = url
-        self.faviconURL = faviconURL
         super.init()
     }
 
     required convenience public init?(coder: NSCoder) {
         guard let url = coder.decodeObject(forKey: "url") as? URL,
-              let faviconURL = coder.decodeObject(forKey: "faviconURL") as? String,
               let title = coder.decodeObject(forKey: "title") as? String else { return nil }
 
-        self.init(
-            url: url,
-            title: title,
-            faviconURL: faviconURL
-        )
+        self.init(url: url,title: title)
     }
 
     open func encode(with coder: NSCoder) {
         coder.encode(url, forKey: "url")
-        coder.encode(faviconURL, forKey: "faviconURL")
         coder.encode(title, forKey: "title")
     }
 }

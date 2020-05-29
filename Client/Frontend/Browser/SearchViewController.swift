@@ -350,9 +350,8 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
                     cell.imageView?.layer.borderColor = SearchViewControllerUX.IconBorderColor.cgColor
                     cell.imageView?.layer.borderWidth = SearchViewControllerUX.IconBorderWidth
                     cell.imageView?.contentMode = .center
-                    cell.imageView?.setImageAndBackground(forIcon: site.icon, website: site.tileURL) { [weak cell] in
-                        cell?.imageView?.image = cell?.imageView?.image?.createScaled(CGSize(width: SearchViewControllerUX.IconSize, height: SearchViewControllerUX.IconSize))
-                    }
+                    cell.imageView?.setImageAndBackground(website: site.tileURL)
+                    cell.imageView?.image = cell.imageView?.image?.createScaled(CGSize(width: SearchViewControllerUX.IconSize, height: SearchViewControllerUX.IconSize))
                 }
             }
             return cell

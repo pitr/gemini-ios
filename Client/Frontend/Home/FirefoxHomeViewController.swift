@@ -5,7 +5,6 @@
 import Shared
 import UIKit
 import Storage
-import SDWebImage
 import XCGLogger
 import SnapKit
 
@@ -686,7 +685,7 @@ extension FirefoxHomeViewController: HomePanelContextMenu {
             })
         } else {
             bookmarkAction = PhotonActionSheetItem(title: Strings.BookmarkContextMenuTitle, iconString: "action_bookmark", handler: { _, _ in
-                let shareItem = ShareItem(url: site.url, title: site.title, favicon: site.icon)
+                let shareItem = ShareItem(url: site.url, title: site.title)
                 _ = self.profile.places.createBookmark(parentGUID: BookmarkRoots.MobileFolderGUID, url: shareItem.url, title: shareItem.title)
 
                 var userData = [QuickActions.TabURLKey: shareItem.url]

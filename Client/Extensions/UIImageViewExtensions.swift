@@ -4,7 +4,6 @@
 
 import UIKit
 import Storage
-import SDWebImage
 import Shared
 
 extension UIColor {
@@ -20,46 +19,14 @@ extension UIColor {
 
 public extension UIImageView {
 
-    func setImageAndBackground(forIcon icon: Favicon?, website: URL?, completion: @escaping () -> Void) {
-        func finish(bgColor: UIColor?) {
-            if let bgColor = bgColor {
-                // If the background color is clear, we may decide to set our own background based on the theme.
-                let color = bgColor.components.alpha < 0.01 ? UIColor.theme.general.faviconBackground : bgColor
-                self.backgroundColor = color
-            }
-            completion()
-        }
-
+    func setImageAndBackground(website: URL?) {
         backgroundColor = nil
-        sd_setImage(with: nil) // cancels any pending SDWebImage operations.
-
-        let imageURL = URL(string: icon?.url ?? "")
         let defaults = fallbackFavicon(forUrl: website)
-        self.sd_setImage(with: imageURL, placeholderImage: defaults.image, options: []) {(img, err, _, _) in
-            guard err == nil else {
-                finish(bgColor: defaults.color)
-                return
-            }
-            finish(bgColor: nil)
-        }
+        self.image = defaults.image
     }
 
-    func setFavicon(forSite site: Site, completion: @escaping () -> Void ) {
-        setImageAndBackground(forIcon: site.icon, website: site.tileURL, completion: completion)
-    }
-    
-   /*
-    * If the webpage has low-res favicon, use defaultFavIcon
-    */
-    func setFaviconOrDefaultIcon(forSite site: Site, completion: @escaping () -> Void ) {
-        setImageAndBackground(forIcon: site.icon, website: site.tileURL) { [weak self] in
-            if let image = self?.image, image.size.width < 32 || image.size.height < 32 {
-                let defaults = self?.fallbackFavicon(forUrl: site.tileURL)
-                self?.image = defaults?.image
-                self?.backgroundColor = defaults?.color
-            }
-            completion()
-        }
+    func setFavicon(forSite site: Site) {
+        setImageAndBackground(website: site.tileURL)
     }
 
     private func fallbackFavicon(forUrl url: URL?) -> (image: UIImage, color: UIColor) {
@@ -76,16 +43,3 @@ public extension UIImageView {
         self.tintColor = color
     }
 }
-
-open class ImageOperation: NSObject, SDWebImageOperation {
-    open var cacheOperation: Operation?
-
-    var cancelled: Bool {
-        return cacheOperation?.isCancelled ?? false
-    }
-
-    @objc open func cancel() {
-        cacheOperation?.cancel()
-    }
-}
-

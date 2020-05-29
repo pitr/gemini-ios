@@ -7,7 +7,6 @@ import Storage
 import AVFoundation
 import XCGLogger
 import MessageUI
-import SDWebImage
 import SwiftKeychainWrapper
 import LocalAuthentication
 import CoreSpotlight
@@ -74,9 +73,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
 
     func startApplication(_ application: UIApplication, withLaunchOptions launchOptions: [AnyHashable: Any]?) -> Bool {
         log.info("startApplication begin")
-
-        // Set the Firefox UA for browsing.
-        setUserAgent()
 
         // Start the keyboard helper to monitor and cache keyboard state.
         KeyboardHelper.defaultHelper.startObserving()
@@ -302,18 +298,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         } catch let err as NSError {
             print("Error: Unable to start WebServer \(err)")
         }
-    }
-
-    fileprivate func setUserAgent() {
-        let firefoxUA = UserAgent.getUserAgent()
-
-        // Set the UA for WKWebView (via defaults), the favicon fetcher, and the image loader.
-        // This only needs to be done once per runtime. Note that we use defaults here that are
-        // readable from extensions, so they can just use the cached identifier.
-
-        SDWebImageDownloader.shared.setValue(firefoxUA, forHTTPHeaderField: "User-Agent")
-        //SDWebImage is setting accept headers that report we support webp. We don't
-        SDWebImageDownloader.shared.setValue("image/*;q=0.8", forHTTPHeaderField: "Accept")
     }
 
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {

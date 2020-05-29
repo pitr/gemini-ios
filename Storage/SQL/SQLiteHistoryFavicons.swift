@@ -4,7 +4,6 @@
 
 import Foundation
 import Fuzi
-import SDWebImage
 import SwiftyJSON
 import Shared
 import XCGLogger
@@ -34,16 +33,6 @@ class FaviconLookupError: MaybeErrorType {
     }
     var description: String {
         return "Unable to find favicon for site URL: \(siteURL)"
-    }
-}
-
-class FaviconDownloadError: MaybeErrorType {
-    let faviconURL: String
-    init(faviconURL: String) {
-        self.faviconURL = faviconURL
-    }
-    internal var description: String {
-        return "Unable to download favicon at URL: \(faviconURL)"
     }
 }
 

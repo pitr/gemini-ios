@@ -10,7 +10,6 @@ class TabEventHandlers {
         return [
             UserActivityHandler(),
             MetadataParserHelper(),
-            MediaImageLoader(prefs),
         ]
     }
 }

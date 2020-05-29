@@ -53,17 +53,15 @@ class BackForwardTableViewCell: UITableViewCell {
     var site: Site? {
         didSet {
             if let s = site {
-                faviconView.setFavicon(forSite: s) { [weak self] in
-                    if InternalURL.isValid(url: s.tileURL) {
-                        self?.faviconView.image = UIImage(named: "faviconFox")
-                        self?.faviconView.image = self?.faviconView.image?.createScaled(CGSize(width: BackForwardViewCellUX.IconSize, height: BackForwardViewCellUX.IconSize))
-                        self?.faviconView.backgroundColor = UIColor.Photon.White100
-                        return
-                    }
-
-                    self?.faviconView.image = self?.faviconView.image?.createScaled(CGSize(width: BackForwardViewCellUX.IconSize, height: BackForwardViewCellUX.IconSize))
-                    if self?.faviconView.backgroundColor == .clear {
-                        self?.faviconView.backgroundColor = .white
+                faviconView.setFavicon(forSite: s)
+                if InternalURL.isValid(url: s.tileURL) {
+                    self.faviconView.image = UIImage(named: "faviconFox")
+                    self.faviconView.image = self.faviconView.image?.createScaled(CGSize(width: BackForwardViewCellUX.IconSize, height: BackForwardViewCellUX.IconSize))
+                    self.faviconView.backgroundColor = UIColor.Photon.White100
+                } else {
+                    self.faviconView.image = self.faviconView.image?.createScaled(CGSize(width: BackForwardViewCellUX.IconSize, height: BackForwardViewCellUX.IconSize))
+                    if self.faviconView.backgroundColor == .clear {
+                        self.faviconView.backgroundColor = .white
                     }
                 }
                 var title = s.title

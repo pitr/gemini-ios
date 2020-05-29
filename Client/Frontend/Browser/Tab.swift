@@ -46,7 +46,6 @@ struct TabState {
     var isPrivate: Bool = false
     var url: URL?
     var title: String?
-    var favicon: Favicon?
 }
 
 class Tab: NSObject {
@@ -63,7 +62,7 @@ class Tab: NSObject {
     }
 
     var tabState: TabState {
-        return TabState(isPrivate: _isPrivate, url: url, title: displayTitle, favicon: displayFavicon)
+        return TabState(isPrivate: _isPrivate, url: url, title: displayTitle)
     }
 
     // PageMetadata is derived from the page content itself, and as such lags behind the
@@ -373,10 +372,6 @@ class Tab: NSObject {
         }
 
         return lastTitle
-    }
-
-    var displayFavicon: Favicon? {
-        return favicons.max { $0.width! < $1.width! }
     }
 
     var canGoBack: Bool {

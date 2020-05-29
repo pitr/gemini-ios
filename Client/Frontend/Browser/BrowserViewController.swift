@@ -11,7 +11,6 @@ import Storage
 import SnapKit
 import XCGLogger
 import MobileCoreServices
-import SDWebImage
 import SwiftyJSON
 
 private let KVOs: [KVOConstants] = [
@@ -785,13 +784,13 @@ class BrowserViewController: UIViewController {
         }
     }
 
-    func addBookmark(url: String, title: String? = nil, favicon: Favicon? = nil) {
+    func addBookmark(url: String, title: String? = nil) {
         var title = (title ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         if title.count == 0 {
             title = url
         }
 
-        let shareItem = ShareItem(url: url, title: title, favicon: favicon)
+        let shareItem = ShareItem(url: url, title: title)
         profile.places.createBookmark(parentGUID: "mobile______", url: shareItem.url, title: shareItem.title)
 
         var userData = [QuickActions.TabURLKey: shareItem.url]
@@ -1572,7 +1571,7 @@ extension BrowserViewController: TabManagerDelegate {
 
     func tabManager(_ tabManager: TabManager, didRemoveTab tab: Tab, isRestoring: Bool) {
         if let url = tab.url, !(InternalURL(url)?.isAboutURL ?? false), !tab.isPrivate {
-            profile.recentlyClosedTabs.addTab(url as URL, title: tab.title, faviconURL: tab.displayFavicon?.url)
+            profile.recentlyClosedTabs.addTab(url as URL, title: tab.title)
         }
         updateTabCountUsingTabManager(tabManager)
     }
@@ -1915,7 +1914,7 @@ extension BrowserViewController: TabTrayDelegate {
     func tabTrayDidAddBookmark(_ tab: Tab) {
         guard let url = tab.url?.absoluteString, !url.isEmpty else { return }
         let tabState = tab.tabState
-        addBookmark(url: url, title: tabState.title, favicon: tabState.favicon)
+        addBookmark(url: url, title: tabState.title)
     }
 
     func tabTrayRequestsPresentationOf(_ viewController: UIViewController) {

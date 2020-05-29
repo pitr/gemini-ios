@@ -44,7 +44,6 @@ public enum PhotonActionSheetCellAccessoryType {
 
 public enum PhotonActionSheetIconType {
     case Image
-    case URL
     case TabsButton
     case None
 }
@@ -221,9 +220,8 @@ class PhotonActionSheetSiteHeaderView: UITableViewHeaderFooterView {
 
     func configure(with site: Site) {
         if let _ = site.icon {
-            self.siteImageView.setFavicon(forSite: site) { 
-                self.siteImageView.image = self.siteImageView.image?.createScaled(PhotonActionSheetUX.IconSize)
-            }
+            self.siteImageView.setFavicon(forSite: site)
+            self.siteImageView.image = self.siteImageView.image?.createScaled(PhotonActionSheetUX.IconSize)
         } else if let appDelegate = UIApplication.shared.delegate as? AppDelegate, let profile = appDelegate.profile {
             profile.favicons.getFaviconImage(forSite: site).uponQueue(.main) { result in
                 guard let image = result.successValue else {

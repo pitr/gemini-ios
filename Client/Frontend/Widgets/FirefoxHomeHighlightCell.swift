@@ -162,28 +162,4 @@ class FirefoxHomeHighlightCell: UICollectionViewCell {
         playLabel.isHidden = true
         descriptionLabel.textColor = UIColor.theme.homePanel.activityStreamCellDescription
     }
-
-    func configureWithSite(_ site: Site) {
-        if let mediaURLStr = site.metadata?.mediaURL,
-            let mediaURL = URL(string: mediaURLStr) {
-            self.siteImageView.sd_setImage(with: mediaURL)
-            self.siteImageView.contentMode = .scaleAspectFill
-        } else {
-            self.siteImageView.setFavicon(forSite: site) { [weak self]  in
-                self?.siteImageView.image = self?.siteImageView.image?.createScaled(FirefoxHomeHighlightCellUX.FaviconSize)
-            }
-            self.siteImageView.contentMode = .center
-        }
-
-        self.domainLabel.text = site.tileURL.shortDisplayString
-        self.titleLabel.text = site.title.isEmpty ? site.url : site.title
-
-        if let bookmarked = site.bookmarked, bookmarked {
-            self.descriptionLabel.text = Strings.HighlightBookmarkText
-            self.statusIcon.image = UIImage(named: "context_bookmark")
-        } else {
-            self.descriptionLabel.text = Strings.HighlightVistedText
-            self.statusIcon.image = UIImage(named: "context_viewed")
-        }
-    }
 }
