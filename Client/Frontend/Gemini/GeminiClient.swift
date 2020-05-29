@@ -18,21 +18,15 @@ enum GeminiClientError: Error {
     case badResponse(GeminiClientStatus)
 }
 
-let htmlHeader = """
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<style>
-:root{--nc-font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,'Open Sans','Helvetica Neue',sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";--nc-font-mono:Consolas,monaco,'Ubuntu Mono','Liberation Mono','Courier New',Courier,monospace;--nc-tx-1:#000;--nc-tx-2:#1A1A1A;--nc-bg-1:#FFF;--nc-bg-2:#F6F8FA;--nc-bg-3:#E5E7EB;--nc-lk-1:#0070F3;--nc-lk-2:#0366D6;--nc-lk-tx:#FFF;--nc-ac-1:#79FFE1;--nc-ac-tx:#0C4047}@media (prefers-color-scheme: dark){:root{--nc-tx-1:#fff;--nc-tx-2:#eee;--nc-bg-1:#000;--nc-bg-2:#111;--nc-bg-3:#222;--nc-lk-1:#3291FF;--nc-lk-2:#0070F3;--nc-lk-tx:#FFF;--nc-ac-1:#7928CA;--nc-ac-tx:#FFF}}*{margin:0;padding:0}address,area,article,aside,audio,blockquote,datalist,details,dl,fieldset,figure,form,input,iframe,img,meter,nav,ol,optgroup,option,output,p,pre,progress,ruby,section,table,textarea,ul,video{margin-bottom:1rem}html,input,select,button{font-family:var(--nc-font-sans)}body{margin:0 auto;max-width:750px;padding:1rem;border-radius:6px;overflow-x:hidden;word-break:break-word;overflow-wrap:break-word;background:var(--nc-bg-1);color:var(--nc-tx-2);font-size:1.03rem;line-height:1.5}::selection{background:var(--nc-ac-1);color:var(--nc-ac-tx)}p{margin-bottom:1rem}h1,h2,h3,h4,h5,h6{line-height:1;color:var(--nc-tx-1);padding-top:.875rem}h1,h2,h3{color:var(--nc-tx-1);padding-bottom:2px;margin-bottom:8px;border-bottom:1px solid var(--nc-bg-2)}h4,h5,h6{margin-bottom:.3rem}h1{font-size:2.25rem}h2{font-size:1.85rem}h3{font-size:1.55rem}h4{font-size:1.25rem}h5{font-size:1rem}h6{font-size:.875rem}a{color:var(--nc-lk-1)}a:hover{color:var(--nc-lk-2)}abbr:hover{cursor:help}blockquote{padding:1.5rem;background:var(--nc-bg-2);border-left:5px solid var(--nc-bg-3)}abbr{cursor:help}blockquote :last-child{padding-bottom:0;margin-bottom:0}header{background:var(--nc-bg-2);border-bottom:1px solid var(--nc-bg-3);padding:2rem 1.5rem;margin:-2rem calc(0px - (50vw - 50%)) 2rem;padding-left:calc(50vw - 50%);padding-right:calc(50vw - 50%)}header h1,header h2,header h3{padding-bottom:0;border-bottom:0}header > :first-child{margin-top:0;padding-top:0}header > :last-child{margin-bottom:0}a button,button,input[type="submit"],input[type="reset"],input[type="button"]{font-size:1rem;display:inline-block;padding:6px 12px;text-align:center;text-decoration:none;white-space:nowrap;background:var(--nc-lk-1);color:var(--nc-lk-tx);border:0;border-radius:4px;box-sizing:border-box;cursor:pointer;color:var(--nc-lk-tx)}a button[disabled],button[disabled],input[type="submit"][disabled],input[type="reset"][disabled],input[type="button"][disabled]{cursor:default;opacity:.5;cursor:not-allowed}a button:focus,a button:hover,button:focus,button:hover,input[type="submit"]:focus,input[type="submit"]:hover,input[type="reset"]:focus,input[type="reset"]:hover,input[type="button"]:focus,input[type="button"]:hover{background:var(--nc-lk-2)}code,pre,kbd,samp{font-family:var(--nc-font-mono)}code,samp,kbd,pre{background:var(--nc-bg-2);border:1px solid var(--nc-bg-3);border-radius:4px;padding:3px 6px;font-size:.9rem}kbd{border-bottom:3px solid var(--nc-bg-3)}pre{padding:1rem 1.4rem;max-width:100%;overflow:auto}pre code{background:inherit;font-size:inherit;color:inherit;border:0;padding:0;margin:0}code pre{display:inline;background:inherit;font-size:inherit;color:inherit;border:0;padding:0;margin:0}details{padding:.6rem 1rem;background:var(--nc-bg-2);border:1px solid var(--nc-bg-3);border-radius:4px}summary{cursor:pointer;font-weight:700}details[open]{padding-bottom:.75rem}details[open] summary{margin-bottom:6px}details[open]>:last-child{margin-bottom:0}dt{font-weight:700}dd::before{content:'→ '}hr{border:0;border-bottom:1px solid var(--nc-bg-3);margin:1rem auto}fieldset{margin-top:1rem;padding:2rem;border:1px solid var(--nc-bg-3);border-radius:4px}legend{padding:auto .5rem}table{border-collapse:collapse;width:100%}td,th{border:1px solid var(--nc-bg-3);text-align:left;padding:.5rem}th{background:var(--nc-bg-2)}tr:nth-child(even){background:var(--nc-bg-2)}table caption{font-weight:700;margin-bottom:.5rem}textarea{max-width:100%}ol,ul{padding-left:2rem}li{margin-top:.4rem}ul ul,ol ul,ul ol,ol ol{margin-bottom:0}mark{padding:3px 6px;background:var(--nc-ac-1);color:var(--nc-ac-tx)}textarea,select,input{width:100%;padding:6px 12px;margin-bottom:.5rem;background:var(--nc-bg-2);color:var(--nc-tx-2);border:1px solid var(--nc-bg-2);border-radius:4px;box-shadow:none;box-sizing:border-box}textarea:focus,select:focus,input[type]:focus{border:1px solid var(--nc-bg-3);outline:0}img{max-width:100%}
-</style>
-"""
 let htmlFooter = """
 <script>document.forms[0].onsubmit=function(e){e.preventDefault();document.location=document.location.origin+document.location.pathname+"?"+encodeURI(document.getElementById("q").value)}</script>
 """
 
 class GeminiClient: NSObject {
+    static var fingerprints: [String: String] = [:]
+
     var inputStream: InputStream!
+    var done = false
     let urlSchemeTask: WKURLSchemeTask
     let url: URL
     var data: Data
@@ -88,19 +82,47 @@ class GeminiClient: NSObject {
             outputStream.write($0.bindMemory(to: UInt8.self).baseAddress!, maxLength: data.count)
         }
     }
+
+    func stop() {
+        if !done {
+            done = true
+            inputStream.close()
+        }
+    }
+
+    fileprivate func asFingerprint(_ s: String) -> String {
+        return s.enumerated().compactMap({ ($0 > 0) && ($0 % 16 == 0) ? "\n\($1)" : ($0 > 0) && ($0 % 2 == 0) ? ":\($1)" : "\($1)" }).joined()
+    }
 }
 
 extension GeminiClient: StreamDelegate {
     func stream(_ aStream: Stream, handle eventCode: Stream.Event) {
         switch eventCode {
         case .openCompleted:
-            log.debug("OpenCompleted")
+            if let trust = self.inputStream.property(forKey: kCFStreamPropertySSLPeerTrust as Stream.PropertyKey) as! SecTrust? {
+                let num = SecTrustGetCertificateCount(trust)
+                log.debug("Found \(num) certificates")
+
+                for ix in 0..<num {
+                    guard let cert = SecTrustGetCertificateAtIndex(trust, ix),
+                        let subject = SecCertificateCopySubjectSummary(cert) else {
+                            log.debug("Certificate \(ix+1), no subject!")
+                            continue
+                    }
+                    log.debug("Certificate \(ix+1), CN: \(subject)")
+                    let fingerprint = (SecCertificateCopyData(cert) as Data).sha256.hexEncodedString.lowercased()
+                    log.debug("Fingerprint: \(asFingerprint(fingerprint))")
+                    if ix == 0 {
+                        GeminiClient.fingerprints[self.url.domainURL.absoluteDisplayString] = asFingerprint(fingerprint)
+                    }
+                }
+            }
+
             break
         case .hasSpaceAvailable:
-            log.debug("HasSpaceAvailable")
+            log.error("HasSpaceAvailable")
             break
         case .endEncountered:
-            log.debug("EndEncountered")
             let endReceive = DispatchTime.now()
             var ms = (endReceive.uptimeNanoseconds - start.uptimeNanoseconds) / 1_000_000
             log.info("Received data in: \(ms)ms")
@@ -108,11 +130,11 @@ extension GeminiClient: StreamDelegate {
             ms = (DispatchTime.now().uptimeNanoseconds - endReceive.uptimeNanoseconds) / 1_000_000
             log.info("Parsed in: \(ms)ms")
             defer {
+                done = true
                 inputStream.close()
             }
             break
         case .hasBytesAvailable:
-            log.debug("HasBytesAvailable")
             let bufferSize = 1024
             let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
             defer {
@@ -121,6 +143,7 @@ extension GeminiClient: StreamDelegate {
             while inputStream.hasBytesAvailable {
                 let read = inputStream.read(buffer, maxLength: bufferSize)
                 if read < 0 {
+                    log.error("HasBytesAvailable but error reading")
                     if let error = inputStream.streamError {
                         renderError(error: error.localizedDescription, for: url, to: urlSchemeTask)
                     } else {
@@ -128,7 +151,7 @@ extension GeminiClient: StreamDelegate {
                     }
                     return
                 } else if read == 0 {
-                    //EOF
+                    log.debug("EOF")
                     break
                 }
                 data.append(buffer, count: read)
@@ -136,25 +159,28 @@ extension GeminiClient: StreamDelegate {
             log.debug("read \(data.count) bytes")
             break
         case .errorOccurred:
+            log.error("ErrorOccurred")
             if let error = inputStream.streamError {
                 renderError(error: error.localizedDescription, for: url, to: urlSchemeTask)
             } else {
                 renderError(error: "Received error reading from server", for: url, to: urlSchemeTask)
             }
             defer {
+                done = true
                 inputStream.close()
             }
             break
         default:
+            log.error("Unknown error while reading from server")
             renderError(error: "Unknown error while reading from server", for: url, to: urlSchemeTask)
             defer {
+                done = true
                 inputStream.close()
             }
             break
         }
     }
 
-    // gemini://gemini.circumlunar.space/
     fileprivate func parseResponse(data: Data) {
         guard let ix = data.firstIndex(of: 13),
             data[ix+1] == 10,
@@ -203,7 +229,8 @@ extension GeminiClient: StreamDelegate {
             urlSchemeTask.didReceive(data)
             urlSchemeTask.didFinish()
         case .input(let question):
-            let body = htmlHeader+"<title>\(question)</title></head><body><h2>\(question)</h2><form><input autocapitalize=off id=q name=q /><hr /><button>Submit</button></form>"+htmlFooter
+            let header = try! String(contentsOfFile: Bundle.main.path(forResource: "GeminiHeader", ofType: "html")!)
+            let body = header+"<title>\(question)</title></head><body><h2>\(question)</h2><form><input autocapitalize=off id=q name=q /><hr /><button>Submit</button></form>"+htmlFooter
             guard let data = body.data(using: .utf8) else {
                 renderError(error: "Could not render form tosk server's question: \(question)", for: url, to: urlSchemeTask)
                 return
@@ -219,7 +246,8 @@ extension GeminiClient: StreamDelegate {
     }
 
     fileprivate func renderError(error: String, for url: URL, to urlSchemeTask: WKURLSchemeTask) {
-        let body = htmlHeader+"<title>\(error)</title></head><body><h2>\(error)</h2>"
+        let header = try! String(contentsOfFile: Bundle.main.path(forResource: "GeminiHeader", ofType: "html")!)
+        let body = header+"<title>\(error)</title></head><body><h2>\(error)</h2>"
         guard let data = body.data(using: .utf8) else {
             urlSchemeTask.didFailWithError(GeminiClientError.responderUnableToHandle)
             return
@@ -336,7 +364,8 @@ extension GeminiClient: StreamDelegate {
                 }
             }
             let title = pageTitle ?? self.url.absoluteDisplayString
-            return htmlHeader+"<title>\(title)</title></head><body>\n\(body)"
+            let header = try! String(contentsOfFile: Bundle.main.path(forResource: "GeminiHeader", ofType: "html")!)
+            return header+"<title>\(title)</title></head><body>\n\(body)"
         } catch let err as NSError {
             return "Error: \(err)"
         }

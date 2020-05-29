@@ -370,6 +370,11 @@ extension Strings {
     public static let ExternalLinkGenericConfirmation = NSLocalizedString("ExternalLink.AppStore.GenericConfirmationTitle", value: "Open this link in external app?", comment: "Question shown to user when tapping an SMS or MailTo link that opens the external app for those.")
 }
 
+// Certificate strings
+extension Strings {
+    public static let CertPageMenuTitle = NSLocalizedString("Menu.Certificate.Title", value: "Certificate for %@", comment: "Title on certificate menu showing the domain. eg. Certificate for gus.guru")
+}
+
 // Location bar long press menu
 extension Strings {
     public static let PasteAndGoTitle = NSLocalizedString("Menu.PasteAndGo.Title", value: "Paste & Go", comment: "The title for the button that lets you paste and go to a URL")

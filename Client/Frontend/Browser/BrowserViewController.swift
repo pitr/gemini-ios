@@ -1131,7 +1131,12 @@ extension BrowserViewController: URLBarDelegate {
         tabManager.selectedTab?.reload()
     }
 
-    func urlBarDidTapShield(_ urlBar: URLBarView) {
+    func urlBarDidTapCert(_ urlBar: URLBarView) {
+        if let tab = self.tabManager.selectedTab {
+            let certMenu = self.getCertSubMenu(for: tab)
+            let title = String.localizedStringWithFormat(Strings.CertPageMenuTitle, tab.url?.host ?? "")
+            self.presentSheetWith(title: title, actions: certMenu, on: self, from: urlBar)
+        }
     }
 
     func urlBarDidPressStop(_ urlBar: URLBarView) {

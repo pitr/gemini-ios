@@ -12,7 +12,7 @@ private let log = Logger.browserLogger
 protocol TabLocationViewDelegate {
     func tabLocationViewDidTapLocation(_ tabLocationView: TabLocationView)
     func tabLocationViewDidLongPressLocation(_ tabLocationView: TabLocationView)
-    func tabLocationViewDidTapShield(_ tabLocationView: TabLocationView)
+    func tabLocationViewDidTapCert(_ tabLocationView: TabLocationView)
     func tabLocationViewDidBeginDragInteraction(_ tabLocationView: TabLocationView)
     func tabLocationViewLocationAccessibilityActions(_ tabLocationView: TabLocationView) -> [UIAccessibilityCustomAction]?
 }
@@ -22,6 +22,7 @@ private struct TabLocationViewUX {
     static let BaseURLFontColor = UIColor.Photon.Grey50
     static let Spacing: CGFloat = 8
     static let StatusIconSize: CGFloat = 18
+    static let CertIconSize: CGFloat = 44
     static let ButtonSize: CGFloat = 44
 }
 
@@ -38,6 +39,7 @@ class TabLocationView: UIView {
     var url: URL? {
         didSet {
             updateTextWithURL()
+            certificateButton.isHidden = !["gemini"].contains(url?.scheme ?? "")
             setNeedsUpdateConstraints()
         }
     }
@@ -68,11 +70,33 @@ class TabLocationView: UIView {
         return urlTextField
     }()
 
+    class CertificateButton: UIButton {
+        override var isHidden: Bool {
+            didSet {
+                separatorLine?.isHidden = isHidden
+            }
+        }
+
+        var separatorLine: UIView?
+    }
+
+    lazy var certificateButton: CertificateButton = {
+        let certificateButton = CertificateButton()
+        certificateButton.setImage(UIImage.templateImageNamed("lock_verified"), for: .normal)
+        certificateButton.addTarget(self, action: #selector(didPressCertButton(_:)), for: .touchUpInside)
+        certificateButton.tintColor = UIColor.Photon.Grey50
+        certificateButton.imageView?.contentMode = .scaleAspectFill
+        certificateButton.accessibilityIdentifier = "TabLocationView.certificateButton"
+        return certificateButton
+    }()
+
     private func makeSeparator() -> UIView {
         let line = UIView()
         line.layer.cornerRadius = 2
         return line
     }
+
+    lazy var separatorLineForTP: UIView = makeSeparator()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -93,7 +117,10 @@ class TabLocationView: UIView {
             make.width.equalTo(10)
         }
 
-        let subviews = [space10px, urlTextField]
+        // Link these so they hide/show in-sync.
+        certificateButton.separatorLine = separatorLineForTP
+
+        let subviews = [certificateButton, separatorLineForTP, space10px, urlTextField]
         contentView = UIStackView(arrangedSubviews: subviews)
         contentView.distribution = .fill
         contentView.alignment = .center
@@ -101,6 +128,14 @@ class TabLocationView: UIView {
 
         contentView.snp.makeConstraints { make in
             make.edges.equalTo(self)
+        }
+        certificateButton.snp.makeConstraints { make in
+            make.width.equalTo(TabLocationViewUX.CertIconSize)
+            make.height.equalTo(TabLocationViewUX.ButtonSize)
+        }
+        separatorLineForTP.snp.makeConstraints { make in
+            make.width.equalTo(1)
+            make.height.equalTo(26)
         }
 
         // Setup UIDragInteraction to handle dragging the location
@@ -114,7 +149,7 @@ class TabLocationView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private lazy var _accessibilityElements = [urlTextField]
+    private lazy var _accessibilityElements = [urlTextField, certificateButton]
 
     override var accessibilityElements: [Any]? {
         get {
@@ -141,8 +176,8 @@ class TabLocationView: UIView {
         delegate?.tabLocationViewDidTapLocation(self)
     }
 
-    @objc func didPressTPShieldButton(_ button: UIButton) {
-        delegate?.tabLocationViewDidTapShield(self)
+    @objc func didPressCertButton(_ button: UIButton) {
+        delegate?.tabLocationViewDidTapCert(self)
     }
 
     fileprivate func updateTextWithURL() {
@@ -197,6 +232,7 @@ extension TabLocationView: Themeable {
     func applyTheme() {
         backgroundColor = UIColor.theme.textField.background
         urlTextField.textColor = UIColor.theme.textField.textAndTint
+        separatorLineForTP.backgroundColor = UIColor.Photon.Grey40
     }
 }
 

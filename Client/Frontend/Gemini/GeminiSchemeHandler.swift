@@ -10,14 +10,23 @@ enum GeminiSchemeHandlerError: Error {
 class GeminiSchemeHandler: NSObject, WKURLSchemeHandler {
     public static let scheme = "gemini"
 
+    var currentClient: GeminiClient?
+
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
         guard let url = urlSchemeTask.request.url else {
             urlSchemeTask.didFailWithError(GeminiSchemeHandlerError.badURL)
             return
         }
 
-        GeminiClient(url: url, urlSchemeTask: urlSchemeTask).load()
+        let client = GeminiClient(url: url, urlSchemeTask: urlSchemeTask)
+        currentClient = client
+        client.load()
     }
 
-    func webView(_ webView: WKWebView, stop urlSchemeTask: WKURLSchemeTask) {}
+    func webView(_ webView: WKWebView, stop urlSchemeTask: WKURLSchemeTask) {
+        log.info("webView(stop)")
+        do {
+            currentClient?.stop()
+        }
+    }
 }

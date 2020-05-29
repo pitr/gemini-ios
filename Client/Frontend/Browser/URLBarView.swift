@@ -31,7 +31,7 @@ protocol URLBarDelegate: AnyObject {
     func urlBarDidEnterOverlayMode(_ urlBar: URLBarView)
     func urlBarDidLeaveOverlayMode(_ urlBar: URLBarView)
     func urlBarDidLongPressLocation(_ urlBar: URLBarView)
-    func urlBarDidTapShield(_ urlBar: URLBarView)
+    func urlBarDidTapCert(_ urlBar: URLBarView)
     func urlBarLocationAccessibilityActions(_ urlBar: URLBarView) -> [UIAccessibilityCustomAction]?
     func urlBarDidPressScrollToTop(_ urlBar: URLBarView)
     func urlBar(_ urlBar: URLBarView, didRestoreText text: String)
@@ -620,8 +620,8 @@ extension URLBarView: TabLocationViewDelegate {
         delegate?.urlBarDidBeginDragInteraction(self)
     }
 
-    func tabLocationViewDidTapShield(_ tabLocationView: TabLocationView) {
-        delegate?.urlBarDidTapShield(self)
+    func tabLocationViewDidTapCert(_ tabLocationView: TabLocationView) {
+        delegate?.urlBarDidTapCert(self)
     }
 }
 
