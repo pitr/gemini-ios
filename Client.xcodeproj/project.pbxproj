@@ -2321,6 +2321,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(inherit)Client/Entitlements/GeminiDevApplication.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 297936744Y;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
