@@ -83,8 +83,8 @@ public struct ExtensionUtils {
         func textToUrl(_ text: String) -> URL? {
             guard text.contains(".") else { return nil }
             var text = text
-            if !text.hasPrefix("http") {
-                text = "http://" + text
+            if !text.hasPrefix("gemini") {
+                text = "gemini://" + text
             }
             let url = URL(string: text)
             return url?.publicSuffix != nil ? url : nil
