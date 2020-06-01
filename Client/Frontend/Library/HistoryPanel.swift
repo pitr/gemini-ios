@@ -7,6 +7,7 @@ import Shared
 import Storage
 import XCGLogger
 import WebKit
+import RealmSwift
 
 private struct HistoryPanelUX {
     static let WelcomeScreenItemWidth = 170
@@ -70,16 +71,9 @@ class HistoryPanel: SiteTableViewController, LibraryPanel {
         }
     }
 
-    let QueryLimitPerFetch = 100
-
     var libraryPanelDelegate: LibraryPanelDelegate?
 
-    var groupedSites = DateGroupedTableData<Site>()
-
-    var refreshControl: UIRefreshControl?
-
-    var currentFetchOffset = 0
-    var isFetchInProgress = false
+    var history: [Results<History>]
 
     var clearHistoryCell: UITableViewCell?
 
@@ -95,10 +89,11 @@ class HistoryPanel: SiteTableViewController, LibraryPanel {
 
     // MARK: - Lifecycle
     override init(profile: Profile) {
+        self.history = profile.db.getSitesByLastVisit()
+
         super.init(profile: profile)
 
-        [ Notification.Name.DynamicFontChanged,
-          Notification.Name.DatabaseWasReopened ].forEach {
+        [ Notification.Name.DynamicFontChanged ].forEach {
             NotificationCenter.default.addObserver(self, selector: #selector(onNotificationReceived), name: $0, object: nil)
         }
     }
@@ -111,83 +106,21 @@ class HistoryPanel: SiteTableViewController, LibraryPanel {
         super.viewDidLoad()
         tableView.addGestureRecognizer(longPressRecognizer)
         tableView.accessibilityIdentifier = "History List"
-        tableView.prefetchDataSource = self
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
-        removeRefreshControl()
-    }
-
-    // MARK: - Refreshing TableView
-
-    func addRefreshControl() {
-        let control = UIRefreshControl()
-        control.addTarget(self, action: #selector(onRefreshPulled), for: .valueChanged)
-        refreshControl = control
-        tableView.refreshControl = control
-    }
-
-    func removeRefreshControl() {
-        tableView.refreshControl = nil
-        refreshControl = nil
-    }
-
-    func endRefreshing() {
-        // Always end refreshing, even if we failed!
-        refreshControl?.endRefreshing()
-
-        // Remove the refresh control if the user has logged out in the meantime
-        removeRefreshControl()
     }
 
     // MARK: - Loading data
 
     override func reloadData() {
-        guard !isFetchInProgress else { return }
-        groupedSites = DateGroupedTableData<Site>()
+        self.tableView.reloadData()
+        self.updateEmptyPanelState()
 
-        currentFetchOffset = 0
-        fetchData().uponQueue(.main) { result in
-            if let sites = result.successValue {
-                for site in sites {
-                    if let site = site, let latestVisit = site.latestVisit {
-                        self.groupedSites.add(site, timestamp: TimeInterval.fromMicrosecondTimestamp(latestVisit.date))
-                    }
-                }
-
-                self.tableView.reloadData()
-                self.updateEmptyPanelState()
-
-                if let cell = self.clearHistoryCell {
-                    AdditionalHistoryActionRow.setStyle(enabled: !self.groupedSites.isEmpty, forCell: cell)
-                }
-
-            }
+        if let cell = self.clearHistoryCell {
+            AdditionalHistoryActionRow.setStyle(enabled: !self.history.isEmpty, forCell: cell)
         }
-    }
-
-    func fetchData() -> Deferred<Maybe<Cursor<Site>>> {
-        guard !isFetchInProgress else {
-            return deferMaybe(FetchInProgressError())
-        }
-
-        isFetchInProgress = true
-
-        return profile.history.getSitesByLastVisit(limit: QueryLimitPerFetch, offset: currentFetchOffset) >>== { result in
-            // Force 100ms delay between resolution of the last batch of results
-            // and the next time `fetchData()` can be called.
-            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)) {
-                self.currentFetchOffset += self.QueryLimitPerFetch
-                self.isFetchInProgress = false
-            }
-
-            return deferMaybe(result)
-        }
-    }
-
-    func resyncHistory() {
     }
 
     // MARK: - Actions
@@ -197,25 +130,23 @@ class HistoryPanel: SiteTableViewController, LibraryPanel {
             return
         }
 
-        profile.history.removeHistoryForURL(site.url).uponQueue(.main) { result in
-            guard site == self.siteForIndexPath(indexPath) else {
-                self.reloadData()
-                return
-            }
-            self.tableView.beginUpdates()
-            self.groupedSites.remove(site)
-            self.tableView.deleteRows(at: [indexPath], with: .right)
-            self.tableView.endUpdates()
-            self.updateEmptyPanelState()
+        profile.db.removeHistoryForURL(site.url)
+        guard site == self.siteForIndexPath(indexPath) else {
+            self.reloadData()
+            return
+        }
+        self.tableView.beginUpdates()
+        self.tableView.deleteRows(at: [indexPath], with: .right)
+        self.tableView.endUpdates()
+        self.updateEmptyPanelState()
 
-            if let cell = self.clearHistoryCell {
-                AdditionalHistoryActionRow.setStyle(enabled: !self.groupedSites.isEmpty, forCell: cell)
-            }
+        if let cell = self.clearHistoryCell {
+            AdditionalHistoryActionRow.setStyle(enabled: !history.allSatisfy({ $0.isEmpty }), forCell: cell)
         }
     }
 
     func pinToTopSites(_ site: Site) {
-        _ = profile.history.addPinnedTopSite(site).value
+        _ = profile.db.addPinnedTopSite(site)
     }
 
     func navigateToRecentlyClosed() {
@@ -226,7 +157,6 @@ class HistoryPanel: SiteTableViewController, LibraryPanel {
         let nextController = RecentlyClosedTabsPanel(profile: profile)
         nextController.title = Strings.RecentlyClosedTabsButtonTitle
         nextController.libraryPanelDelegate = libraryPanelDelegate
-        refreshControl?.endRefreshing()
         navigationController?.pushViewController(nextController, animated: true)
     }
 
@@ -236,9 +166,8 @@ class HistoryPanel: SiteTableViewController, LibraryPanel {
                 let types = WKWebsiteDataStore.allWebsiteDataTypes()
                 WKWebsiteDataStore.default().removeData(ofTypes: types, modifiedSince: date, completionHandler: {})
 
-                self.profile.history.removeHistoryFromDate(date).uponQueue(.main) { _ in
-                    self.reloadData()
-                }
+                self.profile.db.removeHistoryFromDate(date)
+                self.reloadData()
             }
         }
 
@@ -263,9 +192,8 @@ class HistoryPanel: SiteTableViewController, LibraryPanel {
         alert.addAction(UIAlertAction(title: Strings.ClearHistoryMenuOptionEverything, style: .destructive, handler: { _ in
             let types = WKWebsiteDataStore.allWebsiteDataTypes()
             WKWebsiteDataStore.default().removeData(ofTypes: types, modifiedSince: .distantPast, completionHandler: {})
-            self.profile.history.clearHistory().uponQueue(.main) { _ in
-                self.reloadData()
-            }
+            self.profile.db.clearHistory()
+            self.reloadData()
             self.profile.recentlyClosedTabs.clearTabs()
         }))
         let cancelAction = UIAlertAction(title: Strings.CancelString, style: .cancel)
@@ -275,13 +203,13 @@ class HistoryPanel: SiteTableViewController, LibraryPanel {
 
     // MARK: - Cell configuration
 
-    func siteForIndexPath(_ indexPath: IndexPath) -> Site? {
+    func siteForIndexPath(_ indexPath: IndexPath) -> History? {
         // First section is reserved for recently closed.
         guard indexPath.section > Section.additionalHistoryActions.rawValue else {
             return nil
         }
 
-        let sitesInSection = groupedSites.itemsForSection(indexPath.section - 1)
+        let sitesInSection = self.history[indexPath.section - 1]
         return sitesInSection[safe: indexPath.row]
     }
 
@@ -324,7 +252,7 @@ class HistoryPanel: SiteTableViewController, LibraryPanel {
             cell.imageView?.layer.borderColor = HistoryPanelUX.IconBorderColor.cgColor
             cell.imageView?.layer.borderWidth = HistoryPanelUX.IconBorderWidth
             cell.imageView?.contentMode = .center
-            cell.imageView?.setImageAndBackground(website: site.tileURL)
+            cell.imageView?.setImageAndBackground(website: URL(string: site.url)!)
             cell.imageView?.image = cell.imageView?.image?.createScaled(CGSize(width: HistoryPanelUX.IconSize, height: HistoryPanelUX.IconSize))
         }
         return cell
@@ -341,12 +269,7 @@ class HistoryPanel: SiteTableViewController, LibraryPanel {
                 emptyStateOverlayView.removeFromSuperview()
             }
             emptyStateOverlayView = createEmptyStateOverlayView()
-            resyncHistory()
             break
-        case .DatabaseWasReopened:
-            if let dbName = notification.object as? String, dbName == "browser.db" {
-                reloadData()
-            }
         default:
             // no need to do anything at all
             print("Error: Received unexpected notification \(notification.name)")
@@ -364,11 +287,6 @@ class HistoryPanel: SiteTableViewController, LibraryPanel {
         }
     }
 
-    func onRefreshPulled() {
-        refreshControl?.beginRefreshing()
-        resyncHistory()
-    }
-
     // MARK: - UITableViewDataSource
     func numberOfSections(in tableView: UITableView) -> Int {
         return Section.count
@@ -380,7 +298,7 @@ class HistoryPanel: SiteTableViewController, LibraryPanel {
             return 2
         }
 
-        return groupedSites.numberOfItemsForSection(section - 1)
+        return self.history[section - 1].count
     }
 
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -390,7 +308,7 @@ class HistoryPanel: SiteTableViewController, LibraryPanel {
         }
 
         // Ensure there are rows in this section.
-        guard groupedSites.numberOfItemsForSection(section - 1) > 0 else {
+        guard self.history[section - 1].count > 0 else {
             return nil
         }
 
@@ -439,7 +357,7 @@ class HistoryPanel: SiteTableViewController, LibraryPanel {
 
         if let site = siteForIndexPath(indexPath), let url = URL(string: site.url) {
             if let libraryPanelDelegate = libraryPanelDelegate {
-                libraryPanelDelegate.libraryPanel(didSelectURL: url, visitType: VisitType.typed)
+                libraryPanelDelegate.libraryPanel(didSelectURL: url, historyType: .typed)
             }
             return
         }
@@ -460,7 +378,7 @@ class HistoryPanel: SiteTableViewController, LibraryPanel {
         }
 
         // Ensure there are rows in this section.
-        guard groupedSites.numberOfItemsForSection(section - 1) > 0 else {
+        guard self.history[section - 1].count > 0 else {
             return nil
         }
 
@@ -474,7 +392,7 @@ class HistoryPanel: SiteTableViewController, LibraryPanel {
         }
 
         // Ensure there are rows in this section.
-        guard groupedSites.numberOfItemsForSection(section - 1) > 0 else {
+        guard self.history[section - 1].count > 0 else {
             return 0
         }
 
@@ -499,7 +417,7 @@ class HistoryPanel: SiteTableViewController, LibraryPanel {
 
     // MARK: - Empty State
     func updateEmptyPanelState() {
-        if groupedSites.isEmpty {
+        if self.history.allSatisfy({ $0.isEmpty }) {
             if emptyStateOverlayView.superview == nil {
                 tableView.tableFooterView = emptyStateOverlayView
             }
@@ -552,37 +470,6 @@ class HistoryPanel: SiteTableViewController, LibraryPanel {
     }
 }
 
-extension HistoryPanel: UITableViewDataSourcePrefetching {
-    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
-        guard !isFetchInProgress, indexPaths.contains(where: shouldLoadRow) else {
-            return
-        }
-
-        fetchData().uponQueue(.main) { result in
-            if let sites = result.successValue {
-                let indexPaths: [IndexPath] = sites.compactMap({ site in
-                    guard let site = site, let latestVisit = site.latestVisit else {
-                        return nil
-                    }
-
-                    let indexPath = self.groupedSites.add(site, timestamp: TimeInterval.fromMicrosecondTimestamp(latestVisit.date))
-                    return IndexPath(row: indexPath.row, section: indexPath.section + 1)
-                })
-
-                self.tableView.insertRows(at: indexPaths, with: .automatic)
-            }
-        }
-    }
-
-    func shouldLoadRow(for indexPath: IndexPath) -> Bool {
-        guard indexPath.section > Section.additionalHistoryActions.rawValue else {
-            return false
-        }
-
-        return indexPath.row >= groupedSites.numberOfItemsForSection(indexPath.section - 1) - 1
-    }
-}
-
 extension HistoryPanel: LibraryPanelContextMenu {
     func presentContextMenu(for site: Site, with indexPath: IndexPath, completionHandler: @escaping () -> PhotonActionSheet?) {
         guard let contextMenu = completionHandler() else { return }
@@ -590,7 +477,8 @@ extension HistoryPanel: LibraryPanelContextMenu {
     }
 
     func getSiteDetails(for indexPath: IndexPath) -> Site? {
-        return siteForIndexPath(indexPath)
+        guard let history = siteForIndexPath(indexPath) else { return nil }
+        return Site(url: history.url, title: history.title)
     }
 
     func getContextMenuActions(for site: Site, with indexPath: IndexPath) -> [PhotonActionSheetItem]? {

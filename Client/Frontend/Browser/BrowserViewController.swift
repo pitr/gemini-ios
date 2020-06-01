@@ -78,7 +78,7 @@ class BrowserViewController: UIViewController {
     // Tracking navigation items to record history types.
     // TODO: weak references?
     var ignoredNavigation = Set<WKNavigation>()
-    var typedNavigation = [WKNavigation: VisitType]()
+    var typedNavigation = [WKNavigation: HistoryType]()
     var navigationToolbar: TabToolbarProtocol {
         return toolbar ?? urlBar
     }
@@ -461,40 +461,31 @@ class BrowserViewController: UIViewController {
     }
 
     func loadQueuedTabs(receivedURLs: [URL]? = nil) {
-        // Chain off of a trivial deferred in order to run on the background queue.
-        succeed().upon() { res in
-            self.dequeueQueuedTabs(receivedURLs: receivedURLs ?? [])
-        }
+        self.dequeueQueuedTabs(receivedURLs: receivedURLs ?? [])
     }
 
     fileprivate func dequeueQueuedTabs(receivedURLs: [URL]) {
-        assert(!Thread.current.isMainThread, "This must be called in the background.")
-        self.profile.queue.getQueuedTabs() >>== { cursor in
+        assert(Thread.current.isMainThread, "This must be called in main thread.")
+        let result = self.profile.db.getQueuedTabs()
+        // This assumes that the DB returns rows in some kind of sane order.
+        // It does in practice, so WFM.
+        if result.count > 0 {
 
-            // This assumes that the DB returns rows in some kind of sane order.
-            // It does in practice, so WFM.
-            if cursor.count > 0 {
-
-                // Filter out any tabs received by a push notification to prevent dupes.
-                let urls = cursor.compactMap { $0?.url.asURL }.filter { !receivedURLs.contains($0) }
-                if !urls.isEmpty {
-                    DispatchQueue.main.async {
-                        self.tabManager.addTabsForURLs(urls, zombie: false)
-                    }
-                }
-
-                // Clear *after* making an attempt to open. We're making a bet that
-                // it's better to run the risk of perhaps opening twice on a crash,
-                // rather than losing data.
-                self.profile.queue.clearQueuedTabs()
+            // Filter out any tabs received by a push notification to prevent dupes.
+            let urls: [URL] = result.compactMap { $0.url.asURL }.filter { !receivedURLs.contains($0) }
+            if !urls.isEmpty {
+                self.tabManager.addTabsForURLs(urls, zombie: false)
             }
 
-            // Then, open any received URLs from push notifications.
-            if !receivedURLs.isEmpty {
-                DispatchQueue.main.async {
-                    self.tabManager.addTabsForURLs(receivedURLs, zombie: false)
-                }
-            }
+            // Clear *after* making an attempt to open. We're making a bet that
+            // it's better to run the risk of perhaps opening twice on a crash,
+            // rather than losing data.
+            _ = self.profile.db.clearQueuedTabs()
+        }
+
+        // Then, open any received URLs from push notifications.
+        if !receivedURLs.isEmpty {
+            self.tabManager.addTabsForURLs(receivedURLs, zombie: false)
         }
     }
 
@@ -775,12 +766,12 @@ class BrowserViewController: UIViewController {
         searchLoader = nil
     }
 
-    func finishEditingAndSubmit(_ url: URL, visitType: VisitType, forTab tab: Tab) {
+    func finishEditingAndSubmit(_ url: URL, historyType: HistoryType, forTab tab: Tab) {
         urlBar.currentURL = url
         urlBar.leaveOverlayMode()
 
         if let nav = tab.loadRequest(URLRequest(url: url)) {
-            self.recordNavigationInTab(tab, navigation: nav, visitType: visitType)
+            self.recordNavigationInTab(tab, navigation: nav, historyType: historyType)
         }
     }
 
@@ -791,7 +782,7 @@ class BrowserViewController: UIViewController {
         }
 
         let shareItem = ShareItem(url: url, title: title)
-        profile.places.createBookmark(parentGUID: "mobile______", url: shareItem.url, title: shareItem.title)
+        profile.db.createBookmark(parentGUID: Bookmark.RootGUID, url: shareItem.url, title: shareItem.title)
 
         var userData = [QuickActions.TabURLKey: shareItem.url]
         if let title = shareItem.title {
@@ -1011,8 +1002,8 @@ class BrowserViewController: UIViewController {
         var info = [AnyHashable: Any]()
         info["url"] = tab.url?.displayURL
         info["title"] = tab.title
-        if let visitType = self.getVisitTypeForTab(tab, navigation: navigation)?.rawValue {
-            info["visitType"] = visitType
+        if let historyType = self.getHistoryTypeForTab(tab, navigation: navigation)?.rawValue {
+            info["historyType"] = historyType
         }
         info["isPrivate"] = tab.isPrivate
         notificationCenter.post(name: .OnLocationChange, object: self, userInfo: info)
@@ -1091,24 +1082,24 @@ extension BrowserViewController: PresentingModalViewControllerDelegate {
  * TODO: this should be expanded to track various visit types; see Bug 1166084.
  */
 extension BrowserViewController {
-    func recordNavigationInTab(_ tab: Tab, navigation: WKNavigation, visitType: VisitType) {
-        self.typedNavigation[navigation] = visitType
+    func recordNavigationInTab(_ tab: Tab, navigation: WKNavigation, historyType: HistoryType) {
+        self.typedNavigation[navigation] = historyType
     }
 
     /**
      * Untrack and do the right thing.
      */
-    func getVisitTypeForTab(_ tab: Tab, navigation: WKNavigation?) -> VisitType? {
+    func getHistoryTypeForTab(_ tab: Tab, navigation: WKNavigation?) -> HistoryType? {
         guard let navigation = navigation else {
             // See https://github.com/WebKit/webkit/blob/master/Source/WebKit2/UIProcess/Cocoa/NavigationState.mm#L390
-            return VisitType.link
+            return .link
         }
 
         if let _ = self.ignoredNavigation.remove(navigation) {
             return nil
         }
 
-        return self.typedNavigation.removeValue(forKey: navigation) ?? VisitType.link
+        return self.typedNavigation.removeValue(forKey: navigation) ?? .link
     }
 }
 
@@ -1212,35 +1203,11 @@ extension BrowserViewController: URLBarDelegate {
 
         if let fixupURL = URIFixup.getURL(text) {
             // The user entered a URL, so use it.
-            finishEditingAndSubmit(fixupURL, visitType: VisitType.typed, forTab: currentTab)
+            finishEditingAndSubmit(fixupURL, historyType: .typed, forTab: currentTab)
             return
         }
 
-        // We couldn't build a URL, so check for a matching search keyword.
-        let trimmedText = text.trimmingCharacters(in: .whitespaces)
-        guard let possibleKeywordQuerySeparatorSpace = trimmedText.firstIndex(of: " ") else {
-            submitSearchText(text, forTab: currentTab)
-            return
-        }
-
-        let possibleKeyword = String(trimmedText[..<possibleKeywordQuerySeparatorSpace])
-        let possibleQuery = String(trimmedText[trimmedText.index(after: possibleKeywordQuerySeparatorSpace)...])
-
-        profile.places.getBookmarkURLForKeyword(keyword: possibleKeyword).uponQueue(.main) { result in
-
-            if var urlString = result.successValue ?? "",
-                let escapedQuery = possibleQuery.addingPercentEncoding(withAllowedCharacters: NSCharacterSet.urlQueryAllowed),
-                let range = urlString.range(of: "%s") {
-                urlString.replaceSubrange(range, with: escapedQuery)
-
-                if let url = URL(string: urlString) {
-                    self.finishEditingAndSubmit(url, visitType: VisitType.typed, forTab: currentTab)
-                    return
-                }
-            }
-
-            self.submitSearchText(text, forTab: currentTab)
-        }
+        submitSearchText(text, forTab: currentTab)
     }
 
     fileprivate func submitSearchText(_ text: String, forTab tab: Tab) {
@@ -1248,7 +1215,7 @@ extension BrowserViewController: URLBarDelegate {
 
         if let searchURL = engine.searchURLForQuery(text) {
             // We couldn't find a matching search keyword, so do a search query.
-            finishEditingAndSubmit(searchURL, visitType: VisitType.typed, forTab: tab)
+            finishEditingAndSubmit(searchURL, historyType: .typed, forTab: tab)
         } else {
             // We still don't have a valid URL, so something is broken. Give up.
             print("Error handling URL entry: \"\(text)\".")
@@ -1372,18 +1339,18 @@ extension BrowserViewController: TabDelegate {
 }
 
 extension BrowserViewController: LibraryPanelDelegate {
-    func libraryPanel(didSelectURL url: URL, visitType: VisitType) {
+    func libraryPanel(didSelectURL url: URL, historyType: HistoryType) {
         guard let tab = tabManager.selectedTab else { return }
-        finishEditingAndSubmit(url, visitType: visitType, forTab: tab)
+        finishEditingAndSubmit(url, historyType: historyType, forTab: tab)
         libraryDrawerViewController?.close()
     }
 
-    func libraryPanel(didSelectURLString url: String, visitType: VisitType) {
+    func libraryPanel(didSelectURLString url: String, historyType: HistoryType) {
         guard let url = URIFixup.getURL(url) ?? profile.searchEngines.defaultEngine.searchURLForQuery(url) else {
             Logger.browserLogger.warning("Invalid URL, and couldn't generate a search URL for it.")
             return
         }
-        return self.libraryPanel(didSelectURL: url, visitType: visitType)
+        return self.libraryPanel(didSelectURL: url, historyType: historyType)
     }
 
     func libraryPanelDidRequestToOpenInNewTab(_ url: URL, isPrivate: Bool) {
@@ -1409,9 +1376,9 @@ extension BrowserViewController: HomePanelDelegate {
         view.endEditing(true)
     }
 
-    func homePanel(didSelectURL url: URL, visitType: VisitType) {
+    func homePanel(didSelectURL url: URL, historyType: HistoryType) {
         guard let tab = tabManager.selectedTab else { return }
-        finishEditingAndSubmit(url, visitType: visitType, forTab: tab)
+        finishEditingAndSubmit(url, historyType: historyType, forTab: tab)
     }
 
     func homePanelDidRequestToOpenInNewTab(_ url: URL, isPrivate: Bool) {
@@ -1434,7 +1401,7 @@ extension BrowserViewController: HomePanelDelegate {
 extension BrowserViewController: SearchViewControllerDelegate {
     func searchViewController(_ searchViewController: SearchViewController, didSelectURL url: URL) {
         guard let tab = tabManager.selectedTab else { return }
-        finishEditingAndSubmit(url, visitType: VisitType.typed, forTab: tab)
+        finishEditingAndSubmit(url, historyType: .typed, forTab: tab)
     }
 
     func searchViewController(_ searchViewController: SearchViewController, didLongPressSuggestion suggestion: String) {

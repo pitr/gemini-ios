@@ -59,35 +59,21 @@ extension PhotonActionSheetProtocol {
         let removeBookmark = PhotonActionSheetItem(title: Strings.AppMenuRemoveBookmarkTitleString, iconString: "menu-Bookmark-Remove") { _, _ in
             guard let url = tab.url?.displayURL else { return }
 
-            self.profile.places.deleteBookmarksWithURL(url: url.absoluteString).uponQueue(.main) { result in
-                if result.isSuccess {
-                    success(Strings.AppMenuRemoveBookmarkConfirmMessage, .removeBookmark)
-                }
+            if self.profile.db.deleteBookmarksWithURL(url: url.absoluteString).isSuccess {
+                success(Strings.AppMenuRemoveBookmarkConfirmMessage, .removeBookmark)
             }
         }
 
         let pinToTopSites = PhotonActionSheetItem(title: Strings.PinTopsiteActionTitle, iconString: "action_pin") { _, _ in
-            guard let url = tab.url?.displayURL, let sql = self.profile.history as? SQLiteHistory else { return }
+            guard let url = tab.url?.absoluteString, let title = tab.title else { return }
 
-            sql.getSites(forURLs: [url.absoluteString]).bind { val -> Success in
-                guard let site = val.successValue?.asArray().first?.flatMap({ $0 }) else {
-                    return succeed()
-                }
-
-                return self.profile.history.addPinnedTopSite(site)
-            }.uponQueue(.main) { _ in }
+            _ = self.profile.db.addPinnedTopSite(Site(url: url, title: title))
         }
 
         let removeTopSitesPin = PhotonActionSheetItem(title: Strings.RemovePinTopsiteActionTitle, iconString: "action_unpin") { _, _ in
-            guard let url = tab.url?.displayURL, let sql = self.profile.history as? SQLiteHistory else { return }
+            guard let url = tab.url?.absoluteString else { return }
 
-            sql.getSites(forURLs: [url.absoluteString]).bind { val -> Success in
-                guard let site = val.successValue?.asArray().first?.flatMap({ $0 }) else {
-                    return succeed()
-                }
-
-                return self.profile.history.removeFromPinnedTopSites(site)
-            }.uponQueue(.main) { _ in }
+            _ = self.profile.db.removeFromPinnedTopSites(Site(url: url, title: ""))
         }
 
         let sharePage = PhotonActionSheetItem(title: Strings.AppMenuSharePageTitleString, iconString: "action_share") { _, _ in

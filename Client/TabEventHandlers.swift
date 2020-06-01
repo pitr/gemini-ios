@@ -9,7 +9,6 @@ class TabEventHandlers {
     static func create(with prefs: Prefs) -> [TabEventHandler] {
         return [
             UserActivityHandler(),
-            MetadataParserHelper(),
         ]
     }
 }

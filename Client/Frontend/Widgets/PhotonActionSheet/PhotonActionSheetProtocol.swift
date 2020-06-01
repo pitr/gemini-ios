@@ -34,12 +34,12 @@ extension PhotonActionSheetProtocol {
 
     typealias PageOptionsVC = SettingsDelegate & PresentingModalViewControllerDelegate & UIViewController
 
-    func fetchBookmarkStatus(for url: String) -> Deferred<Maybe<Bool>> {
-        return profile.places.isBookmarked(url: url)
+    func fetchBookmarkStatus(for url: String) -> Bool {
+        return profile.db.getBookmarksWithURL(url: url).count > 0
     }
 
-    func fetchPinnedTopSiteStatus(for url: String) -> Deferred<Maybe<Bool>> {
-        return self.profile.history.isPinnedTopSite(url)
+    func fetchPinnedTopSiteStatus(for url: String) -> Bool {
+        return self.profile.db.isPinnedTopSite(url)
     }
 
     func getLongPressLocationBarActions(with urlBar: URLBarView) -> [PhotonActionSheetItem] {

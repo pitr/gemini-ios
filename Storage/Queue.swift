@@ -1,12 +1,46 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
-import Foundation
 import Shared
+import XCGLogger
+import RealmSwift
 
-public protocol TabQueue {
-    func addToQueue(_ tab: ShareItem) -> Success
-    func getQueuedTabs() -> Deferred<Maybe<Cursor<ShareItem>>>
-    @discardableResult func clearQueuedTabs() -> Success
+private let log = Logger.syncLogger
+
+public class TabQueue: Object {
+    @objc dynamic public var id = Bytes.generateGUID()
+    @objc dynamic public var url = ""
+    @objc dynamic public var title: String?
+    public override class func primaryKey() -> String? {
+        "id"
+    }
+}
+
+extension DB {
+    public func addToQueue(_ tab: ShareItem) -> Maybe<Void> {
+        let q = TabQueue()
+        q.url = tab.url
+        q.title = tab.title
+        do {
+            try realm.write {
+                realm.add(q)
+            }
+            return Maybe(success: ())
+        } catch let error as NSError {
+            return Maybe(failure: error)
+        }
+    }
+
+    public func getQueuedTabs() -> Results<TabQueue> {
+        return realm.objects(TabQueue.self)
+    }
+
+    public func clearQueuedTabs() -> Maybe<Void> {
+        let q = realm.objects(TabQueue.self)
+        do {
+            try realm.write {
+                realm.delete(q)
+            }
+            return Maybe(success: ())
+        } catch let error as NSError {
+            return Maybe(failure: error)
+        }
+    }
 }

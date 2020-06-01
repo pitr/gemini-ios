@@ -15,17 +15,15 @@ private let URLBeforePathRegex = try! NSRegularExpression(pattern: "^https?://([
  * Shared data source for the SearchViewController and the URLBar domain completion.
  * Since both of these use the same SQL query, we can perform the query once and dispatch the results.
  */
-class SearchLoader: Loader<Cursor<Site>, SearchViewController> {
+class SearchLoader: Loader<[Site], SearchViewController> {
     fileprivate let profile: Profile
     fileprivate let urlBar: URLBarView
-    fileprivate let frecentHistory: FrecentHistory
 
     private var skipNextAutocomplete: Bool
 
     init(profile: Profile, urlBar: URLBarView) {
         self.profile = profile
         self.urlBar = urlBar
-        self.frecentHistory = profile.history.getFrecentHistory()
 
         self.skipNextAutocomplete = false
 
@@ -37,21 +35,6 @@ class SearchLoader: Loader<Cursor<Site>, SearchViewController> {
         return try! String(contentsOfFile: filePath!).components(separatedBy: "\n")
     }()
 
-    // `weak` usage here allows deferred queue to be the owner. The deferred is always filled and this set to nil,
-    // this is defensive against any changes to queue (or cancellation) behaviour in future.
-    private weak var currentDeferredHistoryQuery: CancellableDeferred<Maybe<Cursor<Site>>>?
-
-    fileprivate func getBookmarksAsSites(matchingSearchQuery query: String, limit: Int) -> Deferred<Maybe<Cursor<Site>>> {
-        return profile.places.searchBookmarks(query: query, limit: 5).bind { result in
-            guard let bookmarkItems = result.successValue else {
-                return deferMaybe(ArrayCursor(data: []))
-            }
-
-            let sites = bookmarkItems.map({ Site(url: $0.url, title: $0.title, bookmarked: true, guid: $0.guid) })
-            return deferMaybe(ArrayCursor(data: sites))
-        }
-    }
-
     var query: String = "" {
         didSet {
             guard self.profile is BrowserProfile else {
@@ -59,65 +42,45 @@ class SearchLoader: Loader<Cursor<Site>, SearchViewController> {
                 return
             }
 
-            currentDeferredHistoryQuery?.cancel()
-
             if query.isEmpty {
-                load(Cursor(status: .success, msg: "Empty query"))
+                load([])
                 return
             }
 
-            guard let deferredHistory = frecentHistory.getSites(matchingSearchQuery: query, limit: 100) as? CancellableDeferred else {
-                assertionFailure("FrecentHistory query should be cancellable")
+            let history = profile.db.searchHistory(query: query, limit: 100)
+            let bookmarks = profile.db.searchBookmarks(query: query, limit: 5)
+
+            let combinedSites = bookmarks + history
+
+            // Load the data in the table view.
+            self.load(combinedSites)
+
+            // If the new search string is not longer than the previous
+            // we don't need to find an autocomplete suggestion.
+            guard oldValue.count < self.query.count else {
                 return
             }
 
-            currentDeferredHistoryQuery = deferredHistory
+            // If we should skip the next autocomplete, reset
+            // the flag and bail out here.
+            guard !self.skipNextAutocomplete else {
+                self.skipNextAutocomplete = false
+                return
+            }
 
-            let deferredBookmarks = getBookmarksAsSites(matchingSearchQuery: query, limit: 5)
-
-            all([deferredHistory, deferredBookmarks]).uponQueue(.main) { results in
-                defer {
-                    self.currentDeferredHistoryQuery = nil
-                }
-
-                guard !deferredHistory.cancelled else {
+            // First, see if the query matches any URLs from the user's search history.
+            for site in combinedSites {
+                if let completion = self.completionForURL(site.url) {
+                    self.urlBar.setAutocompleteSuggestion(completion)
                     return
                 }
+            }
 
-                let deferredHistorySites = results[0].successValue?.asArray() ?? []
-                let deferredBookmarksSites = results[1].successValue?.asArray() ?? []
-                let combinedSites = deferredBookmarksSites + deferredHistorySites
-
-                // Load the data in the table view.
-                self.load(ArrayCursor(data: combinedSites))
-
-                // If the new search string is not longer than the previous
-                // we don't need to find an autocomplete suggestion.
-                guard oldValue.count < self.query.count else {
+            // If there are no search history matches, try matching one of the Alexa top domains.
+            for domain in self.topDomains {
+                if let completion = self.completionForDomain(domain) {
+                    self.urlBar.setAutocompleteSuggestion(completion)
                     return
-                }
-
-                // If we should skip the next autocomplete, reset
-                // the flag and bail out here.
-                guard !self.skipNextAutocomplete else {
-                    self.skipNextAutocomplete = false
-                    return
-                }
-
-                // First, see if the query matches any URLs from the user's search history.
-                for site in combinedSites {
-                    if let completion = self.completionForURL(site.url) {
-                        self.urlBar.setAutocompleteSuggestion(completion)
-                        return
-                    }
-                }
-
-                // If there are no search history matches, try matching one of the Alexa top domains.
-                for domain in self.topDomains {
-                    if let completion = self.completionForDomain(domain) {
-                        self.urlBar.setAutocompleteSuggestion(completion)
-                        return
-                    }
                 }
             }
         }

@@ -11,7 +11,6 @@ struct TabTrayControllerUX {
     static let CornerRadius = CGFloat(6.0)
     static let TextBoxHeight = CGFloat(32.0)
     static let SearchBarHeight = CGFloat(64)
-    static let FaviconSize = CGFloat(20)
     static let Margin = CGFloat(15)
     static let ToolbarButtonOffset = CGFloat(10.0)
     static let CloseButtonSize = CGFloat(32)
@@ -1005,14 +1004,6 @@ class TabCell: UICollectionViewCell {
         return label
     }()
 
-    let favicon: UIImageView = {
-        let favicon = UIImageView()
-        favicon.backgroundColor = UIColor.clear
-        favicon.layer.cornerRadius = 2.0
-        favicon.layer.masksToBounds = true
-        return favicon
-    }()
-
     let closeButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage.templateImageNamed("tab_close"), for: [])
@@ -1047,21 +1038,14 @@ class TabCell: UICollectionViewCell {
         backgroundHolder.addSubview(title)
         title.contentView.addSubview(self.closeButton)
         title.contentView.addSubview(self.titleText)
-        title.contentView.addSubview(self.favicon)
 
         title.snp.makeConstraints { (make) in
             make.top.left.right.equalTo(backgroundHolder)
             make.height.equalTo(TabTrayControllerUX.TextBoxHeight)
         }
 
-        favicon.snp.makeConstraints { make in
-            make.leading.equalTo(title.contentView).offset(6)
-            make.top.equalTo((TabTrayControllerUX.TextBoxHeight - TabTrayControllerUX.FaviconSize) / 2)
-            make.size.equalTo(TabTrayControllerUX.FaviconSize)
-        }
-
         titleText.snp.makeConstraints { (make) in
-            make.leading.equalTo(favicon.snp.trailing).offset(6)
+            make.leading.equalTo(title.contentView).offset(6)
             make.trailing.equalTo(closeButton.snp.leading).offset(-6)
             make.centerY.equalTo(title.contentView)
         }
@@ -1112,13 +1096,6 @@ class TabCell: UICollectionViewCell {
         isAccessibilityElement = true
         accessibilityHint = NSLocalizedString("Swipe right or left with three fingers to close the tab.", comment: "Accessibility hint for tab tray's displayed tab.")
 
-        let defaultFavicon = UIImage(named: "defaultFavicon")
-        if tab.isPrivate {
-            favicon.image = defaultFavicon
-            favicon.tintColor = UIColor.theme.tabTray.faviconTint
-        } else {
-            favicon.image = defaultFavicon
-        }
         if selected {
             setTabSelected(tab.isPrivate)
         } else {

@@ -16,8 +16,8 @@ struct LibraryPanelUX {
 
 protocol LibraryPanelDelegate: AnyObject {
     func libraryPanelDidRequestToOpenInNewTab(_ url: URL, isPrivate: Bool)
-    func libraryPanel(didSelectURL url: URL, visitType: VisitType)
-    func libraryPanel(didSelectURLString url: String, visitType: VisitType)
+    func libraryPanel(didSelectURL url: URL, historyType: HistoryType)
+    func libraryPanel(didSelectURLString url: String, historyType: HistoryType)
 }
 
 enum LibraryPanelType: Int {

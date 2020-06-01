@@ -94,8 +94,7 @@ class RecentlyClosedTabsPanelSiteTableViewController: SiteTableViewController {
             log.warning("No site or no URL when selecting row.")
             return
         }
-        let visitType = VisitType.typed    // Means History, too.
-        libraryPanelDelegate.libraryPanel(didSelectURL: recentlyClosedTabs[indexPath.row].url, visitType: visitType)
+        libraryPanelDelegate.libraryPanel(didSelectURL: recentlyClosedTabs[indexPath.row].url, historyType: .typed)
     }
 
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {

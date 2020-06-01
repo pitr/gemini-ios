@@ -17,7 +17,6 @@ class BackForwardListViewController: UIViewController, UITableViewDataSource, UI
 
     fileprivate let BackForwardListCellIdentifier = "BackForwardListViewController"
     fileprivate var profile: Profile
-    fileprivate lazy var sites = [String: Site]()
     fileprivate var dismissing = false
     fileprivate var currentRow = 0
     fileprivate var verticalConstraints: [Constraint] = []
@@ -68,7 +67,6 @@ class BackForwardListViewController: UIViewController, UITableViewDataSource, UI
         super.init(nibName: nil, bundle: nil)
 
         loadSites(backForwardList)
-        loadSitesFromProfile()
     }
 
     override func viewDidLoad() {
@@ -87,30 +85,6 @@ class BackForwardListViewController: UIViewController, UITableViewDataSource, UI
         view.layoutIfNeeded()
         scrollTableViewToIndex(currentRow)
         setupDismissTap()
-    }
-
-    func loadSitesFromProfile() {
-        let sql = profile.favicons as! SQLiteHistory
-        let urls: [String] = listData.compactMap {
-            guard let internalUrl = InternalURL($0.url) else {
-                return $0.url.absoluteString
-            }
-
-            return internalUrl.extractedUrlParam?.absoluteString
-        }
-
-        sql.getSites(forURLs: urls).uponQueue(.main) { result in
-            guard let results = result.successValue else {
-                return
-            }
-            // Add all results into the sites dictionary
-            results.compactMap({$0}).forEach({site in
-                if let url = site?.url {
-                    self.sites[url] = site
-                }
-            })
-            self.tableView.reloadData()
-        }
     }
 
     func homeAndNormalPagesOnly(_ bfList: WKBackForwardList) {
@@ -253,7 +227,7 @@ class BackForwardListViewController: UIViewController, UITableViewDataSource, UI
             return cell
         }
 
-        cell.site = sites[urlString] ?? Site(url: urlString, title: item.title ?? "")
+        cell.site = Site(url: urlString, title: item.title ?? "")
         cell.setNeedsDisplay()
 
         return cell

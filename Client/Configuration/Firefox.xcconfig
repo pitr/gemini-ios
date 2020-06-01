@@ -1,9 +1,0 @@
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-// Flag to indicate if we want to include the debug settings bundle or not
-INCLUDE_SETTINGS_BUNDLE = NO
-
-ENABLE_BITCODE = NO
-CLANG_MODULES_AUTOLINK = NO

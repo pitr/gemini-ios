@@ -63,18 +63,13 @@ extension BrowserViewController: TabToolbarDelegate, PhotonActionSheetProtocol {
             }
         }
 
-        let deferredBookmarkStatus: Deferred<Maybe<Bool>> = fetchBookmarkStatus(for: urlString)
-        let deferredPinnedTopSiteStatus: Deferred<Maybe<Bool>> = fetchPinnedTopSiteStatus(for: urlString)
+        let isBookmarked = fetchBookmarkStatus(for: urlString)
+        let isPinned = fetchPinnedTopSiteStatus(for: urlString)
 
-        // Wait for both the bookmark status and the pinned status
-        deferredBookmarkStatus.both(deferredPinnedTopSiteStatus).uponQueue(.main) {
-            let isBookmarked = $0.successValue ?? false
-            let isPinned = $1.successValue ?? false
-            let pageActions = self.getTabActions(tab: tab, buttonView: button, presentShareMenu: actionMenuPresenter,
-                                                 findInPage: findInPageAction, openSettings: openSettingsAction, presentableVC: self, isBookmarked: isBookmarked,
-                                                 isPinned: isPinned, success: successCallback)
-            self.presentSheetWith(title: Strings.PageActionMenuTitle, actions: pageActions, on: self, from: button)
-        }
+        let pageActions = self.getTabActions(tab: tab, buttonView: button, presentShareMenu: actionMenuPresenter,
+                                             findInPage: findInPageAction, openSettings: openSettingsAction, presentableVC: self, isBookmarked: isBookmarked,
+                                             isPinned: isPinned, success: successCallback)
+        self.presentSheetWith(title: Strings.PageActionMenuTitle, actions: pageActions, on: self, from: button)
     }
 
     func tabToolbarDidPressTabs(_ tabToolbar: TabToolbarProtocol, button: UIButton) {

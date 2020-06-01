@@ -13,7 +13,7 @@ private let browsingActivityType: String = "com.pitr.ios.gemini.browsing"
 
 class UserActivityHandler {
     init() {
-        register(self, forTabEvents: .didClose, .didLoseFocus, .didGainFocus, .didChangeURL, .didLoadPageMetadata) // .didLoadFavicon, // TODO: Bug 1390294
+        register(self, forTabEvents: .didClose, .didLoseFocus, .didGainFocus, .didChangeURL)
     }
 
     fileprivate func setUserActivityForTab(_ tab: Tab, url: URL) {
@@ -45,14 +45,6 @@ extension UserActivityHandler: TabEventHandler {
     }
 
     func tab(_ tab: Tab, didChangeURL url: URL) {
-        setUserActivityForTab(tab, url: url)
-    }
-
-    func tab(_ tab: Tab, didLoadPageMetadata metadata: PageMetadata) {
-        guard let url = URL(string: metadata.siteURL) else {
-            return
-        }
-
         setUserActivityForTab(tab, url: url)
     }
 

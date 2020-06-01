@@ -354,7 +354,7 @@ class DownloadsPanel: UIViewController, UITableViewDelegate, UITableViewDataSour
                 shareDownloadedFile(downloadedFile, indexPath: indexPath)
                 return
             }
-            libraryPanelDelegate?.libraryPanel(didSelectURL: downloadedFile.path, visitType: VisitType.typed)
+            libraryPanelDelegate?.libraryPanel(didSelectURL: downloadedFile.path, historyType: .typed)
         }
     }
 

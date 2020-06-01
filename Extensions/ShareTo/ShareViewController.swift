@@ -104,7 +104,6 @@ class ShareViewController: UIViewController {
         if shareItem?.isUrlType() ?? true {
             makeActionRow(addTo: stackView, label: Strings.ShareOpenInFirefox, imageName: "open-in-firefox", action: #selector(actionOpenInFirefoxNow), hasNavigation: false)
             makeActionRow(addTo: stackView, label: Strings.ShareLoadInBackground, imageName: "menu-Show-Tabs", action: #selector(actionLoadInBackground), hasNavigation: false)
-            makeActionRow(addTo: stackView, label: Strings.ShareBookmarkThisPage, imageName: "AddToBookmarks", action: #selector(actionBookmarkThisPage), hasNavigation: false)
         } else {
             pageInfoRowUrlLabel?.removeFromSuperview()
             makeActionRow(addTo: stackView, label: Strings.ShareSearchInFirefox, imageName: "quickSearch", action: #selector(actionSearchInFirefox), hasNavigation: false)
@@ -301,22 +300,9 @@ extension ShareViewController {
 
         if let shareItem = shareItem, case .shareItem(let item) = shareItem {
             let profile = BrowserProfile(localName: "profile")
-            profile.queue.addToQueue(item).uponQueue(.main) { _ in
-                profile._shutdown()
+            if let err = profile.db.addToQueue(item).failureValue {
+                print(err)
             }
-        }
-
-        finish()
-    }
-
-    @objc func actionBookmarkThisPage(gesture: UIGestureRecognizer) {
-        gesture.isEnabled = false
-        animateToActionDoneView(withTitle: Strings.ShareBookmarkThisPageDone)
-
-        if let shareItem = shareItem, case .shareItem(let item) = shareItem {
-            let profile = BrowserProfile(localName: "profile")
-            profile._reopen()
-            _ = profile.places.createBookmark(parentGUID: BookmarkRoots.MobileFolderGUID, url: item.url, title: item.title).value // Intentionally block thread with database call.
             profile._shutdown()
         }
 

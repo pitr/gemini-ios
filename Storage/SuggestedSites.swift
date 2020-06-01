@@ -16,15 +16,12 @@ open class SuggestedSite: Site {
     }
 }
 
-public let SuggestedSites = SuggestedSitesCursor()
-
-open class SuggestedSitesCursor: ArrayCursor<SuggestedSite> {
-    fileprivate init() {
-        let sites = DefaultSuggestedSites.sites as Array<SuggestedSiteData>
-        let tiles = sites.map({ data -> SuggestedSite in
+open class SuggestedSites {
+    public static func defaults() -> [SuggestedSite] {
+        let sites = DefaultSuggestedSites.sites
+        return sites.map({ data -> SuggestedSite in
             return SuggestedSite(data: data)
         })
-        super.init(data: tiles, status: .success, statusMessage: "Loaded")
     }
 }
 

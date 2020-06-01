@@ -28,7 +28,7 @@ extension BrowserViewController: UIDropInteractionDelegate {
                 return
             }
 
-            self.finishEditingAndSubmit(url, visitType: VisitType.typed, forTab: tab)
+            self.finishEditingAndSubmit(url, historyType: .typed, forTab: tab)
         }
     }
 }

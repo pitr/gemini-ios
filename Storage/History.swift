@@ -1,106 +1,154 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
 import Shared
+import XCGLogger
+import RealmSwift
 
-open class IgnoredSiteError: MaybeErrorType {
-    open var description: String {
-        return "Ignored site."
+private let log = Logger.syncLogger
+
+
+// These are taken from the Places docs
+// http://mxr.mozilla.org/mozilla-central/source/toolkit/components/places/nsINavHistoryService.idl#1187
+public enum HistoryType: Int {
+    case unknown = 0
+    case link = 1
+    case typed = 2
+    case bookmark = 3
+    case embed = 4
+    case permanentRedirect = 5
+    case temporaryRedirect = 6
+    case download = 7
+    case framedLink = 8
+}
+
+public class History: Object {
+    @objc dynamic public var id = Bytes.generateGUID()
+    @objc dynamic public var url = ""
+    @objc dynamic public var title = ""
+    @objc dynamic var _type = 0
+    public var type: HistoryType {
+        HistoryType.init(rawValue: _type)!
+    }
+    @objc dynamic public var visitedAt = Date(timeIntervalSince1970: 1)
+    public override class func primaryKey() -> String? {
+        "id"
     }
 }
 
-/**
- * The base history protocol for front-end code.
- *
- * Note that the implementation of these methods might be complicated if
- * the implementing class also implements SyncableHistory -- for example,
- * `clear` might or might not need to set a bunch of flags to upload deletions.
- */
-public protocol BrowserHistory {
-    @discardableResult func addLocalVisit(_ visit: SiteVisit) -> Success
-    func clearHistory() -> Success
-    @discardableResult func removeHistoryForURL(_ url: String) -> Success
-    func removeHistoryFromDate(_ date: Date) -> Success
-    func removeSiteFromTopSites(_ site: Site) -> Success
-    func removeHostFromTopSites(_ host: String) -> Success
-    func getFrecentHistory() -> FrecentHistory
-    func getSitesByLastVisit(limit: Int, offset: Int) -> Deferred<Maybe<Cursor<Site>>>
-    func getTopSitesWithLimit(_ limit: Int) -> Deferred<Maybe<Cursor<Site>>>
-    func setTopSitesNeedsInvalidation()
-    func setTopSitesCacheSize(_ size: Int32)
-    func clearTopSitesCache() -> Success
-
-    // Pinning top sites
-    func removeFromPinnedTopSites(_ site: Site) -> Success
-    func addPinnedTopSite(_ site: Site) -> Success
-    func getPinnedTopSites() -> Deferred<Maybe<Cursor<Site>>>
-    func isPinnedTopSite(_ url: String) -> Deferred<Maybe<Bool>>
+fileprivate func getDate(dayOffset: Int) -> Date {
+    let calendar = Calendar(identifier: .gregorian)
+    let components = calendar.dateComponents([.year, .month, .day], from: Date())
+    let today = calendar.date(from: components)!
+    return calendar.date(byAdding: .day, value: dayOffset, to: today)!
 }
 
-/**
- * An interface for fast repeated frecency queries.
- */
-public protocol FrecentHistory {
-    func getSites(matchingSearchQuery filter: String?, limit: Int) -> Deferred<Maybe<Cursor<Site>>>
-    func updateTopSitesCacheQuery() -> (String, Args?)
+fileprivate let ignoredSchemes = ["about"]
+public func isIgnoredURL(_ url: URL) -> Bool {
+    guard let scheme = url.scheme else { return false }
+
+    return ignoredSchemes.contains(scheme) || url.host == "localhost"
 }
 
-/**
- * An interface for accessing recommendation content from Storage
- */
-public protocol HistoryRecommendations {
-    func cleanupHistoryIfNeeded()
-    func repopulate(invalidateTopSites shouldInvalidateTopSites: Bool) -> Success
+public func isIgnoredURL(_ url: String) -> Bool {
+    if let url = URL(string: url) {
+        return isIgnoredURL(url)
+    }
+
+    return false
 }
 
-/**
- * The interface that history storage needs to provide in order to be
- * synced by a `HistorySynchronizer`.
- */
-public protocol SyncableHistory: AccountRemovalDelegate {
-    /**
-     * Make sure that the local place with the provided URL has the provided GUID.
-     * Succeeds if no place exists with that URL.
-     */
-    func ensurePlaceWithURL(_ url: String, hasGUID guid: GUID) -> Success
+fileprivate let MaxHistoryRowCount = 1000
 
-    /**
-     * Delete the place with the provided GUID, and all of its visits. Succeeds if the GUID is unknown.
-     */
-    func deleteByGUID(_ guid: GUID, deletedAt: Timestamp) -> Success
+extension DB {
+    public func getSitesByLastVisit() -> [Results<History>] {
+        let todayTimestamp = getDate(dayOffset: 0)
+        let yesterdayTimestamp = getDate(dayOffset: -1)
+        let lastWeekTimestamp = getDate(dayOffset: -7)
 
-    func storeRemoteVisits(_ visits: [Visit], forGUID guid: GUID) -> Success
-    func insertOrUpdatePlace(_ place: Place, modified: Timestamp) -> Deferred<Maybe<GUID>>
+        let q = self.realm.objects(History.self).sorted(byKeyPath: "visitedAt", ascending: false)
 
-    func getModifiedHistoryToUpload() -> Deferred<Maybe<[(Place, [Visit])]>>
-    func getDeletedHistoryToUpload() -> Deferred<Maybe<[GUID]>>
+        return [
+            q.filter("visitedAt > %@", todayTimestamp), // today
+            q.filter("visitedAt > %@ AND visitedAt <= %@", yesterdayTimestamp, todayTimestamp), // yesterday
+            q.filter("visitedAt > %@ AND visitedAt <= %@", lastWeekTimestamp, yesterdayTimestamp), // last week
+            q.filter("visitedAt <= %@", lastWeekTimestamp), // last month
+        ]
+    }
 
-    /**
-     * Chains through the provided timestamp.
-     */
-    func markAsSynchronized(_: [GUID], modified: Timestamp) -> Deferred<Maybe<Timestamp>>
-    func markAsDeleted(_ guids: [GUID]) -> Success
+    public func addLocalVisit(url: String, title: String, type: HistoryType, visitedAt: Date) -> Maybe<Void> {
+        let h = History()
+        h.url = url
+        h.title = title
+        h._type = type.rawValue
+        h.visitedAt = visitedAt
+        do {
+            try self.realm.write {
+                self.realm.add(h)
+            }
+            return Maybe(success: ())
+        } catch let error as NSError {
+            return Maybe(failure: error)
+        }
+    }
 
-    func doneApplyingRecordsAfterDownload() -> Success
-    func doneUpdatingMetadataAfterUpload() -> Success
+    public func searchHistory(query: String, limit: Int) -> [Site] {
+        let result = self.realm.objects(History.self).filter("url CONTAINS %@ OR title CONTAINS %@", query, query)
+        var sites = [Site]()
+        var count = 0
+        var it = result.makeIterator()
+        while let h = it.next() {
+            sites.append(Site(url: h.url, title: h.title))
+            count += 1
+            if count >= limit { break }
+        }
+        return sites
+    }
 
-    /**
-     * For inspecting whether we're an active participant in history sync.
-     */
-    func hasSyncedHistory() -> Deferred<Maybe<Bool>>
-}
+    public func getTopSitesWithLimit(_ limit: Int) -> [Site] {
+        var it = self.realm
+            .objects(History.self)
+            .groupBy({ $0.url }, transformer: { Site(url: $0.url, title: $0.title) })
+            .sorted { $0.value.count > $1.value.count }
+            .makeIterator()
+        var sites = [Site]()
+        var count = 0
+        while let ss = it.next() {
+            guard let s = ss.value.first else { continue }
+            sites.append(s)
+            count += 1
+            if count >= limit { break }
+        }
+        return sites
+    }
 
-// TODO: integrate Site with this.
+    public func clearHistory() {
+        let history = self.realm.objects(History.self)
+        try! self.realm.write {
+            self.realm.delete(history)
+        }
+    }
 
-open class Place {
-    public let guid: GUID
-    public let url: String
-    public let title: String
+    public func removeHistoryFromDate(_ date: Date) {
+        let history = self.realm.objects(History.self).filter("visitedAt > %@", date)
+        try! self.realm.write {
+            self.realm.delete(history)
+        }
+    }
 
-    public init(guid: GUID, url: String, title: String) {
-        self.guid = guid
-        self.url = url
-        self.title = title
+    public func removeHistoryForURL(_ url: String) {
+        let history = self.realm.objects(History.self).filter("url = %@", url)
+        try! self.realm.write {
+            self.realm.delete(history)
+        }
+    }
+
+    public func cleanupHistoryIfNeeded() {
+        let q = self.realm.objects(History.self).sorted(byKeyPath: "visitedAt", ascending: false)
+        guard q.count > MaxHistoryRowCount else { return }
+
+        let date = q[MaxHistoryRowCount-1].visitedAt
+
+        let toDelete = self.realm.objects(History.self).filter("visitedAt < %@", date)
+        try! self.realm.write {
+            self.realm.delete(toDelete)
+        }
     }
 }

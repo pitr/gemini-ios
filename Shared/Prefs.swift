@@ -6,29 +6,20 @@ import Foundation
 
 public struct PrefsKeys {
     public static let KeyDefaultHomePageURL = "KeyDefaultHomePageURL"
-    public static let KeyNoImageModeStatus = "NoImageModeStatus"
     public static let KeyNightModeButtonIsInMenu = "NightModeButtonIsInMenuPrefKey"
     public static let KeyNightModeStatus = "NightModeStatus"
     public static let KeyNightModeEnabledDarkTheme = "NightModeEnabledDarkTheme"
     public static let KeyMailToOption = "MailToOption"
-    public static let KeyLastVersionNumber = "KeyLastVersionNumber"
     public static let IntroSeen = "IntroViewControllerSeen"
     public static let HomePageTab = "HomePageTab"
     public static let HomeButtonHomePageURL = "HomeButtonHomepageURL"
     public static let NumberOfTopSiteRows = "NumberOfTopSiteRows"
-    public static let KeyInstallSession = "installSessionNumber"
-    public static let KeyETPCoverSheetShowType = "etpCoverSheetShowType"
 
     public static let ContextMenuShowLinkPreviews = "showLinkPreviews"
 
     public static let NewTabCustomUrlPrefKey = "HomePageURLPref"
     //Activity Stream
-    public static let KeyTopSitesCacheIsValid = "topSitesCacheIsValid"
-    public static let KeyTopSitesCacheSize = "topSitesCacheSize"
     public static let KeyNewTab = "NewTabPrefKey"
-    public static let ASRecentHighlightsVisible = "ASRecentHighlightsVisible"
-    public static let ASBookmarkHighlightsVisible = "ASBookmarkHighlightsVisible"
-    public static let ASLastInvalidation = "ASLastInvalidation"
 }
 
 public protocol Prefs {

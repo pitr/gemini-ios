@@ -77,7 +77,7 @@ class SiteTableViewController: UIViewController, UITableViewDelegate, UITableVie
     fileprivate let HeaderIdentifier = "HeaderIdentifier"
     let profile: Profile
 
-    var data: Cursor<Site> = Cursor<Site>(status: .success, msg: "No data set")
+    var data: [Site] = []
     var tableView = UITableView()
 
     private override init(nibName: String?, bundle: Bundle?) {
@@ -147,11 +147,7 @@ class SiteTableViewController: UIViewController, UITableViewDelegate, UITableVie
     }
 
     func reloadData() {
-        if data.status != .success {
-            print("Err: \(data.statusMessage)", terminator: "\n")
-        } else {
-            self.tableView.reloadData()
-        }
+        self.tableView.reloadData()
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

@@ -172,9 +172,7 @@ class TabPeekViewController: UIViewController, WKNavigationDelegate {
             return
         }
 
-        browserProfile.places.isBookmarked(url: displayURL) >>== { isBookmarked in
-            self.isBookmarked = isBookmarked
-        }
+        self.isBookmarked = browserProfile.db.isBookmarked(url: displayURL)
 
         self.ignoreURL = isIgnoredURL(displayURL)
     }

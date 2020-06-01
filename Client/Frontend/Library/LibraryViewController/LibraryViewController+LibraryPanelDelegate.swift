@@ -10,12 +10,12 @@ extension LibraryViewController: LibraryPanelDelegate {
         delegate?.libraryPanelDidRequestToOpenInNewTab(url, isPrivate: isPrivate)
     }
 
-    func libraryPanel(didSelectURL url: URL, visitType: VisitType) {
-        delegate?.libraryPanel(didSelectURL: url, visitType: visitType)
+    func libraryPanel(didSelectURL url: URL, historyType: HistoryType) {
+        delegate?.libraryPanel(didSelectURL: url, historyType: historyType)
         dismiss(animated: true, completion: nil)
     }
 
-    func libraryPanel(didSelectURLString url: String, visitType: VisitType) {
+    func libraryPanel(didSelectURLString url: String, historyType: HistoryType) {
         // If we can't get a real URL out of what should be a URL, we let the user's
         // default search engine give it a shot.
         // Typically we'll be in this state if the user has tapped a bookmarked search template
@@ -26,6 +26,6 @@ extension LibraryViewController: LibraryPanelDelegate {
             Logger.browserLogger.warning("Invalid URL, and couldn't generate a search URL for it.")
             return
         }
-        return self.libraryPanel(didSelectURL: url, visitType: visitType)
+        return self.libraryPanel(didSelectURL: url, historyType: historyType)
     }
 }

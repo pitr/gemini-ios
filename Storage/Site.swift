@@ -39,10 +39,8 @@ open class Site: Identifiable {
 
     public let url: String
     public let title: String
-    open var metadata: PageMetadata?
      // Sites may have multiple favicons. We'll return the largest.
     open var icon: Favicon?
-    open var latestVisit: Visit?
     open fileprivate(set) var bookmarked: Bool?
 
     public convenience init(url: String, title: String) {

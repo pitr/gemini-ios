@@ -132,11 +132,6 @@ class TopTabCell: UICollectionViewCell, PrivateModeUI {
         contentView.addSubview(favicon)
         contentView.addSubview(highlightLine)
 
-        favicon.snp.makeConstraints { make in
-            make.centerY.equalTo(self).offset(TopTabsUX.TabNudge)
-            make.size.equalTo(TabTrayControllerUX.FaviconSize)
-            make.leading.equalTo(self).offset(TopTabsUX.TabTitlePadding)
-        }
         titleText.snp.makeConstraints { make in
             make.centerY.equalTo(self)
             make.height.equalTo(self)

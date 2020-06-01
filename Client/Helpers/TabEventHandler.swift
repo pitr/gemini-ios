@@ -51,49 +51,37 @@ import Storage
 //   ii) a case to map the event to the event handler (func handle:with:)
 protocol TabEventHandler: AnyObject {
     func tab(_ tab: Tab, didChangeURL url: URL)
-    func tab(_ tab: Tab, didLoadPageMetadata metadata: PageMetadata)
-    func tabMetadataNotAvailable(_ tab: Tab)
     func tab(_ tab: Tab, didLoadFavicon favicon: Favicon?, with: Data?)
     func tabDidGainFocus(_ tab: Tab)
     func tabDidLoseFocus(_ tab: Tab)
     func tabDidClose(_ tab: Tab)
-    func tab(_ tab: Tab, didDeriveMetadata metadata: DerivedMetadata)
 }
 
 // Provide default implmentations, because we don't want to litter the code with
 // empty methods, and `@objc optional` doesn't really work very well.
 extension TabEventHandler {
     func tab(_ tab: Tab, didChangeURL url: URL) {}
-    func tab(_ tab: Tab, didLoadPageMetadata metadata: PageMetadata) {}
-    func tabMetadataNotAvailable(_ tab: Tab) {}
     func tab(_ tab: Tab, didLoadFavicon favicon: Favicon?, with: Data?) {}
     func tabDidGainFocus(_ tab: Tab) {}
     func tabDidLoseFocus(_ tab: Tab) {}
     func tabDidClose(_ tab: Tab) {}
-    func tab(_ tab: Tab, didDeriveMetadata metadata: DerivedMetadata) {}
 }
 
 enum TabEventLabel: String {
     case didChangeURL
-    case didLoadPageMetadata
-    case pageMetadataNotAvailable
     case didLoadFavicon
     case didGainFocus
     case didLoseFocus
     case didClose
-    case didDeriveMetadata
 }
 
 // Names of events must be unique!
 enum TabEvent {
     case didChangeURL(URL)
-    case didLoadPageMetadata(PageMetadata)
-    case pageMetadataNotAvailable
     case didLoadFavicon(Favicon?, with: Data?)
     case didGainFocus
     case didLoseFocus
     case didClose
-    case didDeriveMetadata(DerivedMetadata)
 
     var label: TabEventLabel {
         let str = "\(self)".components(separatedBy: "(")[0] // Will grab just the name from 'didChangeURL(...)'
@@ -107,10 +95,6 @@ enum TabEvent {
         switch self {
         case .didChangeURL(let url):
             handler.tab(tab, didChangeURL: url)
-        case .didLoadPageMetadata(let metadata):
-            handler.tab(tab, didLoadPageMetadata: metadata)
-        case .pageMetadataNotAvailable:
-            handler.tabMetadataNotAvailable(tab)
         case .didLoadFavicon(let favicon, let data):
             handler.tab(tab, didLoadFavicon: favicon, with: data)
         case .didGainFocus:
@@ -119,8 +103,6 @@ enum TabEvent {
             handler.tabDidLoseFocus(tab)
         case .didClose:
             handler.tabDidClose(tab)
-        case .didDeriveMetadata(let metadata):
-            handler.tab(tab, didDeriveMetadata: metadata)
         }
     }
 }

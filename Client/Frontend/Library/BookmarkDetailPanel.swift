@@ -39,15 +39,7 @@ class BookmarkDetailPanel: SiteTableViewController {
     let bookmarkNodeType: BookmarkNodeType
 
     // Editable field(s) that all BookmarkNodes have.
-    var parentBookmarkFolder: BookmarkFolder
-
-    // Sort position for the BookmarkItem. If editing, this
-    // value remains the same as it was prior to the edit
-    // unless the parent folder gets changed. In that case,
-    // and in the case of adding a new BookmarkItem, this
-    // value becomes `nil` which causes it to be re-positioned
-    // to the bottom of the parent folder upon saving.
-    var bookmarkItemPosition: UInt32?
+    var parentBookmarkFolder: Bookmark
 
     // Editable field(s) that only BookmarkItems and
     // BookmarkFolders have.
@@ -64,30 +56,28 @@ class BookmarkDetailPanel: SiteTableViewController {
 
     // Array of tuples containing all of the BookmarkFolders
     // along with their indentation depth.
-    var bookmarkFolders: [(folder: BookmarkFolder, indent: Int)] = []
+    var bookmarkFolders: [(folder: Bookmark, indent: Int)] = []
 
     private var maxIndentationLevel: Int {
         return Int(floor((view.frame.width - BookmarkDetailPanelUX.MinIndentedContentWidth) / BookmarkDetailPanelUX.IndentationWidth))
     }
 
-    convenience init(profile: Profile, bookmarkNode: BookmarkNode, parentBookmarkFolder: BookmarkFolder) {
-        self.init(profile: profile, bookmarkNodeGUID: bookmarkNode.guid, bookmarkNodeType: bookmarkNode.type, parentBookmarkFolder: parentBookmarkFolder)
+    convenience init(profile: Profile, bookmarkNode: Bookmark, parentBookmarkFolder: Bookmark) {
+        self.init(profile: profile, bookmarkNodeGUID: bookmarkNode.id, bookmarkNodeType: bookmarkNode.type, parentBookmarkFolder: parentBookmarkFolder)
 
-        self.bookmarkItemPosition = bookmarkNode.position
-
-        if let bookmarkItem = bookmarkNode as? BookmarkItem {
-            self.bookmarkItemOrFolderTitle = bookmarkItem.title
-            self.bookmarkItemURL = bookmarkItem.url
+        if bookmarkNode.type == .bookmark {
+            self.bookmarkItemOrFolderTitle = bookmarkNode.title
+            self.bookmarkItemURL = bookmarkNode.url
 
             self.title = Strings.BookmarksEditBookmark
-        } else if let bookmarkFolder = bookmarkNode as? BookmarkFolder {
-            self.bookmarkItemOrFolderTitle = bookmarkFolder.title
+        } else if bookmarkNode.type == .folder {
+            self.bookmarkItemOrFolderTitle = bookmarkNode.title
 
             self.title = Strings.BookmarksEditFolder
         }
     }
 
-    convenience init(profile: Profile, withNewBookmarkNodeType bookmarkNodeType: BookmarkNodeType, parentBookmarkFolder: BookmarkFolder) {
+    convenience init(profile: Profile, withNewBookmarkNodeType bookmarkNodeType: BookmarkNodeType, parentBookmarkFolder: Bookmark) {
         self.init(profile: profile, bookmarkNodeGUID: nil, bookmarkNodeType: bookmarkNodeType, parentBookmarkFolder: parentBookmarkFolder)
 
         if bookmarkNodeType == .bookmark {
@@ -102,7 +92,7 @@ class BookmarkDetailPanel: SiteTableViewController {
         }
     }
 
-    private init(profile: Profile, bookmarkNodeGUID: GUID?, bookmarkNodeType: BookmarkNodeType, parentBookmarkFolder: BookmarkFolder) {
+    private init(profile: Profile, bookmarkNodeGUID: GUID?, bookmarkNodeType: BookmarkNodeType, parentBookmarkFolder: Bookmark) {
         self.bookmarkNodeGUID = bookmarkNodeGUID
         self.bookmarkNodeType = bookmarkNodeType
         self.parentBookmarkFolder = parentBookmarkFolder
@@ -127,12 +117,11 @@ class BookmarkDetailPanel: SiteTableViewController {
         }
 
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .save) { _ in
-            self.save().uponQueue(.main) { _ in
-                self.navigationController?.popViewController(animated: true)
+            _ = self.save()
+            self.navigationController?.popViewController(animated: true)
 
-                if self.isNew, let bookmarksPanel = self.navigationController?.visibleViewController as? BookmarksPanel {
-                    bookmarksPanel.didAddBookmarkNode()
-                }
+            if self.isNew, let bookmarksPanel = self.navigationController?.visibleViewController as? BookmarksPanel {
+                bookmarksPanel.didAddBookmarkNode()
             }
         }
 
@@ -171,46 +160,28 @@ class BookmarkDetailPanel: SiteTableViewController {
     }
 
     override func reloadData() {
-        profile.places.getBookmarksTree(rootGUID: BookmarkRoots.RootGUID, recursive: true).uponQueue(.main) { result in
-            guard let rootFolder = result.successValue as? BookmarkFolder else {
-                // TODO: Handle error case?
-                self.bookmarkFolders = []
-                self.tableView.reloadData()
-                return
-            }
-
-            var bookmarkFolders: [(folder: BookmarkFolder, indent: Int)] = []
-
-            func addFolder(_ folder: BookmarkFolder, indent: Int = 0) {
-                // Do not append the top "root" folder to this list as
-                // bookmarks cannot be stored directly within it.
-                if folder.guid != BookmarkRoots.RootGUID {
-                    bookmarkFolders.append((folder, indent))
-                }
-
-                for case let childFolder as BookmarkFolder in folder.children ?? [] {
-                    // Any "root" folders (i.e. "Mobile Bookmarks") should
-                    // have an indentation of 0.
-                    if childFolder.isRoot {
-                        if childFolder.guid != BookmarkRoots.MobileFolderGUID {
-                            // skip non-mobile root folders
-                            continue
-                        }
-                        addFolder(childFolder)
-                    }
-                    // Otherwise, all non-root folder should increase the
-                    // indentation by 1.
-                    else {
-                        addFolder(childFolder, indent: indent + 1)
-                    }
-                }
-            }
-
-            addFolder(rootFolder)
-
-            self.bookmarkFolders = bookmarkFolders
+        guard let rootFolder = profile.db.getBookmark(guid: Bookmark.RootGUID) else {
+            // TODO: Handle error case?
+            self.bookmarkFolders = []
             self.tableView.reloadData()
+            return
         }
+
+        var bookmarkFolders: [(folder: Bookmark, indent: Int)] = []
+
+        func addFolder(_ folder: Bookmark, indent: Int = 0) {
+            bookmarkFolders.append((folder, indent))
+
+            for childFolder in folder.children {
+                guard childFolder.type == .folder else { continue }
+                addFolder(childFolder, indent: indent + 1)
+            }
+        }
+
+        addFolder(rootFolder)
+
+        self.bookmarkFolders = bookmarkFolders
+        self.tableView.reloadData()
     }
 
     func updateSaveButton() {
@@ -222,38 +193,34 @@ class BookmarkDetailPanel: SiteTableViewController {
         navigationItem.rightBarButtonItem?.isEnabled = url?.schemeIsValid == true && url?.host != nil
     }
 
-    func save() -> Success {
+    func save() -> Maybe<GUID> {
         if isNew {
             if bookmarkNodeType == .bookmark {
                 guard let bookmarkItemURL = self.bookmarkItemURL else {
-                    return deferMaybe(BookmarkDetailPanelError())
+                    return Maybe(failure: BookmarkDetailPanelError())
                 }
 
-                return profile.places.createBookmark(parentGUID: parentBookmarkFolder.guid, url: bookmarkItemURL, title: bookmarkItemOrFolderTitle).bind({ result in
-                    return result.isFailure ? deferMaybe(BookmarkDetailPanelError()) : succeed()
-                })
+                return profile.db.createBookmark(parentGUID: parentBookmarkFolder.id, url: bookmarkItemURL, title: bookmarkItemOrFolderTitle)
             } else if bookmarkNodeType == .folder {
                 guard let bookmarkItemOrFolderTitle = self.bookmarkItemOrFolderTitle else {
-                    return deferMaybe(BookmarkDetailPanelError())
+                    return Maybe(failure: BookmarkDetailPanelError())
                 }
 
-                return profile.places.createFolder(parentGUID: parentBookmarkFolder.guid, title: bookmarkItemOrFolderTitle).bind({ result in
-                    return result.isFailure ? deferMaybe(BookmarkDetailPanelError()) : succeed()
-                })
+                return profile.db.createFolder(parentGUID: parentBookmarkFolder.id, title: bookmarkItemOrFolderTitle)
             }
         } else {
             guard let bookmarkNodeGUID = self.bookmarkNodeGUID else {
-                return deferMaybe(BookmarkDetailPanelError())
+                return Maybe(failure: BookmarkDetailPanelError())
             }
 
             if bookmarkNodeType == .bookmark {
-                return profile.places.updateBookmarkNode(guid: bookmarkNodeGUID, parentGUID: parentBookmarkFolder.guid, position: bookmarkItemPosition, title: bookmarkItemOrFolderTitle, url: bookmarkItemURL)
+                return profile.db.updateBookmarkNode(guid: bookmarkNodeGUID, parentGUID: parentBookmarkFolder.id, title: bookmarkItemOrFolderTitle, url: bookmarkItemURL)
             } else if bookmarkNodeType == .folder {
-                return profile.places.updateBookmarkNode(guid: bookmarkNodeGUID, parentGUID: parentBookmarkFolder.guid, position: bookmarkItemPosition, title: bookmarkItemOrFolderTitle)
+                return profile.db.updateBookmarkNode(guid: bookmarkNodeGUID, parentGUID: parentBookmarkFolder.id, title: bookmarkItemOrFolderTitle)
             }
         }
 
-        return deferMaybe(BookmarkDetailPanelError())
+        return Maybe(failure: BookmarkDetailPanelError())
     }
 
     // MARK: UITableViewDataSource | UITableViewDelegate
@@ -265,9 +232,8 @@ class BookmarkDetailPanel: SiteTableViewController {
             return
         }
 
-        if isFolderListExpanded, let item = bookmarkFolders[safe: indexPath.row], parentBookmarkFolder.guid != item.folder.guid {
+        if isFolderListExpanded, let item = bookmarkFolders[safe: indexPath.row], parentBookmarkFolder.id != item.folder.id {
             parentBookmarkFolder = item.folder
-            bookmarkItemPosition = nil
         }
 
         isFolderListExpanded = !isFolderListExpanded
@@ -308,7 +274,8 @@ class BookmarkDetailPanel: SiteTableViewController {
             }
 
             // Disable folder selection when creating a new bookmark or folder.
-            if isNew {
+            // Also disable folder movement as it can lead to unreachable folders.
+            if isNew || bookmarkNodeType == .folder {
                 cell.textLabel?.alpha = 0.5
                 cell.imageView?.alpha = 0.5
                 cell.selectionStyle = .none
@@ -329,21 +296,21 @@ class BookmarkDetailPanel: SiteTableViewController {
                     return super.tableView(tableView, cellForRowAt: indexPath)
                 }
 
-                if item.folder.isRoot, let localizedString = LocalizedRootBookmarkFolderStrings[item.folder.guid] {
-                    cell.textLabel?.text = localizedString
+                if item.folder.isRoot {
+                    cell.textLabel?.text = Strings.AllBookmarksTitle
                 } else {
                     cell.textLabel?.text = item.folder.title
                 }
 
                 cell.indentationLevel = min(item.indent, maxIndentationLevel)
-                if item.folder.guid == parentBookmarkFolder.guid {
+                if item.folder.id == parentBookmarkFolder.id {
                     cell.accessoryType = .checkmark
                 } else {
                     cell.accessoryType = .none
                 }
             } else {
-                if parentBookmarkFolder.isRoot, let localizedString = LocalizedRootBookmarkFolderStrings[parentBookmarkFolder.guid] {
-                    cell.textLabel?.text = localizedString
+                if parentBookmarkFolder.isRoot {
+                    cell.textLabel?.text = Strings.AllBookmarksTitle
                 } else {
                     cell.textLabel?.text = parentBookmarkFolder.title
                 }

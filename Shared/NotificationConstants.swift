@@ -3,32 +3,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 extension Notification.Name {
-    public static let DataLoginDidChange = Notification.Name("DataLoginDidChange")
-
     // Fired when the user finishes navigating to a page and the location has changed
     public static let OnLocationChange = Notification.Name("OnLocationChange")
   
     // MARK: Notification UserInfo Keys
 
-    // Fired when a the page metadata extraction script has completed and is being passed back to the native client
-    public static let OnPageMetadataFetched = Notification.Name("OnPageMetadataFetched")
-
-    public static let ProfileDidStartSyncing = Notification.Name("ProfileDidStartSyncing")
-    public static let ProfileDidFinishSyncing = Notification.Name("ProfileDidFinishSyncing")
-
-    public static let DatabaseWasRecreated = Notification.Name("DatabaseWasRecreated")
-    public static let DatabaseWasClosed = Notification.Name("DatabaseWasClosed")
-    public static let DatabaseWasReopened = Notification.Name("DatabaseWasReopened")
-
-    public static let PasscodeDidChange = Notification.Name("PasscodeDidChange")
-
-    public static let PasscodeDidCreate = Notification.Name("PasscodeDidCreate")
-
-    public static let PasscodeDidRemove = Notification.Name("PasscodeDidRemove")
-
     public static let DynamicFontChanged = Notification.Name("DynamicFontChanged")
-
-    public static let FaviconDidLoad = Notification.Name("FaviconDidLoad")
 
     public static let ReachabilityStatusChanged = Notification.Name("ReachabilityStatusChanged")
 

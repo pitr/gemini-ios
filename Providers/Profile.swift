@@ -47,18 +47,12 @@ class ProfileFileAccessor: FileAccessor {
  * A Profile manages access to the user's data.
  */
 protocol Profile: AnyObject {
-    var places: RustPlaces { get }
+    var db: DB { get }
     var prefs: Prefs { get }
-    var queue: TabQueue { get }
     var searchEngines: SearchEngines { get }
     var files: FileAccessor { get }
-    var history: BrowserHistory & SyncableHistory & ResettableSyncStorage { get }
-    var metadata: Metadata { get }
-    var recommendations: HistoryRecommendations { get }
-    var favicons: Favicons { get }
     var certStore: CertStore { get }
     var recentlyClosedTabs: ClosedTabsStore { get }
-    var panelDataObservers: PanelDataObservers { get }
 
     var isShutdown: Bool { get }
 
@@ -75,8 +69,6 @@ protocol Profile: AnyObject {
     func localName() -> String
 
     func cleanupHistoryIfNeeded()
-
-    @discardableResult func storeTabs(_ tabs: [RemoteTab]) -> Deferred<Maybe<Int>>
 }
 
 fileprivate let PrefKeyClientID = "PrefKeyClientID"
@@ -100,7 +92,7 @@ open class BrowserProfile: Profile {
 
     internal let files: FileAccessor
 
-    let db: BrowserDB
+    let db: DB
 
     private let loginsSaltKeychainKey = "sqlcipher.key.logins.salt"
     private let loginsUnlockKeychainKey = "sqlcipher.key.logins.db"
@@ -149,7 +141,8 @@ open class BrowserProfile: Profile {
         let isNewProfile = !files.exists("")
 
         // Set up our database handles.
-        self.db = BrowserDB(filename: "browser.db", schema: BrowserSchema(), files: files)
+        self.db = DB(filename: "browser.realm", files: files)
+        self.db.setUp()
 
         if isNewProfile {
             log.info("New profile. Removing old Keychain/Prefs data.")
@@ -157,45 +150,9 @@ open class BrowserProfile: Profile {
             prefs.clearAll()
         }
 
-        // Log SQLite compile_options.
-        // db.sqliteCompileOptions() >>== { compileOptions in
-        //     log.debug("SQLite compile_options:\n\(compileOptions.joined(separator: "\n"))")
-        // }
-
-        // Set up logging from Rust.
-        if !RustLog.shared.tryEnable({ (level, tag, message) -> Bool in
-            let logString = "[RUST][\(tag ?? "no-tag")] \(message)"
-
-            switch level {
-            case .trace:
-                break
-            case .debug:
-                log.debug(logString)
-            case .info:
-                log.info(logString)
-            case .warn:
-                log.warning(logString)
-            case .error:
-                log.error(logString)
-            }
-
-            return true
-        }) {
-            log.error("ERROR: Unable to enable logging from Rust")
-        }
-
-        // By default, filter logging from Rust below `.info` level.
-        try? RustLog.shared.setLevelFilter(filter: .info)
-
         let notificationCenter = NotificationCenter.default
 
         notificationCenter.addObserver(self, selector: #selector(onLocationChange), name: .OnLocationChange, object: nil)
-        notificationCenter.addObserver(self, selector: #selector(onPageMetadataFetched), name: .OnPageMetadataFetched, object: nil)
-
-        // Always start by needing invalidation.
-        // This is the same as self.history.setTopSitesNeedsInvalidation, but without the
-        // side-effect of instantiating SQLiteHistory (and thus BrowserDB) on the main thread.
-        prefs.setBool(false, forKey: PrefsKeys.KeyTopSitesCacheIsValid)
 
         // Remove the default homepage. This does not change the user's preference,
         // just the behaviour when there is no homepage.
@@ -210,52 +167,27 @@ open class BrowserProfile: Profile {
     func _reopen() {
         log.debug("Reopening profile.")
         isShutdown = false
-
-        if !places.isOpen {
-            places.migrateBookmarksIfNeeded(fromBrowserDB: db)
-        }
-
-        db.reopenIfClosed()
-        _ = places.reopenIfClosed()
     }
 
     func _shutdown() {
         log.debug("Shutting down profile.")
         isShutdown = true
-
-        db.forceClose()
-        _ = places.forceClose()
     }
 
     @objc
     func onLocationChange(notification: NSNotification) {
-        if let v = notification.userInfo!["visitType"] as? Int,
-           let visitType = VisitType(rawValue: v),
-           let url = notification.userInfo!["url"] as? URL, !isIgnoredURL(url),
-           let title = notification.userInfo!["title"] as? NSString {
+        if let v = notification.userInfo!["historyType"] as? Int,
+            let type = HistoryType(rawValue: v),
+            let url = notification.userInfo!["url"] as? URL, !isIgnoredURL(url),
+            let title = notification.userInfo!["title"] as? NSString {
             // Only record local vists if the change notification originated from a non-private tab
             if !(notification.userInfo!["isPrivate"] as? Bool ?? false) {
                 // We don't record a visit if no type was specified -- that means "ignore me".
-                let site = Site(url: url.absoluteString, title: title as String)
-                let visit = SiteVisit(site: site, date: Date.nowMicroseconds(), type: visitType)
-                history.addLocalVisit(visit)
+                _ = db.addLocalVisit(url: url.absoluteString, title: title as String, type: type, visitedAt: Date())
             }
-
-            history.setTopSitesNeedsInvalidation()
         } else {
             log.debug("Ignoring navigation.")
         }
-    }
-
-    @objc
-    func onPageMetadataFetched(notification: NSNotification) {
-        guard let pageURL = notification.userInfo?["tabURL"] as? URL,
-              let pageMetadata = notification.userInfo?["pageMetadata"] as? PageMetadata else {
-            log.debug("Metadata notification doesn't contain any metadata!")
-            return
-        }
-        let defaultMetadataTTL: UInt64 = 3 * 24 * 60 * 60 * 1000 // 3 days for the metadata to live
-        self.metadata.storeMetadata(pageMetadata, forPageURL: pageURL, expireAt: defaultMetadataTTL + Date.now())
     }
 
     deinit {
@@ -265,47 +197,6 @@ open class BrowserProfile: Profile {
     func localName() -> String {
         return name
     }
-
-    lazy var queue: TabQueue = {
-        withExtendedLifetime(self.history) {
-            return SQLiteQueue(db: self.db)
-        }
-    }()
-
-    /**
-     * Favicons, history, and tabs are all stored in one intermeshed
-     * collection of tables.
-     *
-     * Any other class that needs to access any one of these should ensure
-     * that this is initialized first.
-     */
-    fileprivate lazy var legacyPlaces: BrowserHistory & Favicons & SyncableHistory & ResettableSyncStorage & HistoryRecommendations  = {
-        return SQLiteHistory(db: self.db, prefs: self.prefs)
-    }()
-
-    var favicons: Favicons {
-        return self.legacyPlaces
-    }
-
-    var history: BrowserHistory & SyncableHistory & ResettableSyncStorage {
-        return self.legacyPlaces
-    }
-
-    lazy var panelDataObservers: PanelDataObservers = {
-        return PanelDataObservers(profile: self)
-    }()
-
-    lazy var metadata: Metadata = {
-        return SQLiteMetadata(db: self.db)
-    }()
-
-    var recommendations: HistoryRecommendations {
-        return self.legacyPlaces
-    }
-
-    lazy var placesDbPath = URL(fileURLWithPath: (try! files.getAndEnsureDirectory()), isDirectory: true).appendingPathComponent("places.db").path
-
-    lazy var places = RustPlaces(databasePath: placesDbPath)
 
     lazy var searchEngines: SearchEngines = {
         return SearchEngines(prefs: self.prefs, files: self.files)
@@ -319,10 +210,6 @@ open class BrowserProfile: Profile {
         return self.makePrefs()
     }()
 
-    lazy var remoteClientsAndTabs: RemoteClientsAndTabs & ResettableSyncStorage & AccountRemovalDelegate & RemoteDevices = {
-        return SQLiteRemoteClientsAndTabs(db: self.db)
-    }()
-
     lazy var certStore: CertStore = {
         return CertStore()
     }()
@@ -332,10 +219,8 @@ open class BrowserProfile: Profile {
     }()
 
     public func cleanupHistoryIfNeeded() {
-        recommendations.cleanupHistoryIfNeeded()
+        assert(Thread.isMainThread, "cleanupHistoryIfNeeded must run in main thread")
+        db.cleanupHistoryIfNeeded()
     }
 
-    func storeTabs(_ tabs: [RemoteTab]) -> Deferred<Maybe<Int>> {
-        return self.remoteClientsAndTabs.insertOrUpdateTabs(tabs)
-    }
 }

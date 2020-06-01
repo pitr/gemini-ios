@@ -58,7 +58,7 @@ struct UXSizeClasses {
 
 protocol HomePanelDelegate: AnyObject {
     func homePanelDidRequestToOpenInNewTab(_ url: URL, isPrivate: Bool)
-    func homePanel(didSelectURL url: URL, visitType: VisitType)
+    func homePanel(didSelectURL url: URL, historyType: HistoryType)
     func homePanelDidRequestToOpenLibrary(panel: LibraryPanelType)
 }
 
@@ -159,8 +159,6 @@ class FirefoxHomeViewController: UICollectionViewController, HomePanel {
         self.collectionView?.register(ASHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "Header")
         self.collectionView?.register(ASFooterView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: "Footer")
         collectionView?.keyboardDismissMode = .onDrag
-
-        self.profile.panelDataObservers.activityStream.delegate = self
 
         applyTheme()
     }
@@ -412,8 +410,7 @@ extension FirefoxHomeViewController: UICollectionViewDelegateFlowLayout {
     }
 
     fileprivate func showSiteWithURLHandler(_ url: URL) {
-        let visitType = VisitType.bookmark
-        homePanelDelegate?.homePanel(didSelectURL: url, visitType: visitType)
+        homePanelDelegate?.homePanel(didSelectURL: url, historyType: .bookmark)
     }
 }
 
@@ -474,80 +471,55 @@ extension FirefoxHomeViewController {
     }
 }
 
+let ActivityStreamTopSiteCacheSize: Int32 = 32
+
 // MARK: - Data Management
-extension FirefoxHomeViewController: DataObserverDelegate {
+extension FirefoxHomeViewController {
 
     // Reloads both highlights and top sites data from their respective caches. Does not invalidate the cache.
     // See ActivityStreamDataObserver for invalidation logic.
     func reloadAll() {
-        self.getTopSites().uponQueue(.main) { _ in
-            // If there is no pending cache update and highlights are empty. Show the onboarding screen
-            self.collectionView?.reloadData()
-            // Refresh the AS data in the background so we'll have fresh data next time we show.
-            self.profile.panelDataObservers.activityStream.refreshIfNeeded(forceTopSites: false)
-        }
+        self.getTopSites()
+        // If there is no pending cache update and highlights are empty. Show the onboarding screen
+        self.collectionView?.reloadData()
     }
 
-    func getTopSites() -> Success {
+    func getTopSites() {
         let numRows = max(self.profile.prefs.intForKey(PrefsKeys.NumberOfTopSiteRows) ?? TopSitesRowCountSettingsController.defaultNumberOfRows, 1)
-        let maxItems = UIDevice.current.userInterfaceIdiom == .pad ? 32 : 16
-        return self.profile.history.getTopSitesWithLimit(maxItems).both(self.profile.history.getPinnedTopSites()).bindQueue(.main) { (topsites, pinnedSites) in
-            guard let mySites = topsites.successValue?.asArray(), let pinned = pinnedSites.successValue?.asArray() else {
-                return succeed()
-            }
+        let mySites = self.profile.db.getTopSitesWithLimit(UIDevice.current.userInterfaceIdiom == .pad ? 32 : 16)
+        let pinned = self.profile.db.getPinnedTopSites()
 
-            // How sites are merged together. We compare against the url's base domain. example m.youtube.com is compared against `youtube.com`
-            let unionOnURL = { (site: Site) -> String in
-                return URL(string: site.url)?.normalizedHost ?? ""
-            }
-
-            // Fetch the default sites
-            let defaultSites = self.defaultTopSites()
-            // create PinnedSite objects. used by the view layer to tell topsites apart
-            let pinnedSites: [Site] = pinned.map({ PinnedSite(site: $0) })
-
-            // Merge default topsites with a user's topsites.
-            let mergedSites = mySites.union(defaultSites, f: unionOnURL)
-            // Merge pinnedSites with sites from the previous step
-            let allSites = pinnedSites.union(mergedSites, f: unionOnURL)
-
-            // Favour topsites from defaultSites as they have better favicons. But keep PinnedSites
-            let newSites = allSites.map { site -> Site in
-                if let _ = site as? PinnedSite {
-                    return site
-                }
-                let domain = URL(string: site.url)?.shortDisplayString
-                return defaultSites.find { $0.title.lowercased() == domain } ?? site
-            }
-
-            self.topSitesManager.currentTraits = self.view.traitCollection
-            let maxItems = Int(numRows) * self.topSitesManager.numberOfHorizontalItems()
-            if newSites.count > Int(ActivityStreamTopSiteCacheSize) {
-                self.topSitesManager.content = Array(newSites[0..<Int(ActivityStreamTopSiteCacheSize)])
-            } else {
-                self.topSitesManager.content = newSites
-            }
-
-            if newSites.count > maxItems {
-                self.topSitesManager.content =  Array(newSites[0..<maxItems])
-            }
-
-            self.topSitesManager.urlPressedHandler = { [unowned self] url, indexPath in
-                self.longPressRecognizer.isEnabled = false
-                self.showSiteWithURLHandler(url as URL)
-            }
-
-            return succeed()
+        // How sites are merged together. We compare against the url's base domain. example m.youtube.com is compared against `youtube.com`
+        let unionOnURL = { (site: Site) -> String in
+            return URL(string: site.url)?.normalizedHost ?? ""
         }
-    }
 
-    // Invoked by the ActivityStreamDataObserver when highlights/top sites invalidation is complete.
-    func didInvalidateDataSources(refresh forced: Bool, topSitesRefreshed: Bool) {
-        // Do not reload panel unless we're currently showing the highlight intro or if we
-        // force-reloaded the highlights or top sites. This should prevent reloading the
-        // panel after we've invalidated in the background on the first load.
-        if forced {
-            reloadAll()
+        // Fetch the default sites
+        let defaultSites = self.defaultTopSites()
+        // create PinnedSite objects. used by the view layer to tell topsites apart
+        let pinnedSites: [Site] = pinned.map({ PinnedSite(site: $0) })
+
+        // Merge default topsites with a user's topsites.
+        let mergedSites = mySites.union(defaultSites, f: unionOnURL)
+
+        // Merge pinnedSites with sites from the previous step
+        let newSites = pinnedSites.union(mergedSites, f: unionOnURL)
+
+        self.topSitesManager.currentTraits = self.view.traitCollection
+        let maxItems = Int(numRows) * self.topSitesManager.numberOfHorizontalItems()
+        if newSites.count > Int(ActivityStreamTopSiteCacheSize) {
+            self.topSitesManager.content = Array(newSites[0..<Int(ActivityStreamTopSiteCacheSize)])
+        } else {
+            self.topSitesManager.content = newSites
+        }
+
+        if newSites.count > maxItems {
+            self.topSitesManager.content =  Array(newSites[0..<maxItems])
+        }
+
+        self.topSitesManager.urlPressedHandler = { [unowned self] url, indexPath in
+            self.longPressRecognizer.isEnabled = false
+            self.showSiteWithURLHandler(url as URL)
         }
     }
 
@@ -560,24 +532,15 @@ extension FirefoxHomeViewController: DataObserverDelegate {
         if defaultTopSites().filter({$0.url == url}).isEmpty == false {
             deleteTileForSuggestedSite(url)
         }
-        profile.history.removeHostFromTopSites(host).uponQueue(.main) { result in
-            guard result.isSuccess else { return }
-            self.profile.panelDataObservers.activityStream.refreshIfNeeded(forceTopSites: true)
-        }
+        _ = profile.db.removeHostFromTopSites(host)
     }
 
     func pinTopSite(_ site: Site) {
-        profile.history.addPinnedTopSite(site).uponQueue(.main) { result in
-            guard result.isSuccess else { return }
-            self.profile.panelDataObservers.activityStream.refreshIfNeeded(forceTopSites: true)
-        }
+        guard profile.db.addPinnedTopSite(site).isSuccess else { return }
     }
 
     func removePinTopSite(_ site: Site) {
-        profile.history.removeFromPinnedTopSites(site).uponQueue(.main) { result in
-            guard result.isSuccess else { return }
-            self.profile.panelDataObservers.activityStream.refreshIfNeeded(forceTopSites: true)
-        }
+        _ = profile.db.removeFromPinnedTopSites(site)
     }
 
     fileprivate func deleteTileForSuggestedSite(_ siteURL: String) {
@@ -587,7 +550,7 @@ extension FirefoxHomeViewController: DataObserverDelegate {
     }
 
     func defaultTopSites() -> [Site] {
-        let suggested = SuggestedSites.asArray()
+        let suggested = SuggestedSites.defaults()
         let deleted = profile.prefs.arrayForKey(DefaultSuggestedSitesKey) as? [String] ?? []
         return suggested.filter({deleted.firstIndex(of: $0.url) == .none})
     }
@@ -610,11 +573,9 @@ extension FirefoxHomeViewController: DataObserverDelegate {
     }
 
     fileprivate func fetchBookmarkStatus(for site: Site, with indexPath: IndexPath, forSection section: Section, completionHandler: @escaping () -> Void) {
-        profile.places.isBookmarked(url: site.url).uponQueue(.main) { result in
-            let isBookmarked = result.successValue ?? false
-            site.setBookmarked(isBookmarked)
-            completionHandler()
-        }
+        let isBookmarked = self.profile.db.getBookmarksWithURL(url: site.url).count > 0
+        site.setBookmarked(isBookmarked)
+        completionHandler()
     }
 
     func selectItemAtIndex(_ index: Int, inSection section: Section) {
@@ -678,15 +639,14 @@ extension FirefoxHomeViewController: HomePanelContextMenu {
         let bookmarkAction: PhotonActionSheetItem
         if site.bookmarked ?? false {
             bookmarkAction = PhotonActionSheetItem(title: Strings.RemoveBookmarkContextMenuTitle, iconString: "action_bookmark_remove", handler: { _, _ in
-                self.profile.places.deleteBookmarksWithURL(url: site.url) >>== {
-                    self.profile.panelDataObservers.activityStream.refreshIfNeeded(forceTopSites: false)
+                if self.profile.db.deleteBookmarksWithURL(url: site.url).isSuccess {
                     site.setBookmarked(false)
                 }
             })
         } else {
             bookmarkAction = PhotonActionSheetItem(title: Strings.BookmarkContextMenuTitle, iconString: "action_bookmark", handler: { _, _ in
                 let shareItem = ShareItem(url: site.url, title: site.title)
-                _ = self.profile.places.createBookmark(parentGUID: BookmarkRoots.MobileFolderGUID, url: shareItem.url, title: shareItem.title)
+                _ = self.profile.db.createBookmark(parentGUID: Bookmark.RootGUID, url: shareItem.url, title: shareItem.title)
 
                 var userData = [QuickActions.TabURLKey: shareItem.url]
                 if let title = shareItem.title {
@@ -696,7 +656,6 @@ extension FirefoxHomeViewController: HomePanelContextMenu {
                                                                                     withUserData: userData,
                                                                                     toApplication: .shared)
                 site.setBookmarked(true)
-                self.profile.panelDataObservers.activityStream.refreshIfNeeded(forceTopSites: true)
             })
         }
 
@@ -1007,6 +966,5 @@ open class PinnedSite: Site {
     init(site: Site) {
         super.init(url: site.url, title: site.title, bookmarked: site.bookmarked)
         self.icon = site.icon
-        self.metadata = site.metadata
     }
 }

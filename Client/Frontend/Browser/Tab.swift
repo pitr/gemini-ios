@@ -65,27 +65,9 @@ class Tab: NSObject {
         return TabState(isPrivate: _isPrivate, url: url, title: displayTitle)
     }
 
-    // PageMetadata is derived from the page content itself, and as such lags behind the
-    // rest of the tab.
-    var pageMetadata: PageMetadata?
-
     var consecutiveCrashes: UInt = 0
 
     var canonicalURL: URL? {
-        if let string = pageMetadata?.siteURL,
-            let siteURL = URL(string: string) {
-
-            // If the canonical URL from the page metadata doesn't contain the
-            // "#" fragment, check if the tab's URL has a fragment and if so,
-            // append it to the canonical URL.
-            if siteURL.fragment == nil,
-                let fragment = self.url?.fragment,
-                let siteURLWithFragment = URL(string: "\(string)#\(fragment)") {
-                return siteURLWithFragment
-            }
-
-            return siteURL
-        }
         return self.url
     }
 
@@ -166,34 +148,6 @@ class Tab: NSObject {
         self.isPrivate = isPrivate
 
         debugTabCount += 1
-    }
-
-    class func toRemoteTab(_ tab: Tab) -> RemoteTab? {
-        if tab.isPrivate {
-            return nil
-        }
-
-        if let displayURL = tab.url?.displayURL, RemoteTab.shouldIncludeURL(displayURL) {
-            let history = Array(tab.historyList.filter(RemoteTab.shouldIncludeURL).reversed())
-            return RemoteTab(clientGUID: nil,
-                URL: displayURL,
-                title: tab.displayTitle,
-                history: history,
-                lastUsed: Date.now(),
-                icon: nil)
-        } else if let sessionData = tab.sessionData, !sessionData.urls.isEmpty {
-            let history = Array(sessionData.urls.filter(RemoteTab.shouldIncludeURL).reversed())
-            if let displayURL = history.first {
-                return RemoteTab(clientGUID: nil,
-                    URL: displayURL,
-                    title: tab.displayTitle,
-                    history: history,
-                    lastUsed: sessionData.lastUsedTime,
-                    icon: nil)
-            }
-        }
-
-        return nil
     }
 
     weak var navigationDelegate: WKNavigationDelegate? {

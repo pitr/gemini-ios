@@ -120,8 +120,6 @@ class PhotonActionSheet: UIViewController, UITableViewDelegate, UITableViewDataS
             }
         }
 
-        NotificationCenter.default.addObserver(self, selector: #selector(stopRotateSyncIcon), name: .ProfileDidFinishSyncing, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(stopRotateSyncIcon), name: .ProfileDidStartSyncing, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(reduceTransparencyChanged), name: UIAccessibility.reduceTransparencyStatusDidChangeNotification, object: nil)
     }
 
@@ -152,12 +150,6 @@ class PhotonActionSheet: UIViewController, UITableViewDelegate, UITableViewDataS
         closeButton.backgroundColor = UIColor.theme.actionMenu.closeButtonBackground
 
         tableView.reloadData()
-    }
-
-    @objc func stopRotateSyncIcon() {
-        ensureMainThread {
-            self.tableView.reloadData()
-        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
