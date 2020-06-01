@@ -22,12 +22,8 @@ private let log = Logger.syncLogger
 public let ProfileRemoteTabsSyncDelay: TimeInterval = 0.1
 
 class ProfileFileAccessor: FileAccessor {
-    convenience init(profile: Profile) {
-        self.init(localName: profile.localName())
-    }
-
-    init(localName: String) {
-        let profileDirName = "profile.\(localName)"
+    init() {
+        let profileDirName = "profile.profile"
 
         // Bug 1147262: First option is for device, second is for simulator.
         var rootPath: String
@@ -64,10 +60,6 @@ protocol Profile: AnyObject {
     /// or from App Extension code.
     func _reopen()
 
-    // I got really weird EXC_BAD_ACCESS errors on a non-null reference when I made this a getter.
-    // Similar to <http://stackoverflow.com/questions/26029317/exc-bad-access-when-indirectly-accessing-inherited-member-in-swift>.
-    func localName() -> String
-
     func cleanupHistoryIfNeeded()
 }
 
@@ -86,7 +78,6 @@ extension Profile {
 }
 
 open class BrowserProfile: Profile {
-    fileprivate let name: String
     fileprivate let keychain: KeychainWrapper
     var isShutdown = false
 
@@ -119,10 +110,9 @@ open class BrowserProfile: Profile {
      * A SyncDelegate can be provided in this initializer, or once the profile is initialized.
      * However, if we provide it here, it's assumed that we're initializing it from the application.
      */
-    init(localName: String, clear: Bool = false) {
-        log.debug("Initing profile \(localName) on thread \(Thread.current).")
-        self.name = localName
-        self.files = ProfileFileAccessor(localName: localName)
+    init(clear: Bool = false) {
+        log.debug("Initing profile  on thread \(Thread.current).")
+        self.files = ProfileFileAccessor()
         self.keychain = KeychainWrapper.sharedAppContainerKeychain
 
         if clear {
@@ -191,11 +181,7 @@ open class BrowserProfile: Profile {
     }
 
     deinit {
-        log.debug("Deiniting profile \(self.localName()).")
-    }
-
-    func localName() -> String {
-        return name
+        log.debug("Deiniting profile.")
     }
 
     lazy var searchEngines: SearchEngines = {
@@ -203,7 +189,7 @@ open class BrowserProfile: Profile {
     }()
 
     func makePrefs() -> Prefs {
-        return NSUserDefaultsPrefs(prefix: self.localName())
+        return NSUserDefaultsPrefs()
     }
 
     lazy var prefs: Prefs = {

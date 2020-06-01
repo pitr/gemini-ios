@@ -11,6 +11,11 @@ class GeminiSchemeHandler: NSObject, WKURLSchemeHandler {
     public static let scheme = "gemini"
 
     var currentClient: GeminiClient?
+    let prefs = NSUserDefaultsPrefs()
+
+    override init() {
+        super.init()
+    }
 
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
         guard let url = urlSchemeTask.request.url else {
@@ -18,7 +23,7 @@ class GeminiSchemeHandler: NSObject, WKURLSchemeHandler {
             return
         }
 
-        let client = GeminiClient(url: url, urlSchemeTask: urlSchemeTask)
+        let client = GeminiClient(url: url, urlSchemeTask: urlSchemeTask, prefs: prefs)
         currentClient = client
         client.load()
     }

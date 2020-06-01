@@ -14,6 +14,7 @@ public struct PrefsKeys {
     public static let HomePageTab = "HomePageTab"
     public static let HomeButtonHomePageURL = "HomeButtonHomepageURL"
     public static let NumberOfTopSiteRows = "NumberOfTopSiteRows"
+    public static let GeminiShowLinkURL = "GeminiShowLinkURL"
 
     public static let ContextMenuShowLinkPreviews = "showLinkPreviews"
 
@@ -24,7 +25,6 @@ public struct PrefsKeys {
 
 public protocol Prefs {
     func getBranchPrefix() -> String
-    func branch(_ branch: String) -> Prefs
     func setTimestamp(_ value: Timestamp, forKey defaultName: String)
     func setLong(_ value: UInt64, forKey defaultName: String)
     func setLong(_ value: Int64, forKey defaultName: String)

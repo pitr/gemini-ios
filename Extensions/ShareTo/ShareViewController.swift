@@ -299,7 +299,7 @@ extension ShareViewController {
         animateToActionDoneView(withTitle: Strings.ShareLoadInBackgroundDone)
 
         if let shareItem = shareItem, case .shareItem(let item) = shareItem {
-            let profile = BrowserProfile(localName: "profile")
+            let profile = BrowserProfile()
             if let err = profile.db.addToQueue(item).failureValue {
                 print(err)
             }

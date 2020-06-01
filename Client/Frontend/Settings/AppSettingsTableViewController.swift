@@ -54,6 +54,12 @@ class AppSettingsTableViewController: SettingsTableViewController {
 
         settings += [ SettingSection(title: NSAttributedString(string: Strings.SettingsGeneralSectionTitle), children: generalSettings)]
 
+        settings += [ SettingSection(title: NSAttributedString(string: "Gemini"), children: [
+            BoolSetting(prefs: prefs, prefKey: PrefsKeys.GeminiShowLinkURL, defaultValue: false,
+                        titleText: Strings.SettingsShowLinkURLTitle)
+            ])
+        ]
+
         return settings
     }
 

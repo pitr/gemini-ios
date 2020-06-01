@@ -263,6 +263,8 @@ extension Strings {
 
     public static let SettingsOfferClipboardBarTitle = NSLocalizedString("Settings.OfferClipboardBar.Title", value: "Offer to Open Copied Links", comment: "Title of setting to enable the Go to Copied URL feature. See https://bug1223660.bmoattachments.org/attachment.cgi?id=8898349")
     public static let SettingsOfferClipboardBarStatus = NSLocalizedString("Settings.OfferClipboardBar.Status", value: "When Opening Gemini", comment: "Description displayed under the ”Offer to Open Copied Link” option. See https://bug1223660.bmoattachments.org/attachment.cgi?id=8898349")
+
+    public static let SettingsShowLinkURLTitle = NSLocalizedString("Settings.ShowLinkURL.Title", value: "Show Link URL", comment: "Title of setting to show link URL")
 }
 
 // Link Previews

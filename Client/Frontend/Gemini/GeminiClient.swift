@@ -31,12 +31,14 @@ class GeminiClient: NSObject {
     let url: URL
     var data: Data
     let start: DispatchTime
+    let prefs: NSUserDefaultsPrefs
 
-    init(url: URL, urlSchemeTask: WKURLSchemeTask) {
+    init(url: URL, urlSchemeTask: WKURLSchemeTask, prefs: NSUserDefaultsPrefs) {
         self.urlSchemeTask = urlSchemeTask
         self.url = url
         self.data = Data()
         self.start = DispatchTime.now()
+        self.prefs = prefs
     }
 
     func load() {
@@ -356,8 +358,12 @@ extension GeminiClient: StreamDelegate {
                     let title = line[range2].trimmingCharacters(in: .whitespacesAndNewlines)
                     if link == title {
                         body.append("<p><a href=\"\(link)\">\(link)</a></p>\n")
-                    } else {
+                    } else if title.isEmptyOrWhitespace() {
+                        body.append("<p><a href=\"\(link)\">\(link)</a></p>\n")
+                    } else if self.prefs.boolForKey(PrefsKeys.GeminiShowLinkURL) ?? false {
                         body.append("<p><a href=\"\(link)\">\(link)</a> \(title)</p>\n")
+                    } else {
+                        body.append("<p><a href=\"\(link)\">\(title)</a></p>\n")
                     }
                 } else {
                     body.append("<p>\(line)</p>\n")

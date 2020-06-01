@@ -6,6 +6,8 @@ import Foundation
 
 open class NSUserDefaultsPrefs: Prefs {
 
+    fileprivate let prefix = "profile"
+
     fileprivate let prefixWithDot: String
     fileprivate let userDefaults: UserDefaults
 
@@ -13,19 +15,14 @@ open class NSUserDefaultsPrefs: Prefs {
         return self.prefixWithDot
     }
 
-    public init(prefix: String, userDefaults: UserDefaults) {
+    public init(userDefaults: UserDefaults) {
         self.prefixWithDot = prefix + (prefix.hasSuffix(".") ? "" : ".")
         self.userDefaults = userDefaults
     }
 
-    public init(prefix: String) {
+    public init() {
         self.prefixWithDot = prefix + (prefix.hasSuffix(".") ? "" : ".")
         self.userDefaults = UserDefaults(suiteName: AppInfo.sharedContainerIdentifier)!
-    }
-
-    open func branch(_ branch: String) -> Prefs {
-        let prefix = self.prefixWithDot + branch + "."
-        return NSUserDefaultsPrefs(prefix: prefix, userDefaults: self.userDefaults)
     }
 
     // Preferences are qualified by the profile's local name.
