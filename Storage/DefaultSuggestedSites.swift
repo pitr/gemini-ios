@@ -15,8 +15,8 @@ open class DefaultSuggestedSites {
             title: "GUS - Gemini Universal Search"
         ),
         SuggestedSiteData(
-            url: "gemini://houston.coder.town",
-            title: "Houston search engine"
+            url: "gemini://reddit.pitr.ca/",
+            title: "Geddit"
         ),
         SuggestedSiteData(
             url: "gemini://gus.guru/known-hosts",
