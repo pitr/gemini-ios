@@ -125,7 +125,7 @@ class TopSiteItemCell: UICollectionViewCell, Themeable {
     func configureWithTopSiteItem(_ site: Site) {
         url = site.tileURL
 
-        titleLabel.text = site.tileURL.shortDisplayString
+        titleLabel.text = site.title
 
         // If its a pinned site add a bullet point to the front
         if let _ = site as? PinnedSite {
