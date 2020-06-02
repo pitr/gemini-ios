@@ -1280,6 +1280,9 @@ extension BrowserViewController: TabDelegate {
         let printHelper = PrintHelper(tab: tab)
         tab.addContentScript(printHelper, name: PrintHelper.name())
 
+        let nightModeHelper = NightModeHelper(tab: tab)
+        tab.addContentScript(nightModeHelper, name: NightModeHelper.name())
+
         tab.addContentScript(LocalRequestHelper(), name: LocalRequestHelper.name())
 
         tab.addContentScript(FocusHelper(tab: tab), name: FocusHelper.name())
