@@ -5,14 +5,11 @@
 import Foundation
 
 public struct PrefsKeys {
-    public static let KeyDefaultHomePageURL = "KeyDefaultHomePageURL"
     public static let KeyNightModeButtonIsInMenu = "NightModeButtonIsInMenuPrefKey"
     public static let KeyNightModeStatus = "NightModeStatus"
     public static let KeyNightModeEnabledDarkTheme = "NightModeEnabledDarkTheme"
     public static let KeyMailToOption = "MailToOption"
     public static let IntroSeen = "IntroViewControllerSeen"
-    public static let HomePageTab = "HomePageTab"
-    public static let HomeButtonHomePageURL = "HomeButtonHomepageURL"
     public static let NumberOfTopSiteRows = "NumberOfTopSiteRows"
     public static let GeminiShowLinkURL = "GeminiShowLinkURL"
 

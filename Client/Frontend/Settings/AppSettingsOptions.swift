@@ -78,34 +78,6 @@ fileprivate func getDisclosureIndicator() -> UIImageView {
     return disclosureIndicator
 }
 
-class HomeSetting: Setting {
-    let profile: Profile
-
-    override var accessoryView: UIImageView {
-        getDisclosureIndicator()
-    }
-    
-    override var accessibilityIdentifier: String? { return "Home" }
-
-    override var status: NSAttributedString {
-        return NSAttributedString(string: NewTabAccessors.getHomePage(self.profile.prefs).settingTitle)
-    }
-
-    override var style: UITableViewCell.CellStyle { return .value1 }
-
-    init(settings: SettingsTableViewController) {
-        self.profile = settings.profile
-
-        super.init(title: NSAttributedString(string: Strings.AppMenuOpenHomePageTitleString, attributes: [NSAttributedString.Key.foregroundColor: UIColor.theme.tableView.rowText]))
-    }
-
-    override func onClick(_ navigationController: UINavigationController?) {
-        let viewController = HomePageSettingViewController(prefs: profile.prefs)
-        viewController.profile = profile
-        navigationController?.pushViewController(viewController, animated: true)
-    }
-}
-
 @available(iOS 12.0, *)
 class SiriPageSetting: Setting {
     let profile: Profile

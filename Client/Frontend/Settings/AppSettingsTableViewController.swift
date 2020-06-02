@@ -31,7 +31,6 @@ class AppSettingsTableViewController: SettingsTableViewController {
         var generalSettings: [Setting] = [
             SearchSetting(settings: self),
             NewTabPageSetting(settings: self),
-            HomeSetting(settings: self),
             OpenWithSetting(settings: self),
            ]
 

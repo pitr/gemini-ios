@@ -9,8 +9,8 @@ import XCGLogger
 /// Accessors to find what a new tab should do when created without a URL.
 struct NewTabAccessors {
     static let NewTabPrefKey = PrefsKeys.KeyNewTab
-    static let HomePrefKey = PrefsKeys.HomePageTab
     static let Default = NewTabPage.topSites
+    static let NewTabCustomUrlPrefKey = PrefsKeys.NewTabCustomUrlPrefKey
 
     static func getNewTabPage(_ prefs: Prefs) -> NewTabPage {
         guard let raw = prefs.stringForKey(NewTabPrefKey) else {
@@ -19,25 +19,18 @@ struct NewTabAccessors {
         let option = NewTabPage(rawValue: raw) ?? Default
         // Check if the user has chosen to open a homepage, but no homepage is set,
         // then use the default.
-        if option == .homePage && NewTabHomePageAccessors.getHomePage(prefs) == nil {
+        if option == .homePage && getHomePage(prefs) == nil {
             return Default
         }
         return option
     }
 
-    static func getHomePage(_ prefs: Prefs) -> NewTabPage {
-        guard let raw = prefs.stringForKey(HomePrefKey) else {
-            return Default
+    static func getHomePage(_ prefs: Prefs) -> URL? {
+        guard let urlString = prefs.stringForKey(NewTabCustomUrlPrefKey) else {
+            return nil
         }
-        let option = NewTabPage(rawValue: raw) ?? Default
-        // Check if the user has chosen to open a homepage, but no homepage is set,
-        // then use the default.
-        if option == .homePage && HomeButtonHomePageAccessors.getHomePage(prefs) == nil {
-            return Default
-        }
-        return option
+        return URL(string: urlString)
     }
-
 }
 
 /// Enum to encode what should happen when the user opens a new tab without a URL.

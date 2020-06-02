@@ -342,7 +342,7 @@ class TabManager: NSObject {
             case .homePage:
                 // We definitely have a homepage if we've got here
                 // (so we can safely dereference it).
-                let url = NewTabHomePageAccessors.getHomePage(profile.prefs)!
+                let url = NewTabAccessors.getHomePage(profile.prefs)!
                 tab.loadRequest(URLRequest(url: url))
             case .blankPage:
                 // If we're showing "about:blank" in a webview, set
