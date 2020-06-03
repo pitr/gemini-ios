@@ -24,6 +24,7 @@ open class CertStore {
     }
 
     fileprivate func keyForData(_ data: Data, origin: String) -> String {
-        return "\(origin)/\(data.sha256.hexEncodedString)"
+        let hex = data.sha256.hexEncodedStringArray.joined(separator: ":")
+        return "\(origin)/\(hex)"
     }
 }

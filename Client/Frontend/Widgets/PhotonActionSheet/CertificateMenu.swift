@@ -37,6 +37,20 @@ class CopiableLabel: UILabel {
     }
 }
 
+func prettyFingerprint(_ s: [String]) -> String {
+    return s.isEmpty ? "<none>" : s.enumerated().compactMap({
+        if $0 > 0 {
+            return ($0 % 8 == 0 ? "\n" : ":") + $1
+        } else {
+            return $1
+        }
+    }).joined().uppercased()
+}
+
+func oneLineFingerprint(_ s: [String]) -> String {
+    return s.joined(separator: ":").uppercased()
+}
+
 extension PhotonActionSheetProtocol {
     @available(iOS 11.0, *)
     func getCertSubMenu(for tab: Tab) -> [[PhotonActionSheetItem]] {
@@ -49,15 +63,23 @@ extension PhotonActionSheetProtocol {
             return []
         }
 
-        var fingerprintItem = PhotonActionSheetItem(title: "", accessory: .Text)
-        fingerprintItem.customRender = { title, contentView in
-            let fingerprint = GeminiClient.fingerprints[currentURL.domainURL.absoluteDisplayString] ?? "<unknown>"
+        var clientTitle = PhotonActionSheetItem(title: "Client Certificate", accessory: .Text, bold: true)
+        clientTitle.customRender = { label, _ in
+            label.font = DynamicFontHelper.defaultHelper.DeviceFontSmallBold
+        }
+        clientTitle.customHeight = { _ in
+            return PhotonActionSheetUX.RowHeight - 10
+        }
+
+        var clientFingerprintItem = PhotonActionSheetItem(title: "", accessory: .Text)
+        clientFingerprintItem.customRender = { title, contentView in
+            let clientFingerprint = [String]()
 
             let l = CopiableLabel()
-            l.numberOfLines = 0
+            l.numberOfLines = clientFingerprint.isEmpty ? 1 : 4
             l.textAlignment = .center
             l.textColor = UIColor.theme.tableView.headerTextLight
-            l.text = fingerprint
+            l.text = prettyFingerprint(clientFingerprint)
             l.font = UIFont.monospacedDigitSystemFont(ofSize: 22, weight: .regular)
             l.accessibilityIdentifier = "cert.certificate-fingerprint"
             contentView.addSubview(l)
@@ -65,27 +87,44 @@ extension PhotonActionSheetProtocol {
                 make.center.equalToSuperview()
                 make.width.equalToSuperview().inset(40)
             }
-            l.enableCopyMenu(with: fingerprint.split(separator: "\n").joined(separator: ":"))
-        }
-        fingerprintItem.customHeight = { _ in
-            return 180
+            if !clientFingerprint.isEmpty {
+                l.enableCopyMenu(with: oneLineFingerprint(clientFingerprint))
+            }
         }
 
-        return [[fingerprintItem]]
+        var serverTitle = PhotonActionSheetItem(title: "Server Certificate", accessory: .Text, bold: true)
+        serverTitle.customRender = { label, _ in
+            label.font = DynamicFontHelper.defaultHelper.DeviceFontSmallBold
+        }
+        serverTitle.customHeight = { _ in
+            return PhotonActionSheetUX.RowHeight - 10
+        }
+
+        var serverFingerprintItem = PhotonActionSheetItem(title: "", accessory: .Text)
+        serverFingerprintItem.customRender = { title, contentView in
+            let serverFingerprint = GeminiClient.fingerprints[currentURL.domainURL.absoluteDisplayString] ?? []
+
+            let l = CopiableLabel()
+            l.numberOfLines = serverFingerprint.isEmpty ? 1 : 4
+            l.textAlignment = .center
+            l.textColor = UIColor.theme.tableView.headerTextLight
+            l.text = prettyFingerprint(serverFingerprint)
+            l.font = UIFont.monospacedDigitSystemFont(ofSize: 22, weight: .regular)
+            l.accessibilityIdentifier = "cert.certificate-fingerprint"
+            contentView.addSubview(l)
+            l.snp.makeConstraints { make in
+                make.center.equalToSuperview()
+                make.width.equalToSuperview().inset(40)
+            }
+            if !serverFingerprint.isEmpty {
+                l.enableCopyMenu(with: oneLineFingerprint(serverFingerprint))
+            }
+        }
+        serverFingerprintItem.customHeight = { _ in
+            return 150
+        }
+
+
+        return [[clientTitle, clientFingerprintItem], [serverTitle, serverFingerprintItem]]
     }
-//
-//    @available(iOS 11.0, *)
-//    private func menuActionsForWhitelistedSite(for tab: Tab) -> [[PhotonActionSheetItem]] {
-//        guard let currentURL = tab.url else {
-//            return []
-//        }
-//
-//        let removeFromWhitelist = PhotonActionSheetItem(title: Strings.TPWhiteListRemove, iconString: "menu-TrackingProtection") { _, _ in
-//            ContentBlocker.shared.whitelist(enable: false, url: currentURL) {
-//                tab.reload()
-//            }
-//        }
-//        return [[removeFromWhitelist]]
-//    }
 }
-

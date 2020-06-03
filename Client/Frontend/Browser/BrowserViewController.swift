@@ -782,7 +782,7 @@ class BrowserViewController: UIViewController {
         }
 
         let shareItem = ShareItem(url: url, title: title)
-        profile.db.createBookmark(parentGUID: Bookmark.RootGUID, url: shareItem.url, title: shareItem.title)
+        _ = profile.db.createBookmark(parentGUID: Bookmark.RootGUID, url: shareItem.url, title: shareItem.title)
 
         var userData = [QuickActions.TabURLKey: shareItem.url]
         if let title = shareItem.title {

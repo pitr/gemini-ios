@@ -40,16 +40,15 @@ extension String {
 private let HexDigits: [String] = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"]
 
 extension Data {
-    public var hexEncodedString: String {
-        var result = String()
-        result.reserveCapacity(count * 2)
+    public var hexEncodedStringArray: [String] {
+        var result = [String]()
+        result.reserveCapacity(count)
         withUnsafeBytes { (p: UnsafeRawBufferPointer) in
             for i in 0..<count {
-                result.append(HexDigits[Int((p[i] & 0xf0) >> 4)])
-                result.append(HexDigits[Int(p[i] & 0x0f)])
+                result.append(HexDigits[Int((p[i] & 0xf0) >> 4)] + HexDigits[Int(p[i] & 0x0f)])
             }
         }
-        return String(result)
+        return result
     }
 
     public static func randomOfLength(_ length: UInt) -> Data? {

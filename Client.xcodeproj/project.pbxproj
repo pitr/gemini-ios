@@ -97,6 +97,7 @@
 		8043327624831D450058FCD7 /* Bookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8043327524831D450058FCD7 /* Bookmark.swift */; };
 		8084B731247C2F8C002C42DC /* IntroViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8084B72F247C2F8B002C42DC /* IntroViewController.swift */; };
 		8084B732247C2F8C002C42DC /* Intro.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8084B730247C2F8B002C42DC /* Intro.xcassets */; };
+		808E313F2487EA20002B7686 /* GeminiConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 808E313E2487EA20002B7686 /* GeminiConstants.swift */; };
 		80AD817724744E1600FAF049 /* AllFramesAtDocumentEnd.js in Resources */ = {isa = PBXBuildFile; fileRef = D0FCF8031FE4772C004A7995 /* AllFramesAtDocumentEnd.js */; };
 		80AD817824744E1600FAF049 /* AllFramesAtDocumentStart.js in Resources */ = {isa = PBXBuildFile; fileRef = D03F8F22200EAC1E003C2224 /* AllFramesAtDocumentStart.js */; };
 		80AD817924744E1600FAF049 /* MainFrameAtDocumentEnd.js in Resources */ = {isa = PBXBuildFile; fileRef = D0FCF8041FE4772D004A7995 /* MainFrameAtDocumentEnd.js */; };
@@ -456,6 +457,7 @@
 		8043327524831D450058FCD7 /* Bookmark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bookmark.swift; sourceTree = "<group>"; };
 		8084B72F247C2F8B002C42DC /* IntroViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntroViewController.swift; sourceTree = "<group>"; };
 		8084B730247C2F8B002C42DC /* Intro.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Intro.xcassets; sourceTree = "<group>"; };
+		808E313E2487EA20002B7686 /* GeminiConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiConstants.swift; sourceTree = "<group>"; };
 		80BAC1E224852844001111F7 /* PinnedSite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedSite.swift; sourceTree = "<group>"; };
 		80BAC1E4248534CB001111F7 /* SuggestedSites.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SuggestedSites.swift; sourceTree = "<group>"; };
 		80BAC1E5248534CB001111F7 /* DefaultSuggestedSites.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultSuggestedSites.swift; sourceTree = "<group>"; };
@@ -887,6 +889,7 @@
 				802AEA9F24715B0B00567181 /* GeminiClient.swift */,
 				802AEAA12471C4CC00567181 /* GeminiSchemeHandler.swift */,
 				80D1844524810B2A00698303 /* GeminiHeader.html */,
+				808E313E2487EA20002B7686 /* GeminiConstants.swift */,
 			);
 			path = Gemini;
 			sourceTree = "<group>";
@@ -1838,6 +1841,7 @@
 				D3BE7B261B054D4400641031 /* main.swift in Sources */,
 				D3A9949C1A3686BD008AD1AC /* BrowserViewController.swift in Sources */,
 				59A681BDFC95A19F05E07223 /* SearchViewController.swift in Sources */,
+				808E313F2487EA20002B7686 /* GeminiConstants.swift in Sources */,
 				D0625C98208E87F10081F3B2 /* DownloadQueue.swift in Sources */,
 				59A68B280D62462B85CF57A4 /* HistoryPanel.swift in Sources */,
 				C400467C1CF4E43E00B08303 /* BackForwardListViewController.swift in Sources */,

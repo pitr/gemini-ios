@@ -3,27 +3,8 @@ import Shared
 
 private let log = Logger.browserLogger
 
-enum GeminiClientStatus {
-    case input(String)
-    case success(String, String.Encoding)
-    case redirect(String)
-    case failure(String)
-    case certificateRequired(String)
-}
-
-enum GeminiClientError: Error {
-    case badURL
-    case noResponder
-    case responderUnableToHandle
-    case badResponse(GeminiClientStatus)
-}
-
-let htmlFooter = """
-<script>document.forms[0].onsubmit=function(e){e.preventDefault();document.location=document.location.origin+document.location.pathname+"?"+encodeURI(document.getElementById("q").value)}</script>
-"""
-
 class GeminiClient: NSObject {
-    static var fingerprints: [String: String] = [:]
+    static var fingerprints: [String: [String]] = [:]
 
     var inputStream: InputStream!
     var done = false
@@ -91,10 +72,6 @@ class GeminiClient: NSObject {
             inputStream.close()
         }
     }
-
-    fileprivate func asFingerprint(_ s: String) -> String {
-        return s.enumerated().compactMap({ ($0 > 0) && ($0 % 16 == 0) ? "\n\($1)" : ($0 > 0) && ($0 % 2 == 0) ? ":\($1)" : "\($1)" }).joined()
-    }
 }
 
 extension GeminiClient: StreamDelegate {
@@ -112,10 +89,11 @@ extension GeminiClient: StreamDelegate {
                             continue
                     }
                     log.debug("Certificate \(ix+1), CN: \(subject)")
-                    let fingerprint = (SecCertificateCopyData(cert) as Data).sha256.hexEncodedString.lowercased()
-                    log.debug("Fingerprint: \(asFingerprint(fingerprint))")
+                    let fingerprint = (SecCertificateCopyData(cert) as Data).sha256.hexEncodedStringArray
+                    let hex = fingerprint.joined(separator: ":")
+                    log.debug("Fingerprint: \(hex)")
                     if ix == 0 {
-                        GeminiClient.fingerprints[self.url.domainURL.absoluteDisplayString] = asFingerprint(fingerprint)
+                        GeminiClient.fingerprints[self.url.domainURL.absoluteDisplayString] = fingerprint
                     }
                 }
             }
@@ -186,22 +164,25 @@ extension GeminiClient: StreamDelegate {
     fileprivate func parseResponse(data: Data) {
         guard let ix = data.firstIndex(of: 13),
             data[ix+1] == 10,
-            let header = String(data: data.prefix(upTo: ix), encoding: .utf8)
-            else {
+            ix < 1024+3, // +3 for status code
+            let firstLine = String(data: data.prefix(upTo: ix), encoding: .utf8) else {
                 renderError(error: "Invalid response", for: url, to: urlSchemeTask)
                 return
         }
-        log.debug("header: \(header)")
-        let status = parseStatus(header: header)
-        switch status {
-        case .success(let mime, let encoding):
+        log.debug("header: \(firstLine)")
+        guard let header = GeminiHeader(header: firstLine) else {
+            renderError(error: "Invalid header: \(firstLine)", for: url, to: urlSchemeTask)
+            return
+        }
+        switch header {
+        case .success(let mime), .success_end_of_client_certificate_session(let mime):
             let data = data.dropFirst(ix+2)
-            if mime.starts(with: "text/") {
-                guard let body = String(data: data, encoding: encoding) else {
-                    renderError(error: "Could not parse body with encoding \(encoding)", for: url, to: urlSchemeTask)
+            if mime.contentType.starts(with: "text/") {
+                guard let body = String(data: data, encoding: mime.charset) else {
+                    renderError(error: "Could not parse body with encoding \(mime.charset)", for: url, to: urlSchemeTask)
                     return
                 }
-                if mime == "text/gemini" {
+                if mime.contentType == "text/gemini" {
                     guard let resp = parseBody(body).data(using: .utf8) else {
                         renderError(error: "Could not parse body", for: url, to: urlSchemeTask)
                         return
@@ -217,11 +198,11 @@ extension GeminiClient: StreamDelegate {
                     urlSchemeTask.didReceive(resp)
                 }
             } else {
-                urlSchemeTask.didReceive(URLResponse(url: url, mimeType: mime, expectedContentLength: -1,textEncodingName: nil))
+                urlSchemeTask.didReceive(URLResponse(url: url, mimeType: mime.contentType, expectedContentLength: -1,textEncodingName: nil))
                 urlSchemeTask.didReceive(data)
             }
             urlSchemeTask.didFinish()
-        case .redirect(let to):
+        case .redirect_permanent(let to), .redirect_temporary(let to):
             let body = "<meta http-equiv=\"refresh\" content=\"0; URL='\(to)'\" />"
             guard let data = body.data(using: .utf8) else {
                 renderError(error: "Could not redirect to \(to)", for: url, to: urlSchemeTask)
@@ -232,7 +213,7 @@ extension GeminiClient: StreamDelegate {
             urlSchemeTask.didFinish()
         case .input(let question):
             let header = try! String(contentsOfFile: Bundle.main.path(forResource: "GeminiHeader", ofType: "html")!)
-            let body = header+"<title>\(question)</title></head><body><h2>\(question)</h2><form><input autocapitalize=off id=q name=q /><hr /><button>Submit</button></form>"+htmlFooter
+            let body = header+"<title>\(question)</title></head><body><h2>\(question)</h2><form><input autocapitalize=off id=q name=q /><hr /><button>Submit</button></form>"+inputFooter
             guard let data = body.data(using: .utf8) else {
                 renderError(error: "Could not render form tosk server's question: \(question)", for: url, to: urlSchemeTask)
                 return
@@ -240,68 +221,34 @@ extension GeminiClient: StreamDelegate {
             urlSchemeTask.didReceive(URLResponse(url: url, mimeType: "text/html", expectedContentLength: -1, textEncodingName: "utf-8"))
             urlSchemeTask.didReceive(data)
             urlSchemeTask.didFinish()
-        case .certificateRequired(let msg):
-            renderError(error: msg, for: url, to: urlSchemeTask)
-        case .failure(let error):
-            renderError(error: error, for: url, to: urlSchemeTask)
+        case .slow_down(let wait):
+            renderError(error: "slow down: please wait at least \(wait) seconds before retrying", for: url, to: urlSchemeTask)
+        case .temporary_failure(let err),
+             .server_unavailable(let err),
+             .cgi_error(let err),
+             .proxy_error(let err),
+             .permanent_failure(let err),
+             .not_found(let err),
+             .gone(let err),
+             .proxy_request_refused(let err),
+             .bad_request(let err):
+            renderError(error: "\(header.description()): \(err)", for: url, to: urlSchemeTask)
+        case .client_certificate_required(let msg), .transient_certificate_requested(let msg), .authorised_certificate_required(let msg), .certificate_not_accepted(let msg), .future_certificate_rejected(let msg), .expired_certificate_rejected(let msg):
+            renderError(error: "\(header.description()): \(msg)", for: url, to: urlSchemeTask)
         }
     }
 
     fileprivate func renderError(error: String, for url: URL, to urlSchemeTask: WKURLSchemeTask) {
+        urlSchemeTask.didReceive(URLResponse(url: url, mimeType: "text/html", expectedContentLength: -1, textEncodingName: "utf-8"))
+
         let header = try! String(contentsOfFile: Bundle.main.path(forResource: "GeminiHeader", ofType: "html")!)
         let body = header+"<title>\(error)</title></head><body><h2>\(error)</h2>"
-        guard let data = body.data(using: .utf8) else {
-            urlSchemeTask.didFailWithError(GeminiClientError.responderUnableToHandle)
-            return
+        if let data = body.data(using: .utf8) {
+            urlSchemeTask.didReceive(data)
+        } else {
+            urlSchemeTask.didReceive("browser error!".data(using: .utf8)!)
         }
-        urlSchemeTask.didReceive(URLResponse(url: url, mimeType: "text/html", expectedContentLength: -1, textEncodingName: "utf-8"))
-        urlSchemeTask.didReceive(data)
         urlSchemeTask.didFinish()
-    }
-
-    fileprivate func parseStatus(header: String) -> GeminiClientStatus {
-        switch header.prefix(1) {
-        case "1": return .input(String(header.dropFirst(2)))
-        case "2":
-            do {
-                let mimeRegex = try NSRegularExpression(pattern: #"^\d+\s+([^\s;]+)"#, options: [])
-                let charsetRegex = try NSRegularExpression(pattern: #"charset\s*=\s*([^\s;]+)"#, options: [])
-                let range = NSRange(header.startIndex..<header.endIndex, in: header)
-                guard let m1 = mimeRegex.firstMatch(in: header, options: [], range: range),
-                    let range1 = Range(m1.range(at: 1), in: header) else {
-                        return .failure("cannot parse header")
-                }
-                let mime = String(header[range1])
-                var charset = "utf-8"
-                if let m2 = charsetRegex.firstMatch(in: header, options: [], range: range),
-                    let range2 = Range(m2.range(at: 1), in: header) {
-                    charset = String(header[range2])
-                }
-                let cfEncoding = CFStringConvertIANACharSetNameToEncoding(charset as CFString)
-                let nsEncoding = CFStringConvertEncodingToNSStringEncoding(cfEncoding)
-                let encoding = String.Encoding(rawValue: nsEncoding)
-
-                return .success(mime, encoding)
-            } catch let err as NSError {
-                return .failure("cannot parse header: \(err)")
-            }
-        case "3":
-            do {
-                let regex = try NSRegularExpression(pattern: #"^\d+\s+(\S.*)$"#, options: [])
-                let range = NSRange(header.startIndex..<header.endIndex, in: header)
-                guard let m = regex.firstMatch(in: header, options: [], range: range),
-                    let range1 = Range(m.range(at: 1), in: header) else {
-                        return .failure("cannot parse header")
-                }
-                let to = String(header[range1])
-                return .redirect(to)
-            } catch let err as NSError {
-                return .failure("cannot parse header: \(err)")
-            }
-        case "4", "5": return .failure("error: \(header)")
-        case "6": return .failure("client certificate required: \(header)")
-        default: return .failure("unknown response code: \(header)")
-        }
     }
 
     fileprivate func parseBody(_ content: String) -> String {
