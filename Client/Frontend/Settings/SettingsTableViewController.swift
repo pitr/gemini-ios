@@ -33,9 +33,6 @@ class Setting: NSObject {
 
     weak var delegate: SettingsDelegate?
 
-    // The url the SettingsContentViewController will show, e.g. Licenses and Privacy Policy.
-    var url: URL? { return nil }
-
     // The title shown on the pref.
     var title: NSAttributedString? { return _title }
     var footerTitle: NSAttributedString? { return _footerTitle }
@@ -107,16 +104,6 @@ class Setting: NSObject {
 
     // Called when the pref is long-pressed.
     func onLongPress(_ navigationController: UINavigationController?) { return }
-
-    // Helper method to set up and push a SettingsContentViewController
-    func setUpAndPushSettingsContentViewController(_ navigationController: UINavigationController?) {
-        if let url = self.url {
-            let viewController = SettingsContentViewController()
-            viewController.settingsTitle = self.title
-            viewController.url = url
-            navigationController?.pushViewController(viewController, animated: true)
-        }
-    }
 
     init(title: NSAttributedString? = nil, footerTitle: NSAttributedString? = nil, cellHeight: CGFloat? = nil, delegate: SettingsDelegate? = nil, enabled: Bool? = nil) {
         self._title = title

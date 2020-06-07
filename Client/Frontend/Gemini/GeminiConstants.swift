@@ -25,6 +25,7 @@ struct Mime {
 
 enum GeminiHeader {
     case input(question: String)
+    case sensitive_input(question: String)
     case success(mime: Mime)
     case success_end_of_client_certificate_session(mime: Mime)
     case redirect_temporary(url: String)
@@ -47,55 +48,34 @@ enum GeminiHeader {
     case expired_certificate_rejected(msg: String)
 
     init?(header: String) {
-        let split = header.split(separator: " ", maxSplits: 1)
+        let split = header.components(separatedBy: .whitespaces)
         guard let statusNumber = Int(split[0]) else { return nil }
 
-        let meta = String(split[safe: 1] ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        let meta = split.dropFirst().joined(separator: " ").trimmingCharacters(in: .whitespacesAndNewlines)
 
         switch statusNumber {
-        case 10:
-            self = .input(question: meta)
-        case 20:
-            self = .success(mime: Mime(meta: meta))
-        case 21:
-            self = .success_end_of_client_certificate_session(mime: Mime(meta: meta))
-        case 30:
-            self = .redirect_temporary(url: meta)
-        case 31:
-            self = .redirect_permanent(url: meta)
-        case 40:
-            self = .temporary_failure(err: meta)
-        case 41:
-            self = .server_unavailable(err: meta)
-        case 42:
-            self = .cgi_error(err: meta)
-        case 43:
-            self = .proxy_error(err: meta)
-        case 44:
-            guard let wait = Int(meta) else { return nil }
-            self = .slow_down(wait: wait)
-        case 50:
-            self = .permanent_failure(err: meta)
-        case 51:
-            self = .not_found(err: meta)
-        case 52:
-            self = .gone(err: meta)
-        case 53:
-            self = .proxy_request_refused(err: meta)
-        case 59:
-            self = .bad_request(err: meta)
-        case 60:
-            self = .client_certificate_required(msg: meta)
-        case 61:
-            self = .transient_certificate_requested(msg: meta)
-        case 62:
-            self = .authorised_certificate_required(msg: meta)
-        case 63:
-            self = .certificate_not_accepted(msg: meta)
-        case 64:
-            self = .future_certificate_rejected(msg: meta)
-        case 65:
-            self = .expired_certificate_rejected(msg: meta)
+        case 10: self = .input(question: meta)
+        case 11: self = .sensitive_input(question: meta)
+        case 20: self = .success(mime: Mime(meta: meta))
+        case 21: self = .success_end_of_client_certificate_session(mime: Mime(meta: meta))
+        case 30: self = .redirect_temporary(url: meta)
+        case 31: self = .redirect_permanent(url: meta)
+        case 40: self = .temporary_failure(err: meta)
+        case 41: self = .server_unavailable(err: meta)
+        case 42: self = .cgi_error(err: meta)
+        case 43: self = .proxy_error(err: meta)
+        case 44: if let wait = Int(meta) { self = .slow_down(wait: wait) } else { return nil }
+        case 50: self = .permanent_failure(err: meta)
+        case 51: self = .not_found(err: meta)
+        case 52: self = .gone(err: meta)
+        case 53: self = .proxy_request_refused(err: meta)
+        case 59: self = .bad_request(err: meta)
+        case 60: self = .client_certificate_required(msg: meta)
+        case 61: self = .transient_certificate_requested(msg: meta)
+        case 62: self = .authorised_certificate_required(msg: meta)
+        case 63: self = .certificate_not_accepted(msg: meta)
+        case 64: self = .future_certificate_rejected(msg: meta)
+        case 65: self = .expired_certificate_rejected(msg: meta)
         default: return nil
         }
     }
@@ -103,6 +83,7 @@ enum GeminiHeader {
     func description() -> String {
         switch self {
         case .input: return "INPUT"
+        case .sensitive_input: return "SENSITIVE INPUT"
         case .success: return "SUCCESS"
         case .success_end_of_client_certificate_session: return "SUCCESS - END OF CLIENT CERTIFICATE SESSION"
         case .redirect_temporary: return "REDIRECT - TEMPORARY"

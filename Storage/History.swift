@@ -15,7 +15,6 @@ public enum HistoryType: Int {
     case embed = 4
     case permanentRedirect = 5
     case temporaryRedirect = 6
-    case download = 7
     case framedLink = 8
 }
 

@@ -42,8 +42,6 @@ class BookmarksPanel: SiteTableViewController, LibraryPanel {
     var bookmarkFolder: Bookmark
     var recentBookmarks: Results<Bookmark>
 
-    let favicons = Favicons()
-
     fileprivate var flashLastRowOnNextReload = false
 
     fileprivate lazy var bookmarkFolderIconNormal = UIImage(named: "bookmarkFolder")?.createScaled(BookmarksPanelUX.FolderIconSize).tinted(withColor: UIColor.Photon.Grey90)
@@ -348,19 +346,12 @@ class BookmarksPanel: SiteTableViewController, LibraryPanel {
 
             cell.imageView?.image = nil
 
-            let site = Site(url: bookmarkNode.url, title: bookmarkNode.title, bookmarked: true, guid: bookmarkNode.id)
-            favicons.generateDefaultFaviconImage(forSite: site).uponQueue(.main) { result in
-                // Check that we successfully retrieved an image (should always happen)
-                // and ensure that the cell we were fetching for is still on-screen.
-                guard let image = result.successValue, let cell = tableView.cellForRow(at: indexPath) else {
-                    return
-                }
-
-                cell.imageView?.image = image
-                cell.imageView?.contentMode = .scaleAspectFill
-                cell.setNeedsLayout()
+            if let url = bookmarkNode.url.asURL {
+                cell.imageView?.image = FaviconFetcher.letter(forUrl: url)
+            } else {
+                cell.imageView?.image = FaviconFetcher.defaultFavicon
             }
-
+            cell.imageView?.contentMode = .scaleAspectFill
             cell.accessoryType = .none
             cell.editingAccessoryType = .disclosureIndicator
             return cell

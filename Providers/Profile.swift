@@ -59,8 +59,6 @@ protocol Profile: AnyObject {
     /// WARNING: Only to be called as part of the app lifecycle from the AppDelegate
     /// or from App Extension code.
     func _reopen()
-
-    func cleanupHistoryIfNeeded()
 }
 
 fileprivate let PrefKeyClientID = "PrefKeyClientID"
@@ -199,10 +197,4 @@ open class BrowserProfile: Profile {
     lazy var recentlyClosedTabs: ClosedTabsStore = {
         return ClosedTabsStore(prefs: self.prefs)
     }()
-
-    public func cleanupHistoryIfNeeded() {
-        assert(Thread.isMainThread, "cleanupHistoryIfNeeded must run in main thread")
-        db.cleanupHistoryIfNeeded()
-    }
-
 }

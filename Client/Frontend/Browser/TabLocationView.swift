@@ -13,6 +13,8 @@ protocol TabLocationViewDelegate {
     func tabLocationViewDidTapLocation(_ tabLocationView: TabLocationView)
     func tabLocationViewDidLongPressLocation(_ tabLocationView: TabLocationView)
     func tabLocationViewDidTapCert(_ tabLocationView: TabLocationView)
+    func tabLocationViewDidTapReload(_ tabLocationView: TabLocationView)
+    func tabLocationViewDidTapStop(_ tabLocationView: TabLocationView)
     func tabLocationViewDidBeginDragInteraction(_ tabLocationView: TabLocationView)
     func tabLocationViewLocationAccessibilityActions(_ tabLocationView: TabLocationView) -> [UIAccessibilityCustomAction]?
 }
@@ -23,6 +25,7 @@ private struct TabLocationViewUX {
     static let Spacing: CGFloat = 8
     static let StatusIconSize: CGFloat = 18
     static let CertIconSize: CGFloat = 44
+    static let StopReloadIconSize: CGFloat = 44
     static let ButtonSize: CGFloat = 44
 }
 
@@ -70,7 +73,7 @@ class TabLocationView: UIView {
         return urlTextField
     }()
 
-    class CertificateButton: UIButton {
+    class SeparatedButton: UIButton {
         override var isHidden: Bool {
             didSet {
                 separatorLine?.isHidden = isHidden
@@ -80,14 +83,39 @@ class TabLocationView: UIView {
         var separatorLine: UIView?
     }
 
-    lazy var certificateButton: CertificateButton = {
-        let certificateButton = CertificateButton()
+    lazy var certificateButton: SeparatedButton = {
+        let certificateButton = SeparatedButton()
         certificateButton.setImage(UIImage.templateImageNamed("lock_verified"), for: .normal)
         certificateButton.addTarget(self, action: #selector(didPressCertButton(_:)), for: .touchUpInside)
-        certificateButton.tintColor = UIColor.Photon.Grey50
+        certificateButton.tintColor = UIColor.theme.browser.tint
         certificateButton.imageView?.contentMode = .scaleAspectFill
         certificateButton.accessibilityIdentifier = "TabLocationView.certificateButton"
         return certificateButton
+    }()
+
+    let ImageReload = UIImage.templateImageNamed("nav-refresh")
+    let ImageStop = UIImage.templateImageNamed("nav-stop")
+
+    var loading: Bool = false {
+        didSet {
+            if loading {
+                stopReloadButton.setImage(ImageStop, for: .normal)
+                stopReloadButton.accessibilityLabel = NSLocalizedString("Stop", comment: "Accessibility Label for the tab toolbar Stop button")
+            } else {
+                stopReloadButton.setImage(ImageReload, for: .normal)
+                stopReloadButton.accessibilityLabel = NSLocalizedString("Reload", comment: "Accessibility Label for the tab toolbar Reload button")
+            }
+        }
+    }
+
+    lazy var stopReloadButton: UIButton = {
+        let stopReloadButton = UIButton()
+        stopReloadButton.setImage(ImageReload, for: .normal)
+        stopReloadButton.addTarget(self, action: #selector(didClickStopReload(_:)), for: .touchUpInside)
+        stopReloadButton.tintColor = UIColor.theme.browser.tint
+        stopReloadButton.imageView?.contentMode = .scaleAspectFill
+        stopReloadButton.accessibilityIdentifier = "TabLocationView.refreshButton"
+        return stopReloadButton
     }()
 
     private func makeSeparator() -> UIView {
@@ -120,7 +148,7 @@ class TabLocationView: UIView {
         // Link these so they hide/show in-sync.
         certificateButton.separatorLine = separatorLineForTP
 
-        let subviews = [certificateButton, separatorLineForTP, space10px, urlTextField]
+        let subviews = [certificateButton, separatorLineForTP, space10px, urlTextField, stopReloadButton]
         contentView = UIStackView(arrangedSubviews: subviews)
         contentView.distribution = .fill
         contentView.alignment = .center
@@ -137,6 +165,10 @@ class TabLocationView: UIView {
             make.width.equalTo(1)
             make.height.equalTo(26)
         }
+        stopReloadButton.snp.makeConstraints { make in
+            make.width.equalTo(TabLocationViewUX.StopReloadIconSize)
+            make.height.equalTo(TabLocationViewUX.StopReloadIconSize)
+        }
 
         // Setup UIDragInteraction to handle dragging the location
         // bar for dropping its URL into other apps.
@@ -149,7 +181,7 @@ class TabLocationView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private lazy var _accessibilityElements = [urlTextField, certificateButton]
+    private lazy var _accessibilityElements = [urlTextField, certificateButton, stopReloadButton]
 
     override var accessibilityElements: [Any]? {
         get {
@@ -178,6 +210,14 @@ class TabLocationView: UIView {
 
     @objc func didPressCertButton(_ button: UIButton) {
         delegate?.tabLocationViewDidTapCert(self)
+    }
+
+    @objc func didClickStopReload(_ button: UIButton) {
+        if loading {
+            delegate?.tabLocationViewDidTapStop(self)
+        } else {
+            delegate?.tabLocationViewDidTapReload(self)
+        }
     }
 
     fileprivate func updateTextWithURL() {
@@ -233,6 +273,8 @@ extension TabLocationView: Themeable {
         backgroundColor = UIColor.theme.textField.background
         urlTextField.textColor = UIColor.theme.textField.textAndTint
         separatorLineForTP.backgroundColor = UIColor.Photon.Grey40
+        certificateButton.tintColor = UIColor.theme.browser.tint
+        stopReloadButton.tintColor = UIColor.theme.browser.tint
     }
 }
 

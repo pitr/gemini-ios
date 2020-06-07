@@ -73,7 +73,6 @@ class BrowserViewController: UIViewController {
 
     fileprivate var keyboardState: KeyboardState?
     var pendingToast: Toast? // A toast that might be waiting for BVC to appear before displaying
-    var downloadToast: DownloadToast? // A toast that is showing the combined download progress
 
     // Tracking navigation items to record history types.
     // TODO: weak references?
@@ -85,17 +84,6 @@ class BrowserViewController: UIViewController {
 
     var topTabsViewController: TopTabsViewController?
     let topTabsContainer = UIView()
-
-    // Keep track of allowed `URLRequest`s from `webView(_:decidePolicyFor:decisionHandler:)` so
-    // that we can obtain the originating `URLRequest` when a `URLResponse` is received. This will
-    // allow us to re-trigger the `URLRequest` if the user requests a file to be downloaded.
-    var pendingRequests = [String: URLRequest]()
-
-    // This is set when the user taps "Download Link" from the context menu. We then force a
-    // download of the next request through the `WKNavigationDelegate` that matches this web view.
-    weak var pendingDownloadWebView: WKWebView?
-
-    let downloadQueue = DownloadQueue()
 
     init(profile: Profile, tabManager: TabManager) {
         self.profile = profile
@@ -145,7 +133,6 @@ class BrowserViewController: UIViewController {
         screenshotHelper = ScreenshotHelper(controller: self)
         tabManager.addDelegate(self)
         tabManager.addNavigationDelegate(self)
-        downloadQueue.delegate = self
 
         NotificationCenter.default.addObserver(self, selector: #selector(displayThemeChanged), name: .DisplayThemeChanged, object: nil)
   }
@@ -257,7 +244,7 @@ class BrowserViewController: UIViewController {
             updateURLBarDisplayURL(tab)
             navigationToolbar.updateBackStatus(webView.canGoBack)
             navigationToolbar.updateForwardStatus(webView.canGoForward)
-            navigationToolbar.updateReloadStatus(tab.loading)
+            urlBar.updateReloadStatus(tab.loading)
         }
 
         libraryDrawerViewController?.view.snp.remakeConstraints(constraintsForLibraryDrawerView)
@@ -829,7 +816,7 @@ class BrowserViewController: UIViewController {
             guard let loading = change?[.newKey] as? Bool else { break }
 
             if tab === tabManager.selectedTab {
-                navigationToolbar.updateReloadStatus(loading)
+                urlBar.updateReloadStatus(loading)
             }
         case .URL:
             // To prevent spoofing, only change the URL immediately if the new URL is on
@@ -879,7 +866,7 @@ class BrowserViewController: UIViewController {
     fileprivate func updateURLBarDisplayURL(_ tab: Tab) {
         urlBar.currentURL = tab.url?.displayURL
         let isPage = tab.url?.displayURL?.isWebPage() ?? false
-        navigationToolbar.updatePageStatus(isPage)
+        urlBar.updatePageStatus(isPage)
     }
 
     // MARK: Opening New Tabs
@@ -1274,9 +1261,6 @@ extension BrowserViewController: TabDelegate {
         findInPageHelper.delegate = self
         tab.addContentScript(findInPageHelper, name: FindInPageHelper.name())
 
-        let downloadContentScript = DownloadContentScript(tab: tab)
-        tab.addContentScript(downloadContentScript, name: DownloadContentScript.name())
-
         let printHelper = PrintHelper(tab: tab)
         tab.addContentScript(printHelper, name: PrintHelper.name())
 
@@ -1286,6 +1270,10 @@ extension BrowserViewController: TabDelegate {
         tab.addContentScript(LocalRequestHelper(), name: LocalRequestHelper.name())
 
         tab.addContentScript(FocusHelper(tab: tab), name: FocusHelper.name())
+
+        let certificateHelper = CertificateHelper(tab: tab)
+        tab.addContentScript(certificateHelper, name: CertificateHelper.name())
+        certificateHelper.delegate = self
 
     }
 
@@ -1510,7 +1498,7 @@ extension BrowserViewController: TabManagerDelegate {
 
         updateFindInPageVisibility(visible: false, tab: previous)
 
-        navigationToolbar.updateReloadStatus(selected?.loading ?? false)
+        urlBar.updateReloadStatus(selected?.loading ?? false)
         navigationToolbar.updateBackStatus(selected?.canGoBack ?? false)
         navigationToolbar.updateForwardStatus(selected?.canGoForward ?? false)
         if let url = selected?.webView?.url, !InternalURL.isValid(url: url) {
@@ -1555,10 +1543,6 @@ extension BrowserViewController: TabManagerDelegate {
     }
 
     func show(toast: Toast, afterWaiting delay: DispatchTimeInterval = SimpleToastUX.ToastDelayBefore, duration: DispatchTimeInterval? = SimpleToastUX.ToastDismissAfter) {
-        if let downloadToast = toast as? DownloadToast {
-            self.downloadToast = downloadToast
-        }
-
         // If BVC isnt visible hold on to this toast until viewDidAppear
         if self.view.window == nil {
             self.pendingToast = toast
@@ -1685,12 +1669,6 @@ extension BrowserViewController: ContextMenuHelperDelegate {
                 SimpleToast().showAlertWithText(Strings.AppMenuAddBookmarkConfirmMessage, bottomContainer: self.webViewContainer)
             }
             actionSheetController.addAction(bookmarkAction, accessibilityIdentifier: "linkContextMenu.bookmarkLink")
-
-            let downloadAction = UIAlertAction(title: Strings.ContextMenuDownloadLink, style: .default) { _ in
-                self.pendingDownloadWebView = currentTab.webView
-                DownloadContentScript.requestDownload(url: url, tab: currentTab)
-            }
-            actionSheetController.addAction(downloadAction, accessibilityIdentifier: "linkContextMenu.download")
 
             let copyAction = UIAlertAction(title: Strings.ContextMenuCopyLink, style: .default) { _ in
                 UIPasteboard.general.url = url as URL

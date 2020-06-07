@@ -137,7 +137,6 @@ class URLBarView: UIView {
 
     var bookmarkButton = ToolbarButton()
     var forwardButton = ToolbarButton()
-    var stopReloadButton = ToolbarButton()
 
     var backButton: ToolbarButton = {
         let backButton = ToolbarButton()
@@ -145,7 +144,7 @@ class URLBarView: UIView {
         return backButton
     }()
 
-    lazy var actionButtons: [Themeable & UIButton] = [self.tabsButton, self.libraryButton, self.shareButton, self.forwardButton, self.backButton, self.stopReloadButton]
+    lazy var actionButtons: [Themeable & UIButton] = [self.tabsButton, self.libraryButton, self.shareButton, self.forwardButton, self.backButton]
 
     var currentURL: URL? {
         get {
@@ -179,7 +178,7 @@ class URLBarView: UIView {
         locationContainer.addSubview(locationView)
 
         [scrollToTopButton, line, tabsButton, progressBar, cancelButton,
-         libraryButton, shareButton, forwardButton, backButton, stopReloadButton, locationContainer].forEach {
+         libraryButton, shareButton, forwardButton, backButton, locationContainer].forEach {
             addSubview($0)
         }
 
@@ -233,8 +232,8 @@ class URLBarView: UIView {
             make.size.equalTo(URLBarViewUX.ButtonHeight)
         }
 
-        stopReloadButton.snp.makeConstraints { make in
-            make.leading.equalTo(self.forwardButton.snp.trailing)
+        shareButton.snp.makeConstraints { make in
+            make.trailing.equalTo(self.safeArea.trailing).offset(-URLBarViewUX.Padding)
             make.centerY.equalTo(self)
             make.size.equalTo(URLBarViewUX.ButtonHeight)
         }
@@ -245,14 +244,8 @@ class URLBarView: UIView {
             make.size.equalTo(URLBarViewUX.ButtonHeight)
         }
 
-        shareButton.snp.makeConstraints { make in
-            make.trailing.equalTo(self.safeArea.trailing).offset(-URLBarViewUX.Padding)
-            make.centerY.equalTo(self)
-            make.size.equalTo(URLBarViewUX.ButtonHeight)
-        }
-
         tabsButton.snp.makeConstraints { make in
-            make.trailing.equalTo(self.shareButton.snp.leading)
+            make.trailing.equalTo(self.libraryButton.snp.leading)
             make.centerY.equalTo(self)
             make.size.equalTo(URLBarViewUX.ButtonHeight)
         }
@@ -283,7 +276,7 @@ class URLBarView: UIView {
             self.locationContainer.snp.remakeConstraints { make in
                 if self.toolbarIsShowing {
                     // If we are showing a toolbar, show the text field next to the forward button
-                    make.leading.equalTo(self.stopReloadButton.snp.trailing).offset(URLBarViewUX.Padding)
+                    make.leading.equalTo(self.forwardButton.snp.trailing).offset(URLBarViewUX.Padding)
                     if self.topTabsIsShowing {
                         make.trailing.equalTo(self.libraryButton.snp.leading).offset(-URLBarViewUX.Padding)
                     } else {
@@ -443,11 +436,10 @@ class URLBarView: UIView {
         cancelButton.isHidden = false
         progressBar.isHidden = false
         shareButton.isHidden = !toolbarIsShowing
-        libraryButton.isHidden = !toolbarIsShowing || !topTabsIsShowing
+        libraryButton.isHidden = !toolbarIsShowing
         forwardButton.isHidden = !toolbarIsShowing
         backButton.isHidden = !toolbarIsShowing
         tabsButton.isHidden = !toolbarIsShowing || topTabsIsShowing
-        stopReloadButton.isHidden = !toolbarIsShowing
     }
 
     func transitionToOverlay(_ didCancel: Bool = false) {
@@ -459,7 +451,6 @@ class URLBarView: UIView {
         libraryButton.alpha = inOverlayMode ? 0 : 1
         forwardButton.alpha = inOverlayMode ? 0 : 1
         backButton.alpha = inOverlayMode ? 0 : 1
-        stopReloadButton.alpha = inOverlayMode ? 0 : 1
 
         let borderColor = inOverlayMode ? locationActiveBorderColor : locationBorderColor
         locationContainer.layer.borderColor = borderColor.cgColor
@@ -485,11 +476,10 @@ class URLBarView: UIView {
         cancelButton.isHidden = !inOverlayMode
         progressBar.isHidden = inOverlayMode
         shareButton.isHidden = !toolbarIsShowing || inOverlayMode
-        libraryButton.isHidden = !toolbarIsShowing || inOverlayMode || !topTabsIsShowing
+        libraryButton.isHidden = !toolbarIsShowing || inOverlayMode
         forwardButton.isHidden = !toolbarIsShowing || inOverlayMode
         backButton.isHidden = !toolbarIsShowing || inOverlayMode
         tabsButton.isHidden = !toolbarIsShowing || inOverlayMode || topTabsIsShowing
-        stopReloadButton.isHidden = !toolbarIsShowing || inOverlayMode
 
         // badge isHidden is tied to private mode on/off, use alpha to hide in this case
         [appMenuBadge, warningMenuBadge].forEach {
@@ -560,16 +550,11 @@ extension URLBarView: TabToolbarProtocol {
     }
 
     func updateReloadStatus(_ isLoading: Bool) {
-        helper?.updateReloadStatus(isLoading)
-        if isLoading {
-            stopReloadButton.setImage(helper?.ImageStop, for: .normal)
-        } else {
-            stopReloadButton.setImage(helper?.ImageReload, for: .normal)
-        }
+        locationView.loading = isLoading
     }
 
     func updatePageStatus(_ isWebPage: Bool) {
-        stopReloadButton.isEnabled = isWebPage
+        locationView.stopReloadButton.isEnabled = isWebPage
     }
 
     var access: [Any]? {
@@ -579,7 +564,7 @@ extension URLBarView: TabToolbarProtocol {
                 return [locationTextField, cancelButton]
             } else {
                 if toolbarIsShowing {
-                    return [backButton, forwardButton, stopReloadButton, locationView, tabsButton, libraryButton, shareButton, progressBar]
+                    return [backButton, forwardButton, locationView, libraryButton, tabsButton, shareButton, progressBar]
                 } else {
                     return [locationView, progressBar]
                 }

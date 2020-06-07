@@ -48,76 +48,8 @@ struct MIMEType {
 }
 
 protocol OpenInHelper {
-    init?(request: URLRequest?, response: URLResponse, canShowInWebView: Bool, forceDownload: Bool, browserViewController: BrowserViewController)
+    init?(response: URLResponse, canShowInWebView: Bool, browserViewController: BrowserViewController)
     func open()
-}
-
-class DownloadHelper: NSObject, OpenInHelper {
-    fileprivate let request: URLRequest
-    fileprivate let preflightResponse: URLResponse
-    fileprivate let browserViewController: BrowserViewController
-
-    static func requestDownload(url: URL, tab: Tab) {
-        let safeUrl = url.absoluteString.replacingOccurrences(of: "'", with: "%27")
-        tab.webView?.evaluateJavaScript("window.__gemini__.download('\(safeUrl)', '\(UserScriptManager.securityToken)')")
-    }
-
-    required init?(request: URLRequest?, response: URLResponse, canShowInWebView: Bool, forceDownload: Bool, browserViewController: BrowserViewController) {
-        guard let request = request else {
-            return nil
-        }
-
-        let mimeType = response.mimeType ?? MIMEType.OctetStream
-        let isAttachment = mimeType == MIMEType.OctetStream
-
-        // Bug 1474339 - Don't auto-download files served with 'Content-Disposition: attachment'
-        // Leaving this here for now, but commented out. Checking this HTTP header is
-        // what Desktop does should we ever decide to change our minds on this.
-        // let contentDisposition = (response as? HTTPURLResponse)?.allHeaderFields["Content-Disposition"] as? String
-        // let isAttachment = contentDisposition?.starts(with: "attachment") ?? (mimeType == MIMEType.OctetStream)
-
-        guard isAttachment || !canShowInWebView || forceDownload else {
-            return nil
-        }
-
-        self.request = request
-        self.preflightResponse = response
-        self.browserViewController = browserViewController
-    }
-
-    func open() {
-        guard let host = request.url?.host else {
-            return
-        }
-
-        let download = HTTPDownload(preflightResponse: preflightResponse, request: request)
-
-        let expectedSize = download.totalBytesExpected != nil ? ByteCountFormatter.string(fromByteCount: download.totalBytesExpected!, countStyle: .file) : nil
-
-        var filenameItem: PhotonActionSheetItem
-        if let expectedSize = expectedSize {
-            let expectedSizeAndHost = "\(expectedSize) — \(host)"
-            filenameItem = PhotonActionSheetItem(title: download.filename, text: expectedSizeAndHost, iconString: "file", iconAlignment: .right, bold: true)
-        } else {
-            filenameItem = PhotonActionSheetItem(title: download.filename, text: host, iconString: "file", iconAlignment: .right, bold: true)
-        }
-        filenameItem.customHeight = { _ in
-            return 80
-        }
-        filenameItem.customRender = { label, contentView in
-            label.numberOfLines = 2
-            label.font = DynamicFontHelper.defaultHelper.DeviceFontSmallBold
-            label.lineBreakMode = .byCharWrapping
-        }
-
-        let downloadFileItem = PhotonActionSheetItem(title: Strings.OpenInDownloadHelperAlertDownloadNow, iconString: "download") { _, _ in
-            self.browserViewController.downloadQueue.enqueue(download)
-        }
-
-        let actions = [[filenameItem], [downloadFileItem]]
-
-        browserViewController.presentSheetWith(actions: actions, on: browserViewController, from: browserViewController.urlBar, closeButtonTitle: Strings.CancelString, suppressPopover: true)
-    }
 }
 
 class OpenPassBookHelper: NSObject, OpenInHelper {
@@ -125,9 +57,9 @@ class OpenPassBookHelper: NSObject, OpenInHelper {
 
     fileprivate let browserViewController: BrowserViewController
 
-    required init?(request: URLRequest?, response: URLResponse, canShowInWebView: Bool, forceDownload: Bool, browserViewController: BrowserViewController) {
+    required init?(response: URLResponse, canShowInWebView: Bool, browserViewController: BrowserViewController) {
         guard let mimeType = response.mimeType, mimeType == MIMEType.Passbook, PKAddPassesViewController.canAddPasses(),
-            let responseURL = response.url, !forceDownload else { return nil }
+            let responseURL = response.url else { return nil }
         self.url = responseURL
         self.browserViewController = browserViewController
         super.init()
@@ -165,8 +97,8 @@ class OpenQLPreviewHelper: NSObject, OpenInHelper, QLPreviewControllerDataSource
 
     fileprivate let previewController: QLPreviewController
 
-    required init?(request: URLRequest?, response: URLResponse, canShowInWebView: Bool, forceDownload: Bool, browserViewController: BrowserViewController) {
-        guard let mimeType = response.mimeType, mimeType == MIMEType.USDZ, let responseURL = response.url as NSURL?, QLPreviewController.canPreview(responseURL), !forceDownload, !canShowInWebView else { return nil }
+    required init?(response: URLResponse, canShowInWebView: Bool, browserViewController: BrowserViewController) {
+        guard let mimeType = response.mimeType, mimeType == MIMEType.USDZ, let responseURL = response.url as NSURL?, QLPreviewController.canPreview(responseURL), !canShowInWebView else { return nil }
         self.url = responseURL
         self.browserViewController = browserViewController
         self.previewController = QLPreviewController()

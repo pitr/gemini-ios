@@ -11,9 +11,10 @@ class GeminiSchemeHandler: NSObject, WKURLSchemeHandler {
     public static let scheme = "gemini"
 
     var currentClient: GeminiClient?
-    let prefs = NSUserDefaultsPrefs()
+    let profile: Profile
 
-    override init() {
+    init(profile: Profile) {
+        self.profile = profile
         super.init()
     }
 
@@ -23,7 +24,7 @@ class GeminiSchemeHandler: NSObject, WKURLSchemeHandler {
             return
         }
 
-        let client = GeminiClient(url: url, urlSchemeTask: urlSchemeTask, prefs: prefs)
+        let client = GeminiClient(url: url, urlSchemeTask: urlSchemeTask, profile: profile)
         currentClient = client
         client.load()
     }

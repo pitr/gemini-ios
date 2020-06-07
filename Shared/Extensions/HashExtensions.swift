@@ -5,6 +5,13 @@
 import Foundation
 
 extension Data {
+    public var md5: Data {
+        let len = Int(CC_MD5_DIGEST_LENGTH)
+        let digest = UnsafeMutablePointer<UInt8>.allocate(capacity: len)
+        CC_MD5((self as NSData).bytes, CC_LONG(self.count), digest)
+        return Data(bytes: UnsafePointer<UInt8>(digest), count: len)
+    }
+
     public var sha1: Data {
         let len = Int(CC_SHA1_DIGEST_LENGTH)
         let digest = UnsafeMutablePointer<UInt8>.allocate(capacity: len)
@@ -21,6 +28,11 @@ extension Data {
 }
 
 extension String {
+    public var md5: Data {
+        let data = self.data(using: .utf8)!
+        return data.md5
+    }
+
     public var sha1: Data {
         let data = self.data(using: .utf8)!
         return data.sha1

@@ -84,7 +84,7 @@ class RecentlyClosedTabsPanelSiteTableViewController: SiteTableViewController {
         cell.imageView?.layer.borderWidth = RecentlyClosedPanelUX.IconBorderWidth
         cell.imageView?.contentMode = .center
         cell.imageView?.setImageAndBackground(website: displayURL)
-        cell.imageView?.image = cell.imageView?.image?.createScaled(RecentlyClosedPanelUX.IconSize)
+        cell.imageView?.image = cell.imageView?.image
         return cell
     }
 

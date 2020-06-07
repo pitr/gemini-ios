@@ -153,7 +153,6 @@ class PhotonActionSheetTitleHeaderView: UITableViewHeaderFooterView {
 class PhotonActionSheetSiteHeaderView: UITableViewHeaderFooterView {
     static let Padding: CGFloat = 12
     static let VerticalPadding: CGFloat = 2
-    let favicons = Favicons()
 
     lazy var titleLabel: UILabel = {
         let titleLabel = UILabel()
@@ -224,13 +223,11 @@ class PhotonActionSheetSiteHeaderView: UITableViewHeaderFooterView {
             self.siteImageView.setFavicon(forSite: site)
             self.siteImageView.image = self.siteImageView.image?.createScaled(PhotonActionSheetUX.IconSize)
         } else {
-            self.favicons.generateDefaultFaviconImage(forSite: site).uponQueue(.main) { result in
-                guard let image = result.successValue else {
-                    return
-                }
-
-                self.siteImageView.backgroundColor = .clear
-                self.siteImageView.image = image.createScaled(PhotonActionSheetUX.IconSize)
+            self.siteImageView.backgroundColor = .clear
+            if let url = site.url.asURL {
+                self.siteImageView.image = FaviconFetcher.letter(forUrl: url).createScaled(PhotonActionSheetUX.IconSize)
+            } else {
+                self.siteImageView.image = FaviconFetcher.defaultFavicon.createScaled(PhotonActionSheetUX.IconSize)
             }
         }
         self.titleLabel.text = site.title.isEmpty ? site.url : site.title

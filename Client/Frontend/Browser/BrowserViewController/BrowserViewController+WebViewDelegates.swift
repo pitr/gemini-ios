@@ -160,11 +160,6 @@ extension BrowserViewController: WKUIDelegate {
                 SimpleToast().showAlertWithText(Strings.AppMenuAddBookmarkConfirmMessage, bottomContainer: self.webViewContainer)
             })
 
-            actions.append(UIAction(title: Strings.ContextMenuDownloadLink, image: UIImage.templateImageNamed("menu-panel-Downloads"), identifier: UIAction.Identifier("linkContextMenu.download")) {_ in
-                self.pendingDownloadWebView = currentTab.webView
-                DownloadContentScript.requestDownload(url: url, tab: currentTab)
-            })
-
             actions.append(UIAction(title: Strings.ContextMenuCopyLink, image: UIImage.templateImageNamed("menu-Copy-Link"), identifier: UIAction.Identifier("linkContextMenu.copyLink")) { _ in
                 UIPasteboard.general.url = url
             })
@@ -446,8 +441,6 @@ extension BrowserViewController: WKNavigationDelegate {
         // always allow this. Additionally, data URIs are also handled just like normal web pages.
 
         if ["gemini", "blob", "file"].contains(url.scheme) {
-            pendingRequests[url.absoluteString] = navigationAction.request
-
             decisionHandler(.allow)
             return
         }
@@ -471,63 +464,18 @@ extension BrowserViewController: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
         let response = navigationResponse.response
-        let responseURL = response.url
-
-        var request: URLRequest?
-        if let url = responseURL {
-            request = pendingRequests.removeValue(forKey: url.absoluteString)
-        }
 
         // We can only show this content in the web view if this web view is not pending
         // download via the context menu.
-        let canShowInWebView = navigationResponse.canShowMIMEType && (webView != pendingDownloadWebView)
-        let forceDownload = webView == pendingDownloadWebView
+        let canShowInWebView = navigationResponse.canShowMIMEType
 
         // Check if this response should be handed off to Passbook.
-        if let passbookHelper = OpenPassBookHelper(request: request, response: response, canShowInWebView: canShowInWebView, forceDownload: forceDownload, browserViewController: self) {
+        if let passbookHelper = OpenPassBookHelper(response: response, canShowInWebView: canShowInWebView, browserViewController: self) {
             // Clear the network activity indicator since our helper is handling the request.
             UIApplication.shared.isNetworkActivityIndicatorVisible = false
 
             // Open our helper and cancel this response from the webview.
             passbookHelper.open()
-            decisionHandler(.cancel)
-            return
-        }
-
-        if #available(iOS 12.0, *) {
-            // Check if this response should be displayed in a QuickLook for USDZ files.
-            if let previewHelper = OpenQLPreviewHelper(request: request, response: response, canShowInWebView: canShowInWebView, forceDownload: forceDownload, browserViewController: self) {
-
-                // Certain files are too large to download before the preview presents, block and use a temporary document instead
-                if let tab = tabManager[webView] {
-                    if navigationResponse.isForMainFrame, response.mimeType != MIMEType.HTML, let request = request {
-                        tab.temporaryDocument = TemporaryDocument(preflightResponse: response, request: request)
-                        previewHelper.url = tab.temporaryDocument!.getURL().value as NSURL
-
-                        // Open our helper and cancel this response from the webview.
-                        previewHelper.open()
-                        decisionHandler(.cancel)
-                        return
-                    } else {
-                        tab.temporaryDocument = nil
-                    }
-                }
-
-                // We don't have a temporary document, fallthrough
-            }
-        }
-
-        // Check if this response should be downloaded.
-        if let downloadHelper = DownloadHelper(request: request, response: response, canShowInWebView: canShowInWebView, forceDownload: forceDownload, browserViewController: self) {
-            // Clear the network activity indicator since our helper is handling the request.
-            UIApplication.shared.isNetworkActivityIndicatorVisible = false
-
-            // Clear the pending download web view so that subsequent navigations from the same
-            // web view don't invoke another download.
-            pendingDownloadWebView = nil
-
-            // Open our helper and cancel this response from the webview.
-            downloadHelper.open()
             decisionHandler(.cancel)
             return
         }
@@ -538,12 +486,7 @@ extension BrowserViewController: WKNavigationDelegate {
         // we may end up overriding the "Share Page With..." action to share a temp file that is not
         // representative of the contents of the web view.
         if navigationResponse.isForMainFrame, let tab = tabManager[webView] {
-            if response.mimeType != MIMEType.HTML, let request = request {
-                tab.temporaryDocument = TemporaryDocument(preflightResponse: response, request: request)
-            } else {
-                tab.temporaryDocument = nil
-            }
-
+            tab.temporaryDocument = nil
             tab.mimeType = response.mimeType
         }
 

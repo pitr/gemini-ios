@@ -63,28 +63,25 @@ class TabManager: NSObject {
 
     fileprivate let navDelegate: TabManagerNavDelegate
 
-    public static func makeWebViewConfig(isPrivate: Bool) -> WKWebViewConfiguration {
+    public static func makeWebViewConfig(profile: Profile) -> WKWebViewConfiguration {
         let configuration = WKWebViewConfiguration()
         configuration.processPool = WKProcessPool()
         // We do this to go against the configuration of the <meta name="viewport">
         // tag to behave the same way as Safari :-(
         configuration.ignoresViewportScaleLimits = true
-        if isPrivate {
-            configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
-        }
         configuration.setURLSchemeHandler(InternalSchemeHandler(), forURLScheme: InternalURL.scheme)
-        configuration.setURLSchemeHandler(GeminiSchemeHandler(), forURLScheme: GeminiSchemeHandler.scheme)
+        configuration.setURLSchemeHandler(GeminiSchemeHandler(profile: profile), forURLScheme: GeminiSchemeHandler.scheme)
         return configuration
     }
 
     // A WKWebViewConfiguration used for normal tabs
     lazy fileprivate var configuration: WKWebViewConfiguration = {
-        return TabManager.makeWebViewConfig(isPrivate: false)
+        return TabManager.makeWebViewConfig(profile: self.profile)
     }()
 
     // A WKWebViewConfiguration used for private mode tabs
     lazy fileprivate var privateConfiguration: WKWebViewConfiguration = {
-        return TabManager.makeWebViewConfig(isPrivate: true)
+        return TabManager.makeWebViewConfig(profile: self.profile)
     }()
 
     var selectedIndex: Int { return _selectedIndex }

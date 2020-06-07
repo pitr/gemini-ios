@@ -1,54 +1,70 @@
 import WebKit
 import Shared
+import Storage
 
 private let log = Logger.browserLogger
 
 class GeminiClient: NSObject {
-    static var fingerprints: [String: [String]] = [:]
+    static var serverFingerprints: [String: [String]] = [:]
 
     var inputStream: InputStream!
+    var outputStream: OutputStream!
     var done = false
     let urlSchemeTask: WKURLSchemeTask
     let url: URL
     var data: Data
     let start: DispatchTime
-    let prefs: NSUserDefaultsPrefs
+    let profile: Profile
 
-    init(url: URL, urlSchemeTask: WKURLSchemeTask, prefs: NSUserDefaultsPrefs) {
+    init(url: URL, urlSchemeTask: WKURLSchemeTask, profile: Profile) {
         self.urlSchemeTask = urlSchemeTask
         self.url = url
         self.data = Data()
         self.start = DispatchTime.now()
-        self.prefs = prefs
+        self.profile = profile
     }
 
     func load() {
+        var certificate = self.profile.db.getActiveCertificate(host: self.url.host!)
+        if let c = certificate {
+            let result = self.profile.db.recordVisit(for: c)
+            if result.isFailure {
+                certificate = nil
+                log.error(result.failureValue!)
+            }
+        }
+        let data = certificate?.data
         DispatchQueue.global(qos: .userInitiated).async {
-            self._load()
+            self._load(cert: data)
             RunLoop.current.run()
         }
     }
 
-    fileprivate func _load() {
+    fileprivate func _load(cert: Data?) {
         var readStream: Unmanaged<CFReadStream>?
         var writeStream: Unmanaged<CFWriteStream>?
 
         CFStreamCreatePairWithSocketToHost(kCFAllocatorDefault, self.url.host! as CFString, UInt32(self.url.port ?? 1965), &readStream, &writeStream)
 
         inputStream = readStream!.takeRetainedValue()
-        let outputStream: OutputStream = writeStream!.takeRetainedValue()
+        outputStream = writeStream!.takeRetainedValue()
 
         inputStream.delegate = self
 
         inputStream.schedule(in: .current, forMode: .default)
         outputStream.schedule(in: .current, forMode: .default)
+
         // Enable SSL/TLS on the streams
         inputStream.setProperty(StreamSocketSecurityLevel.negotiatedSSL, forKey: .socketSecurityLevelKey)
         outputStream.setProperty(StreamSocketSecurityLevel.negotiatedSSL, forKey: .socketSecurityLevelKey)
-        let sslSettings = [
+        var sslSettings = [
             NSString(format: kCFStreamSSLValidatesCertificateChain): kCFBooleanFalse!,
-            NSString(format: kCFStreamSSLIsServer): kCFBooleanFalse!
+            NSString(format: kCFStreamSSLIsServer): kCFBooleanFalse!,
             ] as [NSString : Any]
+
+        if let data = cert, let p12 = CertificateUtils.toP12(data: data).successValue {
+            sslSettings[NSString(format: kCFStreamSSLCertificates)] = p12 as CFArray
+        }
 
         inputStream.setProperty(sslSettings, forKey: kCFStreamPropertySSLSettings as Stream.PropertyKey)
         outputStream.setProperty(sslSettings, forKey: kCFStreamPropertySSLSettings as Stream.PropertyKey)
@@ -70,7 +86,40 @@ class GeminiClient: NSObject {
         if !done {
             done = true
             inputStream.close()
+            outputStream.close()
+            self.inputStream = nil
+            self.outputStream = nil
         }
+    }
+
+    fileprivate func readServerCert(trust: SecTrust) {
+        let num = SecTrustGetCertificateCount(trust)
+        log.debug("Found \(num) certificates")
+
+        for ix in 0..<num {
+            guard let fingerprint = SecTrustGetCertificateAtIndex(trust, ix)?.fingerprint() else {
+                continue
+            }
+            let hex = fingerprint.joined(separator: ":")
+            log.debug("Fingerprint: \(hex)")
+            if ix == 0 {
+                GeminiClient.serverFingerprints[self.url.domainURL.absoluteDisplayString] = fingerprint
+            }
+        }
+    }
+}
+
+extension SecCertificate {
+    func fingerprint() -> [String] {
+        guard let subject = SecCertificateCopySubjectSummary(self) else {
+            log.debug("Certificate has no subject!")
+            return []
+        }
+        log.debug("CN: \(subject)")
+        let fingerprint = (SecCertificateCopyData(self) as Data).md5.hexEncodedStringArray
+        let hex = fingerprint.joined(separator: ":")
+        log.debug("Fingerprint: \(hex)")
+        return fingerprint
     }
 }
 
@@ -79,23 +128,7 @@ extension GeminiClient: StreamDelegate {
         switch eventCode {
         case .openCompleted:
             if let trust = self.inputStream.property(forKey: kCFStreamPropertySSLPeerTrust as Stream.PropertyKey) as! SecTrust? {
-                let num = SecTrustGetCertificateCount(trust)
-                log.debug("Found \(num) certificates")
-
-                for ix in 0..<num {
-                    guard let cert = SecTrustGetCertificateAtIndex(trust, ix),
-                        let subject = SecCertificateCopySubjectSummary(cert) else {
-                            log.debug("Certificate \(ix+1), no subject!")
-                            continue
-                    }
-                    log.debug("Certificate \(ix+1), CN: \(subject)")
-                    let fingerprint = (SecCertificateCopyData(cert) as Data).sha256.hexEncodedStringArray
-                    let hex = fingerprint.joined(separator: ":")
-                    log.debug("Fingerprint: \(hex)")
-                    if ix == 0 {
-                        GeminiClient.fingerprints[self.url.domainURL.absoluteDisplayString] = fingerprint
-                    }
-                }
+                readServerCert(trust: trust)
             }
 
             break
@@ -112,9 +145,13 @@ extension GeminiClient: StreamDelegate {
             defer {
                 done = true
                 inputStream.close()
+                outputStream.close()
+                self.inputStream = nil
+                self.outputStream = nil
             }
             break
         case .hasBytesAvailable:
+            log.debug("hasBytesAvailable")
             let bufferSize = 1024
             let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
             defer {
@@ -131,12 +168,11 @@ extension GeminiClient: StreamDelegate {
                     }
                     return
                 } else if read == 0 {
-                    log.debug("EOF")
                     break
                 }
                 data.append(buffer, count: read)
+                log.debug("read \(read) bytes")
             }
-            log.debug("read \(data.count) bytes")
             break
         case .errorOccurred:
             log.error("ErrorOccurred")
@@ -148,6 +184,9 @@ extension GeminiClient: StreamDelegate {
             defer {
                 done = true
                 inputStream.close()
+                outputStream.close()
+                self.inputStream = nil
+                self.outputStream = nil
             }
             break
         default:
@@ -156,6 +195,9 @@ extension GeminiClient: StreamDelegate {
             defer {
                 done = true
                 inputStream.close()
+                outputStream.close()
+                self.inputStream = nil
+                self.outputStream = nil
             }
             break
         }
@@ -164,7 +206,7 @@ extension GeminiClient: StreamDelegate {
     fileprivate func parseResponse(data: Data) {
         guard let ix = data.firstIndex(of: 13),
             data[ix+1] == 10,
-            ix < 1024+3, // +3 for status code
+            ix < (1024+3), // +3 for status code
             let firstLine = String(data: data.prefix(upTo: ix), encoding: .utf8) else {
                 renderError(error: "Invalid response", for: url, to: urlSchemeTask)
                 return
@@ -187,40 +229,46 @@ extension GeminiClient: StreamDelegate {
                         renderError(error: "Could not parse body", for: url, to: urlSchemeTask)
                         return
                     }
-                    urlSchemeTask.didReceive(URLResponse(url: url, mimeType: "text/html", expectedContentLength: -1, textEncodingName: "utf-8"))
-                    urlSchemeTask.didReceive(resp)
+                    render(with: resp, mime: "text/html")
                 } else {
                     guard let resp = body.data(using: .utf8) else {
                         renderError(error: "Could not parse body", for: url, to: urlSchemeTask)
                         return
                     }
-                    urlSchemeTask.didReceive(URLResponse(url: url, mimeType: "text/plain", expectedContentLength: -1, textEncodingName: "utf-8"))
-                    urlSchemeTask.didReceive(resp)
+                    render(with: resp, mime: "text/plain")
                 }
             } else {
-                urlSchemeTask.didReceive(URLResponse(url: url, mimeType: mime.contentType, expectedContentLength: -1,textEncodingName: nil))
-                urlSchemeTask.didReceive(data)
+                render(with: data, mime: mime.contentType)
             }
-            urlSchemeTask.didFinish()
+            switch header {
+            case .success_end_of_client_certificate_session:
+                DispatchQueue.main.async {
+                    _ = self.profile.db.deactivateCertificatesFor(host: self.url.host!)
+                }
+            default: break
+            }
         case .redirect_permanent(let to), .redirect_temporary(let to):
             let body = "<meta http-equiv=\"refresh\" content=\"0; URL='\(to)'\" />"
             guard let data = body.data(using: .utf8) else {
                 renderError(error: "Could not redirect to \(to)", for: url, to: urlSchemeTask)
                 return
             }
-            urlSchemeTask.didReceive(URLResponse(url: url, mimeType: "text/html", expectedContentLength: -1, textEncodingName: "utf-8"))
-            urlSchemeTask.didReceive(data)
-            urlSchemeTask.didFinish()
-        case .input(let question):
-            let header = try! String(contentsOfFile: Bundle.main.path(forResource: "GeminiHeader", ofType: "html")!)
-            let body = header+"<title>\(question)</title></head><body><h2>\(question)</h2><form><input autocapitalize=off id=q name=q /><hr /><button>Submit</button></form>"+inputFooter
+            render(with: data, mime: "text/html")
+        case .input(let question), .sensitive_input(let question):
+            var body = try! String(contentsOfFile: Bundle.main.path(forResource: "GeminiHeader", ofType: "html")!)
+            var type: String
+            switch header {
+            case .sensitive_input:
+                type = "password"
+            default:
+                type = "text"
+            }
+            body += "<title>\(question)</title></head><body><h2>\(question)</h2><form><input autocapitalize=off type=\(type) id=q name=q /><hr /><button>Submit</button></form>"+inputFooter
             guard let data = body.data(using: .utf8) else {
-                renderError(error: "Could not render form tosk server's question: \(question)", for: url, to: urlSchemeTask)
+                renderError(error: "Could not render form to ask server's question: \(question)", for: url, to: urlSchemeTask)
                 return
             }
-            urlSchemeTask.didReceive(URLResponse(url: url, mimeType: "text/html", expectedContentLength: -1, textEncodingName: "utf-8"))
-            urlSchemeTask.didReceive(data)
-            urlSchemeTask.didFinish()
+            render(with: data, mime: "text/html")
         case .slow_down(let wait):
             renderError(error: "slow down: please wait at least \(wait) seconds before retrying", for: url, to: urlSchemeTask)
         case .temporary_failure(let err),
@@ -234,52 +282,65 @@ extension GeminiClient: StreamDelegate {
              .bad_request(let err):
             renderError(error: "\(header.description()): \(err)", for: url, to: urlSchemeTask)
         case .client_certificate_required(let msg), .transient_certificate_requested(let msg), .authorised_certificate_required(let msg), .certificate_not_accepted(let msg), .future_certificate_rejected(let msg), .expired_certificate_rejected(let msg):
-            renderError(error: "\(header.description()): \(msg)", for: url, to: urlSchemeTask)
+
+            var body = try! String(contentsOfFile: Bundle.main.path(forResource: "GeminiHeader", ofType: "html")!)
+            body += "<title>\(msg)</title></head><body><h1>\(header.description().capitalized)</h1><h3>\(msg)</h3>"
+            switch header {
+            case .transient_certificate_requested:
+                body += "<div id='need-transient-certificate'></div>"
+            default:
+                body += "<div id='need-certificate'></div>"
+            }
+            guard let data = body.data(using: .utf8) else {
+                renderError(error: "Could not render server's certification message: \(msg)", for: url, to: urlSchemeTask)
+                return
+            }
+            render(with: data, mime: "text/html")
         }
     }
 
-    fileprivate func renderError(error: String, for url: URL, to urlSchemeTask: WKURLSchemeTask) {
-        urlSchemeTask.didReceive(URLResponse(url: url, mimeType: "text/html", expectedContentLength: -1, textEncodingName: "utf-8"))
+    fileprivate func render(with data: Data, mime: String){
+        urlSchemeTask.didReceive(URLResponse(url: url, mimeType: mime, expectedContentLength: -1, textEncodingName: "utf-8"))
+        urlSchemeTask.didReceive(data)
+        urlSchemeTask.didFinish()
+    }
 
+    fileprivate func renderError(error: String, for url: URL, to urlSchemeTask: WKURLSchemeTask) {
         let header = try! String(contentsOfFile: Bundle.main.path(forResource: "GeminiHeader", ofType: "html")!)
         let body = header+"<title>\(error)</title></head><body><h2>\(error)</h2>"
         if let data = body.data(using: .utf8) {
-            urlSchemeTask.didReceive(data)
+            render(with: data, mime: "text/html")
         } else {
-            urlSchemeTask.didReceive("browser error!".data(using: .utf8)!)
+            render(with: "browser error!".data(using: .utf8)!, mime: "text/html")
         }
-        urlSchemeTask.didFinish()
     }
 
     fileprivate func parseBody(_ content: String) -> String {
         do {
-            let h1Regex = try NSRegularExpression(pattern: #"^#\s+(.*)$"#, options: [])
-            let h2Regex = try NSRegularExpression(pattern: #"^##\s+(.*)$"#, options: [])
-            let h3Regex = try NSRegularExpression(pattern: #"^###\s+(.*)$"#, options: [])
-            let listRegex = try NSRegularExpression(pattern: #"^\*\s+([^*]*)$"#, options: [])
-            let linkRegex = try NSRegularExpression(pattern: #"^=>\s*(\S*)\s*(.*)?$"#, options: [])
+            let h1Regex = try NSRegularExpression(pattern: #"^#\s+(.+)$"#, options: [])
+            let h2Regex = try NSRegularExpression(pattern: #"^##\s+(.+)$"#, options: [])
+            let h3Regex = try NSRegularExpression(pattern: #"^###\s+(.+)$"#, options: [])
+            let listRegex = try NSRegularExpression(pattern: #"^\*\s+(.+)$"#, options: [])
+            let linkRegex = try NSRegularExpression(pattern: #"^=&gt;\s*(\S+)\s*(.*)$"#, options: [])
 
             var pageTitle: String?
             var body = ""
             var pre = false
-            for line in content.components(separatedBy: "\n") {
+            for rawLine in content.components(separatedBy: "\n") {
+                let line = rawLine.escapeHTML()
                 let range = NSRange(line.startIndex..<line.endIndex, in: line)
-                if line.contains("```") {
+                if line.starts(with: "```") {
                     pre = !pre
                     if pre {
-                        let l = line.replaceFirstOccurrence(of: "```", with: "<pre><code>")
-                        body.append("\(l)\n")
+                        body.append("<pre><code>")
                     } else {
-                        let l = line.replaceFirstOccurrence(of: "```", with: "</code></pre>")
-                        body.append("\(l)\n")
+                        body.append("</code></pre>")
                     }
                     continue
                 }
                 if pre {
                     body.append("\(line)\n")
-                    continue
-                }
-                if let m = h1Regex.firstMatch(in: line, options: [], range: range),
+                } else if let m = h1Regex.firstMatch(in: line, options: [], range: range),
                     let range = Range(m.range(at: 1), in: line) {
                     let title = line[range]
                     pageTitle = pageTitle ?? String(title)
@@ -303,14 +364,21 @@ extension GeminiClient: StreamDelegate {
                     let range2 = Range(m.range(at: 2), in: line) {
                     let link = line[range1].trimmingCharacters(in: .whitespacesAndNewlines)
                     let title = line[range2].trimmingCharacters(in: .whitespacesAndNewlines)
+                    let url = URL(string: link, relativeTo: self.url)
+                    var prefix = "→"
+                    if url?.scheme != "gemini" {
+                        prefix = "⎋"
+                    } else if url?.host != self.url.host {
+                        prefix = "⇒"
+                    }
                     if link == title {
-                        body.append("<p><a href=\"\(link)\">\(link)</a></p>\n")
+                        body.append("<p><a href=\"\(link)\">\(prefix) \(link)</a></p>\n")
                     } else if title.isEmptyOrWhitespace() {
-                        body.append("<p><a href=\"\(link)\">\(link)</a></p>\n")
-                    } else if self.prefs.boolForKey(PrefsKeys.GeminiShowLinkURL) ?? false {
-                        body.append("<p><a href=\"\(link)\">\(link)</a> \(title)</p>\n")
+                        body.append("<p><a href=\"\(link)\">\(prefix) \(link)</a></p>\n")
+                    } else if self.profile.prefs.boolForKey(PrefsKeys.GeminiShowLinkURL) ?? false {
+                        body.append("<p><a href=\"\(link)\">\(prefix) \(link)</a> \(title)</p>\n")
                     } else {
-                        body.append("<p><a href=\"\(link)\">\(title)</a></p>\n")
+                        body.append("<p><a href=\"\(link)\">\(prefix) \(title)</a></p>\n")
                     }
                 } else {
                     body.append("<p>\(line)</p>\n")
