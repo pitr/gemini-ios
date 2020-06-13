@@ -254,6 +254,8 @@ extension Strings {
     public static let SettingsOfferClipboardBarStatus = NSLocalizedString("Settings.OfferClipboardBar.Status", value: "When Opening Gemini", comment: "Description displayed under the ”Offer to Open Copied Link” option. See https://bug1223660.bmoattachments.org/attachment.cgi?id=8898349")
 
     public static let SettingsShowLinkURLTitle = NSLocalizedString("Settings.ShowLinkURL.Title", value: "Show Link URL", comment: "Title of setting to show link URL")
+    public static let SettingsDisableSiteThemeTitle = NSLocalizedString("Settings.DisableSiteTheme.Title", value: "Disable Site Themes", comment: "Title of setting to disable site-specific themes")
+    public static let SettingsDisableSiteThemeStatus = NSLocalizedString("Settings.DisableSiteTheme.Status", value: "Site themes are auto-generated based on site URL", comment: "Status of setting to disable site-specific themes")
 }
 
 // Link Previews

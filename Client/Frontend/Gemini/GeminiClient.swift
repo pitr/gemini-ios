@@ -263,6 +263,11 @@ extension GeminiClient: StreamDelegate {
             default:
                 type = "text"
             }
+            if !(self.profile.prefs.boolForKey(PrefsKeys.DisableSiteTheme) ?? false) {
+                let bg = FaviconFetcher.color(forUrl: self.url).hexString
+                let bgNight = FaviconFetcher.nightColor(forUrl: self.url).hexString
+                body += "<style>:root{--nc-bg-1:\(bg)}@media (prefers-color-scheme: dark){:root{--nc-bg-1:\(bgNight)}}</style>"
+            }
             body += "<title>\(question)</title></head><body><h2>\(question)</h2><form><input autocapitalize=off type=\(type) id=q name=q /><hr /><button>Submit</button></form>"+inputFooter
             guard let data = body.data(using: .utf8) else {
                 renderError(error: "Could not render form to ask server's question: \(question)", for: url, to: urlSchemeTask)
@@ -284,6 +289,11 @@ extension GeminiClient: StreamDelegate {
         case .client_certificate_required(let msg), .transient_certificate_requested(let msg), .authorised_certificate_required(let msg), .certificate_not_accepted(let msg), .future_certificate_rejected(let msg), .expired_certificate_rejected(let msg):
 
             var body = try! String(contentsOfFile: Bundle.main.path(forResource: "GeminiHeader", ofType: "html")!)
+            if !(self.profile.prefs.boolForKey(PrefsKeys.DisableSiteTheme) ?? false) {
+                let bg = FaviconFetcher.color(forUrl: self.url).hexString
+                let bgNight = FaviconFetcher.nightColor(forUrl: self.url).hexString
+                body += "<style>:root{--nc-bg-1:\(bg)}@media (prefers-color-scheme: dark){:root{--nc-bg-1:\(bgNight)}}</style>"
+            }
             body += "<title>\(msg)</title></head><body><h1>\(header.description().capitalized)</h1><h3>\(msg)</h3>"
             switch header {
             case .transient_certificate_requested:
@@ -306,8 +316,13 @@ extension GeminiClient: StreamDelegate {
     }
 
     fileprivate func renderError(error: String, for url: URL, to urlSchemeTask: WKURLSchemeTask) {
-        let header = try! String(contentsOfFile: Bundle.main.path(forResource: "GeminiHeader", ofType: "html")!)
-        let body = header+"<title>\(error)</title></head><body><h2>\(error)</h2>"
+        var body = try! String(contentsOfFile: Bundle.main.path(forResource: "GeminiHeader", ofType: "html")!)
+        if !(self.profile.prefs.boolForKey(PrefsKeys.DisableSiteTheme) ?? false) {
+            let bg = FaviconFetcher.color(forUrl: self.url).hexString
+            let bgNight = FaviconFetcher.nightColor(forUrl: self.url).hexString
+            body += "<style>:root{--nc-bg-1:\(bg)}@media (prefers-color-scheme: dark){:root{--nc-bg-1:\(bgNight)}}</style>"
+        }
+        body += "<title>\(error)</title></head><body><h2>\(error)</h2>"
         if let data = body.data(using: .utf8) {
             render(with: data, mime: "text/html")
         } else {
@@ -385,7 +400,12 @@ extension GeminiClient: StreamDelegate {
                 }
             }
             let title = pageTitle ?? self.url.absoluteDisplayString
-            let header = try! String(contentsOfFile: Bundle.main.path(forResource: "GeminiHeader", ofType: "html")!)
+            var header = try! String(contentsOfFile: Bundle.main.path(forResource: "GeminiHeader", ofType: "html")!)
+            if !(self.profile.prefs.boolForKey(PrefsKeys.DisableSiteTheme) ?? false) {
+                let bg = FaviconFetcher.color(forUrl: self.url).hexString
+                let bgNight = FaviconFetcher.nightColor(forUrl: self.url).hexString
+                header += "<style>:root{--nc-bg-1:\(bg)}@media (prefers-color-scheme: dark){:root{--nc-bg-1:\(bgNight)}}</style>"
+            }
             return header+"<title>\(title)</title></head><body>\n\(body)"
         } catch let err as NSError {
             return "Error: \(err)"

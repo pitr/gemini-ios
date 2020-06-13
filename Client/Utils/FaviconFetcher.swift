@@ -58,4 +58,14 @@ open class FaviconFetcher: NSObject, XMLParserDelegate {
         let saturation = CGFloat(hash[2]) / 255.0
         return UIColor(hue: hue, saturation: saturation, brightness: 0.85, alpha: 1.0)
     }
+
+    // Returns a night theme color based on the url's hash
+    class func nightColor(forUrl url: URL) -> UIColor {
+        guard let hash = url.host?.md5, hash.count > 2 else {
+            return UIColor.Photon.Grey50
+        }
+        let hue = CGFloat(hash[0]) + CGFloat(hash[1]) / 510.0
+        let saturation = CGFloat(hash[2]) / 255.0
+        return UIColor(hue: hue, saturation: saturation, brightness: 0.25, alpha: 1.0)
+    }
 }

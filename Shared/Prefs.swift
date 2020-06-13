@@ -12,6 +12,7 @@ public struct PrefsKeys {
     public static let IntroSeen = "IntroViewControllerSeen"
     public static let NumberOfTopSiteRows = "NumberOfTopSiteRows"
     public static let GeminiShowLinkURL = "GeminiShowLinkURL"
+    public static let DisableSiteTheme = "DisableSiteTheme"
 
     public static let ContextMenuShowLinkPreviews = "showLinkPreviews"
 
