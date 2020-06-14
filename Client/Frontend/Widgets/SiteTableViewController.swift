@@ -194,10 +194,11 @@ class SiteTableViewController: UIViewController, UITableViewDelegate, UITableVie
 
         tableView.backgroundColor = UIColor.theme.tableView.rowBackground
         tableView.separatorColor = UIColor.theme.tableView.separator
-        if let rows = tableView.indexPathsForVisibleRows {
-            tableView.reloadRows(at: rows, with: .none)
-            tableView.reloadSections(IndexSet(rows.map { $0.section }), with: .none)
-        }
+        // if let rows = tableView.indexPathsForVisibleRows {
+        //   This is where 100% of recent crashes come from
+        //   tableView.reloadRows(at: rows, with: .none)
+        //   tableView.reloadSections(IndexSet(rows.map { $0.section }), with: .none)
+        // }
     }
 }
 
