@@ -243,7 +243,12 @@ extension GeminiClient: StreamDelegate {
             switch header {
             case .success_end_of_client_certificate_session:
                 DispatchQueue.main.async {
-                    _ = self.profile.db.deactivateCertificatesFor(host: self.url.host!)
+                    guard let host = self.url.host, let cert = self.profile.db.getActiveCertificate(host: host)
+                        else { return }
+                    switch cert.type {
+                    case .permanent: _ = self.profile.db.deactivateCertificatesFor(host: host)
+                    case .transient: _ = self.profile.db.deleteCertificate(cert)
+                    }
                 }
             default: break
             }
