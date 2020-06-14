@@ -13,7 +13,7 @@ private let log = Logger.browserLogger
  * If that fails, it will attempt to find a favicon.ico in the root host domain.
  */
 open class FaviconFetcher: NSObject, XMLParserDelegate {
-    fileprivate static var characterToFaviconCache = [String: UIImage]()
+    fileprivate static var hostToFaviconCache = [String: UIImage]()
     static var defaultFavicon: UIImage = {
         return UIImage(named: "defaultFavicon")!
     }()
@@ -23,13 +23,13 @@ open class FaviconFetcher: NSObject, XMLParserDelegate {
     // Create (or return from cache) a fallback image for a site based on the first letter of the site's domain
     // Letter is white on a colored background
     class func letter(forUrl url: URL) -> UIImage {
-        guard let character = url.baseDomain?.first else {
+        guard let host = url.host, let character = host.first else {
             return defaultFavicon
         }
 
         let faviconLetter = String(character).uppercased()
 
-        if let cachedFavicon = characterToFaviconCache[faviconLetter] {
+        if let cachedFavicon = hostToFaviconCache[host] {
             return cachedFavicon
         }
 
@@ -45,7 +45,7 @@ open class FaviconFetcher: NSObject, XMLParserDelegate {
         faviconImage = UIGraphicsGetImageFromCurrentImageContext()!
         UIGraphicsEndImageContext()
 
-        characterToFaviconCache[faviconLetter] = faviconImage
+        hostToFaviconCache[host] = faviconImage
         return faviconImage
     }
 
