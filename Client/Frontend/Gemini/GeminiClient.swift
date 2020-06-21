@@ -217,7 +217,7 @@ extension GeminiClient: StreamDelegate {
             return
         }
         switch header {
-        case .success(let mime), .success_end_of_client_certificate_session(let mime):
+        case .success(let mime):
             let data = data.dropFirst(ix+2)
             if mime.contentType.starts(with: "text/") {
                 guard let body = String(data: data, encoding: mime.charset) else {
@@ -239,18 +239,6 @@ extension GeminiClient: StreamDelegate {
                 }
             } else {
                 render(with: data, mime: mime.contentType)
-            }
-            switch header {
-            case .success_end_of_client_certificate_session:
-                DispatchQueue.main.async {
-                    guard let host = self.url.host, let cert = self.profile.db.getActiveCertificate(host: host)
-                        else { return }
-                    switch cert.type {
-                    case .permanent: _ = self.profile.db.deactivateCertificatesFor(host: host)
-                    case .transient: _ = self.profile.db.deleteCertificate(cert)
-                    }
-                }
-            default: break
             }
         case .redirect_permanent(let to), .redirect_temporary(let to):
             let body = "<meta http-equiv=\"refresh\" content=\"0; URL='\(to)'\" />"
@@ -286,16 +274,11 @@ extension GeminiClient: StreamDelegate {
              .proxy_request_refused(let err),
              .bad_request(let err):
             renderError(error: "\(header.description()): \(err)", for: url, to: urlSchemeTask)
-        case .client_certificate_required(let msg), .transient_certificate_requested(let msg), .authorised_certificate_required(let msg), .certificate_not_accepted(let msg), .future_certificate_rejected(let msg), .expired_certificate_rejected(let msg):
+        case .client_certificate_required(let msg), .certificate_not_authorised(let msg), .certificate_not_valid(let msg):
 
             var body = getHeader(for: self.url)
             body += "<title>\(msg)</title></head><body><h1>\(header.description().capitalized)</h1><h3>\(msg)</h3>"
-            switch header {
-            case .transient_certificate_requested:
-                body += "<div id='need-transient-certificate'></div>"
-            default:
-                body += "<div id='need-certificate'></div>"
-            }
+            body += "<div id='need-certificate'></div>"
             guard let data = body.data(using: .utf8) else {
                 renderError(error: "Could not render server's certification message: \(msg)", for: url, to: urlSchemeTask)
                 return

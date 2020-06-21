@@ -183,12 +183,7 @@ class CertificatesPanel: UIViewController, UITableViewDelegate, UITableViewDataS
             let cell = cell as? TwoLineTableViewCell {
             let activeStatus = certificate.isActive ? "(active) " : ""
             let used = certificate.lastUsedAt.toRelativeTimeString()
-            switch certificate.type {
-            case .permanent:
-                cell.setLines(activeStatus+certificate.name, detailText: "last used \(used)")
-            case .transient:
-                cell.setLines("\(activeStatus)Transient certificate", detailText: "last used \(used)")
-            }
+            cell.setLines(activeStatus+certificate.name, detailText: "last used \(used)")
 
             if let url = "gemini://\(certificate.host)/".asURL {
                 cell.imageView?.image = FaviconFetcher.letter(forUrl: url)

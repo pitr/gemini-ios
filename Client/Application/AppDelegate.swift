@@ -244,7 +244,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         // Cleanup can be a heavy operation, take it out of the startup path. Instead check after a few seconds.
         DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
             self.profile?.db.cleanupHistoryIfNeeded()
-            self.profile?.db.cleanupCertificatesIfNeeded()
         }
     }
 

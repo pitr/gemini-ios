@@ -27,7 +27,6 @@ enum GeminiHeader {
     case input(question: String)
     case sensitive_input(question: String)
     case success(mime: Mime)
-    case success_end_of_client_certificate_session(mime: Mime)
     case redirect_temporary(url: String)
     case redirect_permanent(url: String)
     case temporary_failure(err: String)
@@ -41,11 +40,8 @@ enum GeminiHeader {
     case proxy_request_refused(err: String)
     case bad_request(err: String)
     case client_certificate_required(msg: String)
-    case transient_certificate_requested(msg: String)
-    case authorised_certificate_required(msg: String)
-    case certificate_not_accepted(msg: String)
-    case future_certificate_rejected(msg: String)
-    case expired_certificate_rejected(msg: String)
+    case certificate_not_authorised(msg: String)
+    case certificate_not_valid(msg: String)
 
     init?(header: String) {
         let split = header.components(separatedBy: .whitespaces)
@@ -57,7 +53,6 @@ enum GeminiHeader {
         case 10: self = .input(question: meta)
         case 11: self = .sensitive_input(question: meta)
         case 20: self = .success(mime: Mime(meta: meta))
-        case 21: self = .success_end_of_client_certificate_session(mime: Mime(meta: meta))
         case 30: self = .redirect_temporary(url: meta)
         case 31: self = .redirect_permanent(url: meta)
         case 40: self = .temporary_failure(err: meta)
@@ -71,11 +66,8 @@ enum GeminiHeader {
         case 53: self = .proxy_request_refused(err: meta)
         case 59: self = .bad_request(err: meta)
         case 60: self = .client_certificate_required(msg: meta)
-        case 61: self = .transient_certificate_requested(msg: meta)
-        case 62: self = .authorised_certificate_required(msg: meta)
-        case 63: self = .certificate_not_accepted(msg: meta)
-        case 64: self = .future_certificate_rejected(msg: meta)
-        case 65: self = .expired_certificate_rejected(msg: meta)
+        case 61: self = .certificate_not_authorised(msg: meta)
+        case 62: self = .certificate_not_valid(msg: meta)
         default: return nil
         }
     }
@@ -85,7 +77,6 @@ enum GeminiHeader {
         case .input: return "INPUT"
         case .sensitive_input: return "SENSITIVE INPUT"
         case .success: return "SUCCESS"
-        case .success_end_of_client_certificate_session: return "SUCCESS - END OF CLIENT CERTIFICATE SESSION"
         case .redirect_temporary: return "REDIRECT - TEMPORARY"
         case .redirect_permanent: return "REDIRECT - PERMANENT"
         case .temporary_failure: return "TEMPORARY FAILURE"
@@ -99,11 +90,8 @@ enum GeminiHeader {
         case .proxy_request_refused: return "PROXY REQUEST REFUSED"
         case .bad_request: return "BAD REQUEST"
         case .client_certificate_required: return "CLIENT CERTIFICATE REQUIRED"
-        case .transient_certificate_requested: return "TRANSIENT CERTIFICATE REQUESTED"
-        case .authorised_certificate_required: return "AUTHORISED CERTIFICATE REQUIRED"
-        case .certificate_not_accepted: return "CERTIFICATE NOT ACCEPTED"
-        case .future_certificate_rejected: return "FUTURE CERTIFICATE REJECTED"
-        case .expired_certificate_rejected: return "EXPIRED CERTIFICATE REJECTED"
+        case .certificate_not_authorised: return "CERTIFICATE NOT AUTHORISED"
+        case .certificate_not_valid: return "CERTIFICATE NOT VALID"
         }
     }
 }

@@ -7,7 +7,7 @@ import Shared
 import WebKit
 
 protocol CertificateHelperDelegate: AnyObject {
-    func certificateRequested(host: String, transient: Bool)
+    func certificateRequested(host: String)
 }
 
 class CertificateHelper: TabContentScript {
@@ -32,6 +32,6 @@ class CertificateHelper: TabContentScript {
             // oops
             return
         }
-        delegate?.certificateRequested(host: host, transient: data["transient"] ?? false)
+        delegate?.certificateRequested(host: host)
     }
 }

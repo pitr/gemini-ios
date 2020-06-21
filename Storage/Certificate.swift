@@ -4,11 +4,6 @@ import RealmSwift
 
 private let log = Logger.syncLogger
 
-public enum CertificateType: Int {
-    case permanent = 0
-    case transient = 1
-}
-
 public class Certificate: Object {
     @objc dynamic public var id = Bytes.generateGUID()
     @objc dynamic public var host = ""
@@ -17,9 +12,6 @@ public class Certificate: Object {
     @objc dynamic public var data = Data()
     @objc dynamic public var fingerprint = ""
     @objc dynamic var _type = 0
-    public var type: CertificateType {
-        CertificateType.init(rawValue: _type)!
-    }
     @objc dynamic public var createdAt = Date(timeIntervalSince1970: 1)
     @objc dynamic public var lastUsedAt = Date(timeIntervalSince1970: 1)
     public override class func primaryKey() -> String? {
@@ -35,7 +27,7 @@ extension DB {
         return q[safe: 0]
     }
 
-    public func addAndActivateCertificate(host: String, name: String, type: CertificateType, data: Data, fingerprint: String) -> Maybe<Void> {
+    public func addAndActivateCertificate(host: String, name: String, data: Data, fingerprint: String) -> Maybe<Void> {
         let result = deactivateCertificatesFor(host: host)
         if result.isFailure {
             return result
@@ -47,7 +39,6 @@ extension DB {
         c.isActive = true
         c.data = data
         c.fingerprint = fingerprint
-        c._type = type.rawValue
         c.createdAt = Date()
         c.lastUsedAt = Date()
         do {
@@ -122,19 +113,5 @@ extension DB {
         return self.realm.objects(Certificate.self)
             .filter("host = %@", host)
             .sorted(byKeyPath: "lastUsedAt", ascending: false)
-    }
-
-    public func cleanupCertificatesIfNeeded() {
-        guard let yesterday = Calendar.current.date(byAdding: .hour, value: -24, to: Date()) else {
-            log.error("could not cleanup old transient certificates")
-            return
-        }
-
-        let toDelete = self.realm.objects(Certificate.self)
-            .filter("_type = %@ AND lastUsedAt < %@", CertificateType.transient.rawValue, yesterday)
-
-        try! self.realm.write {
-            self.realm.delete(toDelete)
-        }
     }
 }

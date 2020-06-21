@@ -31,14 +31,8 @@ class CertificatesTableDataSource: NSObject, UITableViewDataSource, UITableViewD
         let used = cert.lastUsedAt.toRelativeTimeString()
         let name = cert.name
         let activeStatus = cert.isActive ? "(active) " : ""
-        switch cert.type {
-        case .permanent:
-            cell.textLabel?.text = "\(activeStatus)\(name)"
-            cell.detailTextLabel?.text = "last used \(used)"
-        case .transient:
-            cell.textLabel?.text = "\(activeStatus)Transient certificate"
-            cell.detailTextLabel?.text = "last used \(used)"
-        }
+        cell.textLabel?.text = "\(activeStatus)\(name)"
+        cell.detailTextLabel?.text = "last used \(used)"
         cell.backgroundColor = .clear
         cell.textLabel?.backgroundColor = .clear
         cell.detailTextLabel?.backgroundColor = .clear
