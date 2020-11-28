@@ -1,6 +1,8 @@
 Gemini for iOS
 ===============
 
+A [Project Gemini](https://gemini.circumlunar.space/) browser.
+
 This is a fork of an open source [Firefox Browser for iOS](https://github.com/mozilla-mobile/firefox-ios)
 
 Download on the App Store (not submitted yet).
