@@ -17,7 +17,7 @@ if [ "$1" == "--force" ]; then
     rm -rf ~/Library/Caches/org.carthage.CarthageKit
 fi
 
-carthage bootstrap --platform ios --color auto --cache-builds
+./carthage.sh
 
 # Install Node.js dependencies and build user scripts
 
