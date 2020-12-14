@@ -5,9 +5,8 @@ A [Project Gemini](https://gemini.circumlunar.space/) browser.
 
 This is a fork of an open source [Firefox Browser for iOS](https://github.com/mozilla-mobile/firefox-ios)
 
-Download on the App Store (not submitted yet).
-
-Download in [TestFlight](https://testflight.apple.com/join/ln6yTtqK).
+Download on [the App Store](apps.apple.com/app/id1514950389
+).
 
 ![Gemini screenshot](https://raw.githubusercontent.com/pitr/gemini-ios/master/screenshot.png)
 
