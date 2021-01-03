@@ -65,7 +65,7 @@ extension BrowserViewController: TabToolbarDelegate, PhotonActionSheetProtocol {
         let pageActions = self.getTabActions(tab: tab, buttonView: button, presentShareMenu: actionMenuPresenter,
                                              findInPage: findInPageAction, openSettings: openSettingsAction, presentableVC: self, isBookmarked: isBookmarked,
                                              isPinned: isPinned, success: successCallback)
-        self.presentSheetWith(title: Strings.PageActionMenuTitle, actions: pageActions, on: self, from: button)
+        self.presentSheetWith(actions: pageActions, on: self, from: button)
     }
 
     func tabToolbarDidPressTabs(_ tabToolbar: TabToolbarProtocol, button: UIButton) {
