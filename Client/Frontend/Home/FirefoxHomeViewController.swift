@@ -115,7 +115,7 @@ extension HomePanelContextMenu {
     }
 }
 
-class FirefoxHomeViewController: UICollectionViewController, HomePanel {
+class GeminiHomeViewController: UICollectionViewController, HomePanel {
     weak var homePanelDelegate: HomePanelDelegate?
     fileprivate let profile: Profile
     fileprivate let flowLayout = UICollectionViewFlowLayout()
@@ -210,7 +210,7 @@ class FirefoxHomeViewController: UICollectionViewController, HomePanel {
 }
 
 // MARK: -  Section management
-extension FirefoxHomeViewController {
+extension GeminiHomeViewController {
     enum Section: Int {
         case topSites
         case libraryShortcuts
@@ -321,7 +321,7 @@ extension FirefoxHomeViewController {
 }
 
 // MARK: -  Tableview Delegate
-extension FirefoxHomeViewController: UICollectionViewDelegateFlowLayout {
+extension GeminiHomeViewController: UICollectionViewDelegateFlowLayout {
 
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         switch kind {
@@ -383,7 +383,7 @@ extension FirefoxHomeViewController: UICollectionViewDelegateFlowLayout {
         case .topSites:
             return Section(section).headerHeight
         case .libraryShortcuts:
-            return UIDevice.current.userInterfaceIdiom == .pad ? CGSize.zero : Section(section).headerHeight
+            return Section(section).headerHeight
         }
     }
 
@@ -392,7 +392,7 @@ extension FirefoxHomeViewController: UICollectionViewDelegateFlowLayout {
         case .topSites:
             return Section(section).footerHeight
         case .libraryShortcuts:
-            return UIDevice.current.userInterfaceIdiom == .pad ? CGSize.zero : Section(section).footerHeight
+            return Section(section).footerHeight
         }
     }
 
@@ -415,7 +415,7 @@ extension FirefoxHomeViewController: UICollectionViewDelegateFlowLayout {
 }
 
 // MARK: - Tableview Data Source
-extension FirefoxHomeViewController {
+extension GeminiHomeViewController {
 
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
         return Section.count
@@ -433,8 +433,7 @@ extension FirefoxHomeViewController {
         case .topSites:
             return topSitesManager.content.isEmpty ? 0 : 1
         case .libraryShortcuts:
-            // disable the libary shortcuts on the ipad
-            return UIDevice.current.userInterfaceIdiom == .pad ? 0 : 1
+            return 1
         }
     }
 
@@ -474,7 +473,7 @@ extension FirefoxHomeViewController {
 let ActivityStreamTopSiteCacheSize: Int32 = 32
 
 // MARK: - Data Management
-extension FirefoxHomeViewController {
+extension GeminiHomeViewController {
 
     // Reloads both highlights and top sites data from their respective caches. Does not invalidate the cache.
     // See ActivityStreamDataObserver for invalidation logic.
@@ -588,7 +587,7 @@ extension FirefoxHomeViewController {
     }
 }
 
-extension FirefoxHomeViewController {
+extension GeminiHomeViewController {
     @objc func openBookmarks() {
         homePanelDelegate?.homePanelDidRequestToOpenLibrary(panel: .bookmarks)
     }
@@ -602,7 +601,7 @@ extension FirefoxHomeViewController {
     }
 }
 
-extension FirefoxHomeViewController: HomePanelContextMenu {
+extension GeminiHomeViewController: HomePanelContextMenu {
     func presentContextMenu(for site: Site, with indexPath: IndexPath, completionHandler: @escaping () -> PhotonActionSheet?) {
 
         fetchBookmarkStatus(for: site, with: indexPath, forSection: Section(indexPath.section)) {
@@ -703,7 +702,7 @@ extension FirefoxHomeViewController: HomePanelContextMenu {
     }
 }
 
-extension FirefoxHomeViewController: UIPopoverPresentationControllerDelegate {
+extension GeminiHomeViewController: UIPopoverPresentationControllerDelegate {
 
     // Dismiss the popover if the device is being rotated.
     // This is used by the Share UIActivityViewController action sheet on iPad

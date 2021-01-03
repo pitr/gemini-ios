@@ -220,7 +220,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             setUpWebServer(profile)
         }
         
-        BrowserViewController.foregroundBVC().firefoxHomeViewController?.reloadAll()
+        BrowserViewController.foregroundBVC().geminiHomeViewController?.reloadAll()
 
         // handle quick actions is available
         let quickActions = QuickActions.sharedInstance

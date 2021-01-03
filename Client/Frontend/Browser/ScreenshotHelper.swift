@@ -22,7 +22,7 @@ class ScreenshotHelper {
 
         if let url = tab.url {
             if InternalURL(url)?.isAboutHomeURL ?? false {
-                if let homePanel = controller?.firefoxHomeViewController {
+                if let homePanel = controller?.geminiHomeViewController {
                     screenshot = homePanel.view.screenshot(quality: UIConstants.ActiveScreenshotQuality)
                 }
             } else {

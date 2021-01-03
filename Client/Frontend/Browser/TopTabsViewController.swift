@@ -127,7 +127,7 @@ class TopTabsViewController: UIViewController {
         }
         topTabFader.snp.makeConstraints { make in
             make.top.bottom.equalTo(view)
-            make.leading.equalTo(view.snp.trailing)
+            make.leading.equalTo(view).offset(10)
             make.trailing.equalTo(newTab.snp.leading)
         }
         collectionView.snp.makeConstraints { make in
