@@ -356,7 +356,7 @@ extension GeminiClient: StreamDelegate {
                     let range2 = Range(m.range(at: 2), in: line) {
                     let link = line[range1].trimmingCharacters(in: .whitespacesAndNewlines)
                     let title = line[range2].trimmingCharacters(in: .whitespacesAndNewlines)
-                    let url = URL(string: link, relativeTo: self.url)
+                    let url = URIFixup.getURL(link, relativeTo: self.url)
                     var prefix = "→"
                     if url?.scheme != "gemini" {
                         prefix = "⎋"
@@ -364,13 +364,13 @@ extension GeminiClient: StreamDelegate {
                         prefix = "⇒"
                     }
                     if link == title {
-                        body.append("<p><a href=\"\(link)\">\(prefix) \(link)</a></p>\n")
+                        body.append("<p><a href=\"\(url?.absoluteString ?? link)\">\(prefix) \(link)</a></p>\n")
                     } else if title.isEmptyOrWhitespace() {
-                        body.append("<p><a href=\"\(link)\">\(prefix) \(link)</a></p>\n")
+                        body.append("<p><a href=\"\(url?.absoluteString ?? link)\">\(prefix) \(link)</a></p>\n")
                     } else if self.profile.prefs.boolForKey(PrefsKeys.GeminiShowLinkURL) ?? false {
-                        body.append("<p><a href=\"\(link)\">\(prefix) \(link)</a> \(title)</p>\n")
+                        body.append("<p><a href=\"\(url?.absoluteString ?? link)\">\(prefix) \(link)</a> \(title)</p>\n")
                     } else {
-                        body.append("<p><a href=\"\(link)\">\(prefix) \(title)</a></p>\n")
+                        body.append("<p><a href=\"\(url?.absoluteString ?? link)\">\(prefix) \(title)</a></p>\n")
                     }
                 } else {
                     body.append("<p>\(line)</p>\n")

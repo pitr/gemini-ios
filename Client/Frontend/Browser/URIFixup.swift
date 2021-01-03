@@ -6,9 +6,9 @@ import Foundation
 import Shared
 
 class URIFixup {
-    static func getURL(_ entry: String) -> URL? {
-        if let url = URL(string: entry), InternalURL.isValid(url: url) {
-            return URL(string: entry)
+    static func getURL(_ entry: String, relativeTo: URL? = nil) -> URL? {
+        if let url = URL(string: entry, relativeTo: relativeTo), InternalURL.isValid(url: url) {
+            return url
         }
 
         let trimmed = entry.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -22,7 +22,7 @@ class URIFixup {
         // However, we ensure that the scheme is one that is listed in
         // the official URI scheme list, so that other such search phrases
         // like "filetype:" are recognised as searches rather than URLs.
-        if let url = isURL(escaped), url.schemeIsValid {
+        if let url = punycodedURL(escaped, relativeTo: relativeTo), url.schemeIsValid {
             return url
         }
 
@@ -38,21 +38,42 @@ class URIFixup {
             return nil
         }
 
-        // If there is a ".", prepend "gemini://" and try again. Since this
+        // If there is a ".", prepend "gemini:" (with // or without) and try again. Since this
         // is strictly an "gemini://" URL, we also require a host.
-        if let url = isURL("gemini://\(escaped)"), url.host != nil {
+        if escaped.starts(with: "//") {
+            escaped = "gemini:\(escaped)"
+        } else {
+            escaped = "gemini://\(escaped)"
+        }
+        if let url = punycodedURL(escaped), url.host != nil {
             return url
         }
 
         return nil
     }
 
-    static func isURL(_ string: String) -> URL? {
-        let components = URLComponents(string: string)
+    static func punycodedURL(_ string: String, relativeTo: URL? = nil) -> URL? {
+        var string = string
+        if string.filter({ $0 == "#" }).count > 1 {
+            string = replaceHashMarks(url: string)
+        }
+
+        guard let url = URL(string: string, relativeTo: relativeTo) else { return nil }
+
+        var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
+        let host = components?.host?.utf8HostToAscii()
+        components?.host = host
+
         return components?.url
     }
 
     static func replaceBrackets(url: String) -> String {
         return url.replacingOccurrences(of: "[", with: "%5B").replacingOccurrences(of: "]", with: "%5D")
+    }
+
+    static func replaceHashMarks(url: String) -> String {
+        guard let firstIndex = url.firstIndex(of: "#") else { return String() }
+        let start = url.index(firstIndex, offsetBy: 1)
+        return url.replacingOccurrences(of: "#", with: "%23", range: start..<url.endIndex)
     }
 }

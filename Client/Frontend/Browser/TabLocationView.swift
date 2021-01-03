@@ -221,9 +221,13 @@ class TabLocationView: UIView {
     }
 
     fileprivate func updateTextWithURL() {
-        urlTextField.text = url?.absoluteString
+        if let host = url?.host {
+            urlTextField.text = url?.absoluteString.replacingOccurrences(of: host, with: host.asciiHostToUTF8())
+        } else {
+            urlTextField.text = url?.absoluteString
+        }
 
-        // remove https:// (the scheme) from the url when displaying
+        // remove gemini:// (the scheme) from the url when displaying
         if let scheme = url?.scheme, let range = url?.absoluteString.range(of: "\(scheme)://") {
             urlTextField.text = url?.absoluteString.replacingCharacters(in: range, with: "")
         }
