@@ -348,6 +348,12 @@ class Tab: NSObject {
         _ = webView?.go(to: item)
     }
 
+    func goUp() {
+        if let url = self.url?.deletingLastPathComponent() {
+            _ = webView?.load(URLRequest(url: url))
+        }
+    }
+
     @discardableResult func loadRequest(_ request: URLRequest) -> WKNavigation? {
         if let webView = webView {
             lastRequest = request

@@ -15,8 +15,8 @@ extension BrowserViewController: TabToolbarDelegate, PhotonActionSheetProtocol {
         showBackForwardList()
     }
 
-    func tabToolbarDidPressLibrary(_ tabToolbar: TabToolbarProtocol, button: UIButton) {
-        self.showLibrary()
+    func tabToolbarDidPressUp(_ tabToolbar: TabToolbarProtocol, button: UIButton) {
+        tabManager.selectedTab?.goUp()
     }
 
     func tabToolbarDidPressForward(_ tabToolbar: TabToolbarProtocol, button: UIButton) {

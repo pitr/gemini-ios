@@ -133,7 +133,7 @@ class URLBarView: UIView {
     }()
 
     var shareButton = ToolbarButton()
-    var libraryButton = ToolbarButton()
+    var upButton = ToolbarButton()
 
     var bookmarkButton = ToolbarButton()
     var forwardButton = ToolbarButton()
@@ -144,7 +144,7 @@ class URLBarView: UIView {
         return backButton
     }()
 
-    lazy var actionButtons: [Themeable & UIButton] = [self.tabsButton, self.libraryButton, self.shareButton, self.forwardButton, self.backButton]
+    lazy var actionButtons: [Themeable & UIButton] = [self.tabsButton, self.upButton, self.shareButton, self.forwardButton, self.backButton]
 
     var currentURL: URL? {
         get {
@@ -178,7 +178,7 @@ class URLBarView: UIView {
         locationContainer.addSubview(locationView)
 
         [scrollToTopButton, line, tabsButton, progressBar, cancelButton,
-         libraryButton, shareButton, forwardButton, backButton, locationContainer].forEach {
+         upButton, shareButton, forwardButton, backButton, locationContainer].forEach {
             addSubview($0)
         }
 
@@ -238,14 +238,14 @@ class URLBarView: UIView {
             make.size.equalTo(URLBarViewUX.ButtonHeight)
         }
 
-        libraryButton.snp.makeConstraints { make in
+        upButton.snp.makeConstraints { make in
             make.trailing.equalTo(self.shareButton.snp.leading)
             make.centerY.equalTo(self)
             make.size.equalTo(URLBarViewUX.ButtonHeight)
         }
 
         tabsButton.snp.makeConstraints { make in
-            make.trailing.equalTo(self.libraryButton.snp.leading)
+            make.trailing.equalTo(self.upButton.snp.leading)
             make.centerY.equalTo(self)
             make.size.equalTo(URLBarViewUX.ButtonHeight)
         }
@@ -278,7 +278,7 @@ class URLBarView: UIView {
                     // If we are showing a toolbar, show the text field next to the forward button
                     make.leading.equalTo(self.forwardButton.snp.trailing).offset(URLBarViewUX.Padding)
                     if self.topTabsIsShowing {
-                        make.trailing.equalTo(self.libraryButton.snp.leading).offset(-URLBarViewUX.Padding)
+                        make.trailing.equalTo(self.upButton.snp.leading).offset(-URLBarViewUX.Padding)
                     } else {
                         make.trailing.equalTo(self.tabsButton.snp.leading).offset(-URLBarViewUX.Padding)
                     }
@@ -436,7 +436,7 @@ class URLBarView: UIView {
         cancelButton.isHidden = false
         progressBar.isHidden = false
         shareButton.isHidden = !toolbarIsShowing
-        libraryButton.isHidden = !toolbarIsShowing
+        upButton.isHidden = !toolbarIsShowing
         forwardButton.isHidden = !toolbarIsShowing
         backButton.isHidden = !toolbarIsShowing
         tabsButton.isHidden = !toolbarIsShowing || topTabsIsShowing
@@ -448,7 +448,7 @@ class URLBarView: UIView {
         progressBar.alpha = inOverlayMode || didCancel ? 0 : 1
         tabsButton.alpha = inOverlayMode ? 0 : 1
         shareButton.alpha = inOverlayMode ? 0 : 1
-        libraryButton.alpha = inOverlayMode ? 0 : 1
+        upButton.alpha = inOverlayMode ? 0 : 1
         forwardButton.alpha = inOverlayMode ? 0 : 1
         backButton.alpha = inOverlayMode ? 0 : 1
 
@@ -476,7 +476,7 @@ class URLBarView: UIView {
         cancelButton.isHidden = !inOverlayMode
         progressBar.isHidden = inOverlayMode
         shareButton.isHidden = !toolbarIsShowing || inOverlayMode
-        libraryButton.isHidden = !toolbarIsShowing || inOverlayMode
+        upButton.isHidden = !toolbarIsShowing || inOverlayMode
         forwardButton.isHidden = !toolbarIsShowing || inOverlayMode
         backButton.isHidden = !toolbarIsShowing || inOverlayMode
         tabsButton.isHidden = !toolbarIsShowing || inOverlayMode || topTabsIsShowing
@@ -564,7 +564,7 @@ extension URLBarView: TabToolbarProtocol {
                 return [locationTextField, cancelButton]
             } else {
                 if toolbarIsShowing {
-                    return [backButton, forwardButton, locationView, libraryButton, tabsButton, shareButton, progressBar]
+                    return [backButton, forwardButton, locationView, upButton, tabsButton, shareButton, progressBar]
                 } else {
                     return [locationView, progressBar]
                 }

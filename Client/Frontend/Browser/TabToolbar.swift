@@ -12,7 +12,7 @@ protocol TabToolbarProtocol: AnyObject {
     var shareButton: ToolbarButton { get }
     var forwardButton: ToolbarButton { get }
     var backButton: ToolbarButton { get }
-    var libraryButton: ToolbarButton { get }
+    var upButton: ToolbarButton { get }
     var actionButtons: [Themeable & UIButton] { get }
 
     func updateBackStatus(_ canGoBack: Bool)
@@ -27,7 +27,7 @@ protocol TabToolbarDelegate: AnyObject {
     func tabToolbarDidPressForward(_ tabToolbar: TabToolbarProtocol, button: UIButton)
     func tabToolbarDidLongPressBack(_ tabToolbar: TabToolbarProtocol, button: UIButton)
     func tabToolbarDidLongPressForward(_ tabToolbar: TabToolbarProtocol, button: UIButton)
-    func tabToolbarDidPressLibrary(_ tabToolbar: TabToolbarProtocol, button: UIButton)
+    func tabToolbarDidPressUp(_ tabToolbar: TabToolbarProtocol, button: UIButton)
     func tabToolbarDidPressShare(_ tabToolbar: TabToolbarProtocol, button: UIButton)
     func tabToolbarDidPressTabs(_ tabToolbar: TabToolbarProtocol, button: UIButton)
     func tabToolbarDidLongPressTabs(_ tabToolbar: TabToolbarProtocol, button: UIButton)
@@ -57,16 +57,16 @@ open class TabToolbarHelper: NSObject {
         toolbar.forwardButton.addGestureRecognizer(longPressGestureForwardButton)
         toolbar.forwardButton.addTarget(self, action: #selector(didClickForward), for: .touchUpInside)
 
-        toolbar.libraryButton.setImage(UIImage.templateImageNamed("menu-library"), for: .normal)
-        toolbar.libraryButton.accessibilityLabel = NSLocalizedString("Library", comment: "Accessibility Label for the tab toolbar Library button")
-        toolbar.libraryButton.addTarget(self, action: #selector(didClickLibrary), for: .touchUpInside)
+        toolbar.upButton.setImage(UIImage.templateImageNamed("nav-up"), for: .normal)
+        toolbar.upButton.accessibilityLabel = NSLocalizedString("Up", comment: "Accessibility Label for the tab toolbar Up button")
+        toolbar.upButton.addTarget(self, action: #selector(didClickUp), for: .touchUpInside)
 
         toolbar.tabsButton.addTarget(self, action: #selector(didClickTabs), for: .touchUpInside)
         let longPressGestureTabsButton = UILongPressGestureRecognizer(target: self, action: #selector(didLongPressTabs))
         toolbar.tabsButton.addGestureRecognizer(longPressGestureTabsButton)
 
         toolbar.shareButton.contentMode = .center
-        toolbar.shareButton.setImage(UIImage.templateImageNamed("nav-share"), for: .normal)
+        toolbar.shareButton.setImage(UIImage.templateImageNamed("nav-menu"), for: .normal)
         toolbar.shareButton.accessibilityLabel = Strings.AppMenuSharePageTitleString
         toolbar.shareButton.addTarget(self, action: #selector(didClickShare), for: .touchUpInside)
         toolbar.shareButton.accessibilityIdentifier = "TabToolbar.shareButton"
@@ -106,8 +106,8 @@ open class TabToolbarHelper: NSObject {
         toolbar.tabToolbarDelegate?.tabToolbarDidPressShare(toolbar, button: toolbar.shareButton)
     }
 
-    func didClickLibrary() {
-        toolbar.tabToolbarDelegate?.tabToolbarDidPressLibrary(toolbar, button: toolbar.libraryButton)
+    func didClickUp() {
+        toolbar.tabToolbarDelegate?.tabToolbarDidPressUp(toolbar, button: toolbar.upButton)
     }
 }
 
@@ -173,7 +173,7 @@ class TabToolbar: UIView {
     let shareButton = ToolbarButton()
     let forwardButton = ToolbarButton()
     let backButton = ToolbarButton()
-    let libraryButton = ToolbarButton()
+    let upButton = ToolbarButton()
     let actionButtons: [Themeable & UIButton]
 
     fileprivate let appMenuBadge = BadgeWithBackdrop(imageName: "menuBadge")
@@ -183,7 +183,7 @@ class TabToolbar: UIView {
     private let contentView = UIStackView()
 
     fileprivate override init(frame: CGRect) {
-        actionButtons = [backButton, forwardButton, shareButton, libraryButton, tabsButton]
+        actionButtons = [backButton, forwardButton, shareButton, upButton, tabsButton]
         super.init(frame: frame)
         setupAccessibility()
 
@@ -212,7 +212,7 @@ class TabToolbar: UIView {
     private func setupAccessibility() {
         backButton.accessibilityIdentifier = "TabToolbar.backButton"
         forwardButton.accessibilityIdentifier = "TabToolbar.forwardButton"
-        libraryButton.accessibilityIdentifier = "TabToolbar.libraryButton"
+        upButton.accessibilityIdentifier = "TabToolbar.upButton"
         tabsButton.accessibilityIdentifier = "TabToolbar.tabsButton"
         shareButton.accessibilityIdentifier = "TabToolbar.menuButton"
         accessibilityNavigationStyle = .combined
