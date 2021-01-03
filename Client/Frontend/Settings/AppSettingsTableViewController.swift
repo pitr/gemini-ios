@@ -32,6 +32,9 @@ class AppSettingsTableViewController: SettingsTableViewController {
             SearchSetting(settings: self),
             NewTabPageSetting(settings: self),
             OpenWithSetting(settings: self),
+            BoolSetting(prefs: prefs, prefKey: "useInAppSafari", defaultValue: false,
+                        titleText: Strings.SettingsUseInAppSafariTitle,
+                        statusText: Strings.SettingsUseInAppSafariStatus),
            ]
 
         if #available(iOS 12.0, *) {
@@ -55,7 +58,8 @@ class AppSettingsTableViewController: SettingsTableViewController {
 
         settings += [ SettingSection(title: NSAttributedString(string: "Gemini"), children: [
             BoolSetting(prefs: prefs, prefKey: PrefsKeys.GeminiShowLinkURL, defaultValue: false,
-                        titleText: Strings.SettingsShowLinkURLTitle),
+                        titleText: Strings.SettingsShowLinkURLTitle,
+                        statusText: Strings.SettingsShowLinkURLStatus),
             BoolSetting(prefs: prefs, prefKey: PrefsKeys.DisableSiteTheme, defaultValue: false,
                         titleText: Strings.SettingsDisableSiteThemeTitle, statusText: Strings.SettingsDisableSiteThemeStatus)
             ])

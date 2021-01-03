@@ -4,6 +4,7 @@
 
 import Foundation
 import WebKit
+import SafariServices
 import Shared
 import Photos
 
@@ -445,14 +446,18 @@ extension BrowserViewController: WKNavigationDelegate {
         }
 
         if !(url.scheme?.contains("firefox") ?? true) {
-            showSnackbar(forExternalUrl: url, tab: tab) { isOk in
-                guard isOk else { return }
-                UIApplication.shared.open(url, options: [:]) { openedURL in
-                    // Do not show error message for JS navigated links or redirect as it's not the result of a user action.
-                    if !openedURL, navigationAction.navigationType == .linkActivated {
-                        let alert = UIAlertController(title: Strings.UnableToOpenURLErrorTitle, message: Strings.UnableToOpenURLError, preferredStyle: .alert)
-                        alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
-                        self.present(alert, animated: true, completion: nil)
+            if url.scheme?.contains("http") ?? false && self.profile.prefs.boolForKey("useInAppSafari") ?? false {
+                self.present(SFSafariViewController(url: url), animated: true, completion: nil)
+            } else {
+                showSnackbar(forExternalUrl: url, tab: tab) { isOk in
+                    guard isOk else { return }
+                    UIApplication.shared.open(url, options: [:]) { openedURL in
+                        // Do not show error message for JS navigated links or redirect as it's not the result of a user action.
+                        if !openedURL, navigationAction.navigationType == .linkActivated {
+                            let alert = UIAlertController(title: Strings.UnableToOpenURLErrorTitle, message: Strings.UnableToOpenURLError, preferredStyle: .alert)
+                            alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
+                            self.present(alert, animated: true, completion: nil)
+                        }
                     }
                 }
             }
