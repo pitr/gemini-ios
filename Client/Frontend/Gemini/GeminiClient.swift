@@ -18,7 +18,11 @@ class GeminiClient: NSObject {
 
     init(url: URL, urlSchemeTask: WKURLSchemeTask, profile: Profile) {
         self.urlSchemeTask = urlSchemeTask
-        self.url = url
+        if let fragment = url.fragment {
+            self.url = URL(string: url.absoluteString.replacingOccurrences(of: "#\(fragment)", with: "")) ?? url
+        } else {
+            self.url = url
+        }
         self.data = Data()
         self.start = DispatchTime.now()
         self.profile = profile
