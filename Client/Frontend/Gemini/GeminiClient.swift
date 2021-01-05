@@ -260,7 +260,7 @@ extension GeminiClient: StreamDelegate {
             default:
                 type = "text"
             }
-            body += "<title>\(question)</title></head><body><h2>\(question)</h2><form><input autocapitalize=off type=\(type) id=q name=q /><hr /><button>Submit</button></form>"+inputFooter
+            body += "<title>\(question)</title></head><body><h3>\(question)</h3><form><input autocapitalize=off type=\(type) id=q name=q /><button>Submit</button></form>"+inputFooter
             guard let data = body.data(using: .utf8) else {
                 renderError(error: "Could not render form to ask server's question: \(question)", for: url, to: urlSchemeTask)
                 return
@@ -309,9 +309,6 @@ extension GeminiClient: StreamDelegate {
 
     fileprivate func parseBody(_ content: String) -> String {
         do {
-            let h1Regex = try NSRegularExpression(pattern: #"^#\s+(.+)$"#, options: [])
-            let h2Regex = try NSRegularExpression(pattern: #"^##\s+(.+)$"#, options: [])
-            let h3Regex = try NSRegularExpression(pattern: #"^###\s+(.+)$"#, options: [])
             let listRegex = try NSRegularExpression(pattern: #"^\*\s+(.+)$"#, options: [])
             let linkRegex = try NSRegularExpression(pattern: #"^=&gt;\s*(\S+)\s*(.*)$"#, options: [])
 
@@ -326,31 +323,35 @@ extension GeminiClient: StreamDelegate {
                     if pre {
                         body.append("<pre><code>")
                     } else {
-                        body.append("</code></pre>")
+                        body.append("</code></pre>\n")
                     }
                     continue
                 }
                 if pre {
                     body.append("\(line)\n")
-                } else if let m = h1Regex.firstMatch(in: line, options: [], range: range),
-                    let range = Range(m.range(at: 1), in: line) {
-                    let title = line[range]
+                } else if line.starts(with: "###") {
+                    let title = line.dropFirst(3)
                     pageTitle = pageTitle ?? String(title)
-                    body.append("<h1>\(title)</h1>\n")
-                } else if let m = h2Regex.firstMatch(in: line, options: [], range: range),
-                    let range = Range(m.range(at: 1), in: line) {
-                    let title = line[range]
+                    body.append("<h3>\(title)</h2>\n")
+                } else if line.starts(with: "##") {
+                    let title = line.dropFirst(2)
                     pageTitle = pageTitle ?? String(title)
                     body.append("<h2>\(title)</h2>\n")
-                } else if let m = h3Regex.firstMatch(in: line, options: [], range: range),
-                    let range = Range(m.range(at: 1), in: line) {
-                    let title = line[range]
+                } else if line.starts(with: "#") {
+                    let title = line.dropFirst(1)
                     pageTitle = pageTitle ?? String(title)
-                    body.append("<h3>\(title)</h3>\n")
+                    body.append("<h1>\(title)</h1>\n")
                 } else if let m = listRegex.firstMatch(in: line, options: [], range: range),
                     let range = Range(m.range(at: 1), in: line) {
                     let title = line[range]
                     body.append("<li>\(title)</li>\n")
+                } else if line.starts(with: "&gt;") {
+                    let quote = line.dropFirst(4)
+                    if quote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        body.append("<blockquote><br/></blockquote>\n")
+                    } else {
+                        body.append("<blockquote>\(quote)</blockquote>\n")
+                    }
                 } else if let m = linkRegex.firstMatch(in: line, options: [], range: range),
                     let range1 = Range(m.range(at: 1), in: line),
                     let range2 = Range(m.range(at: 2), in: line) {
@@ -362,6 +363,11 @@ extension GeminiClient: StreamDelegate {
                         prefix = "⎋"
                     } else if url?.host != self.url.host {
                         prefix = "⇒"
+                    } else if let img = url,
+                              ["jpg", "jpeg", "gif ", "png"].contains(img.pathExtension.lowercased()),
+                              self.profile.prefs.boolForKey(PrefsKeys.GeminiShowImagesInline) ?? true {
+                        body.append("<img src=\"\(img.absoluteString)\">\n")
+                        continue
                     }
                     if link == title {
                         body.append("<p><a href=\"\(url?.absoluteString ?? link)\">\(prefix) \(link)</a></p>\n")
@@ -372,6 +378,8 @@ extension GeminiClient: StreamDelegate {
                     } else {
                         body.append("<p><a href=\"\(url?.absoluteString ?? link)\">\(prefix) \(title)</a></p>\n")
                     }
+                } else if line.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    body.append("<br/>\n")
                 } else {
                     body.append("<p>\(line)</p>\n")
                 }

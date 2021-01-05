@@ -60,6 +60,9 @@ class AppSettingsTableViewController: SettingsTableViewController {
             BoolSetting(prefs: prefs, prefKey: PrefsKeys.GeminiShowLinkURL, defaultValue: false,
                         titleText: Strings.SettingsShowLinkURLTitle,
                         statusText: Strings.SettingsShowLinkURLStatus),
+            BoolSetting(prefs: prefs, prefKey: PrefsKeys.GeminiShowImagesInline, defaultValue: true,
+                        titleText: Strings.SettingsShowImagesInlineTitle,
+                        statusText: Strings.SettingsShowImagesInlineStatus),
             BoolSetting(prefs: prefs, prefKey: PrefsKeys.DisableSiteTheme, defaultValue: false,
                         titleText: Strings.SettingsDisableSiteThemeTitle, statusText: Strings.SettingsDisableSiteThemeStatus)
             ])
