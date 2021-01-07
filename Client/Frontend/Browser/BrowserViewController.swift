@@ -1887,6 +1887,10 @@ extension BrowserViewController: Themeable {
 
         let tabs = tabManager.tabs
         tabs.forEach { $0.applyTheme() }
+
+        guard let webView = tabManager.selectedTab?.webView else { return }
+        let theme = ThemeManager.instance.current.name
+        webView.evaluateJavaScript("__gemini__.setTheme(\"\(theme)\")", completionHandler: nil)
     }
 }
 
