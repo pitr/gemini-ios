@@ -260,7 +260,8 @@ extension GeminiClient: StreamDelegate {
             default:
                 type = "text"
             }
-            body += "<title>\(question)</title></head><body><h3>\(question)</h3><form><input autocapitalize=off type=\(type) id=q name=q /><button>Submit</button></form>"+inputFooter
+            let theme = ThemeManager.instance.current.name
+            body += "<title>\(question)</title></head><body class=\(theme)><h3>\(question)</h3><form><input autocapitalize=off type=\(type) id=q name=q /><button>Submit</button></form>"+inputFooter
             guard let data = body.data(using: .utf8) else {
                 renderError(error: "Could not render form to ask server's question: \(question)", for: url, to: urlSchemeTask)
                 return
@@ -281,7 +282,8 @@ extension GeminiClient: StreamDelegate {
         case .client_certificate_required(let msg), .certificate_not_authorised(let msg), .certificate_not_valid(let msg):
 
             var body = getHeader(for: self.url)
-            body += "<title>\(msg)</title></head><body><h1>\(header.description().capitalized)</h1><h3>\(msg)</h3>"
+            let theme = ThemeManager.instance.current.name
+            body += "<title>\(msg)</title></head><body class=\(theme)><h1>\(header.description().capitalized)</h1><h3>\(msg)</h3>"
             body += "<div id='need-certificate'></div>"
             guard let data = body.data(using: .utf8) else {
                 renderError(error: "Could not render server's certification message: \(msg)", for: url, to: urlSchemeTask)
@@ -299,7 +301,8 @@ extension GeminiClient: StreamDelegate {
 
     fileprivate func renderError(error: String, for url: URL, to urlSchemeTask: WKURLSchemeTask) {
         var body = getHeader(for: self.url)
-        body += "<title>\(error)</title></head><body><h2>\(error)</h2>"
+        let theme = ThemeManager.instance.current.name
+        body += "<title>\(error)</title></head><body class=\(theme)><h2>\(error)</h2>"
         if let data = body.data(using: .utf8) {
             render(with: data, mime: "text/html")
         } else {
@@ -373,8 +376,6 @@ extension GeminiClient: StreamDelegate {
                         body.append("<p><a href=\"\(url?.absoluteString ?? link)\">\(prefix) \(link)</a></p>\n")
                     } else if title.isEmptyOrWhitespace() {
                         body.append("<p><a href=\"\(url?.absoluteString ?? link)\">\(prefix) \(link)</a></p>\n")
-                    } else if self.profile.prefs.boolForKey(PrefsKeys.GeminiShowLinkURL) ?? false {
-                        body.append("<p><a href=\"\(url?.absoluteString ?? link)\">\(prefix) \(link)</a> \(title)</p>\n")
                     } else {
                         body.append("<p><a href=\"\(url?.absoluteString ?? link)\">\(prefix) \(title)</a></p>\n")
                     }
@@ -385,27 +386,15 @@ extension GeminiClient: StreamDelegate {
                 }
             }
             let title = pageTitle ?? self.url.absoluteDisplayString
-            return getHeader(for: self.url)+"<title>\(title)</title></head><body>\n\(body)"
+
+            let theme = ThemeManager.instance.current.name
+            return getHeader(for: self.url)+"<title>\(title)</title></head><body class=\(theme)>\n\(body)"
         } catch let err as NSError {
             return "Error: \(err)"
         }
     }
 
     fileprivate func getHeader(for url: URL) -> String {
-        var header = try! String(contentsOfFile: Bundle.main.path(forResource: "GeminiHeader", ofType: "html")!)
-        if !(self.profile.prefs.boolForKey(PrefsKeys.DisableSiteTheme) ?? false),
-            let hash = url.host?.md5, hash.count > 2 {
-
-            let hue = CGFloat(hash[0]) + CGFloat(hash[1]) / 510.0
-            let saturation = CGFloat(hash[2]) / 255.0 / 2.0
-
-            let bg1 = UIColor(hue: hue, saturation: saturation/2.0, brightness: 0.90, alpha: 1.0).hexString
-            let bg2 = UIColor(hue: hue, saturation: saturation/4.0, brightness: 0.90, alpha: 1.0).hexString
-            let dbg1 = UIColor(hue: hue, saturation: saturation, brightness: 0.20, alpha: 1.0).hexString
-            let dbg2 = UIColor(hue: hue, saturation: saturation*2.0, brightness: 0.20, alpha: 1.0).hexString
-
-            header += "<style>:root{--nc-bg-1:\(bg1);--nc-bg-2:\(bg2)}@media (prefers-color-scheme: dark){:root{--nc-bg-1:\(dbg1);--nc-bg-2:\(dbg2)}}</style>"
-        }
-        return header
+        return try! String(contentsOfFile: Bundle.main.path(forResource: "GeminiHeader", ofType: "html")!)
     }
 }

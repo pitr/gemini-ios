@@ -3,33 +3,36 @@
     <head>
         <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
             <style>
-                /* adopted from: https://github.com/xz/new.css */
-                :root{--nc-font-sans:-apple-system,'Helvetica Neue',sans-serif,"Apple Color Emoji";--nc-font-mono:'Menlo',monospace;--nc-tx-1:#000;--nc-tx-2:#1A1A1A;--nc-bg-1:#FFF;--nc-bg-2:#F6F8FA;--nc-bg-3:#0C4047;--nc-lk-1:#0070F3;--nc-lk-2:#0366D6;--nc-lk-tx:#FFF;--nc-ac-1:#79FFE1;--nc-ac-tx:#0C4047}
+                :root{--nc-font:-apple-system,'Helvetica Neue',sans-serif,"Apple Color Emoji";--nc-font-mono:'Menlo',monospace}
                 @media (prefers-color-scheme: dark){
-                    :root{--nc-tx-1:#fff;--nc-tx-2:#eee;--nc-bg-1:#000;--nc-bg-2:#111;--nc-bg-3:#7928CA;--nc-lk-1:#3291FF;--nc-lk-2:#0070F3;--nc-lk-tx:#FFF;--nc-ac-1:#7928CA;--nc-ac-tx:#FFF}
+                    :root{--nc-c:#eee;--nc-bg:#333;--nc-quote:#eee;--nc-button:#0070F3}
                 }
+
+                .normal {background:#fff;color:#222}
+                .normal blockquote{border-left:3px solid #222}
+                .normal button{color:#222}
+                .normal button:focus,button:hover{background:#0366D6}
+                .normal input{background:#fff;color:#222;border:1px solid #222}
+
+                .dark {background:#333;color:#eee}
+                .dark blockquote{border-left:3px solid #eee}
+                .dark button{color:#eee}
+                .dark button:focus,button:hover{background:#0070F3}
+                .dark input{background:#eee;color:#333}
+
                 *{margin:0;padding:0}
-                form,input,img,p,pre,table,textarea,video{margin-bottom:1rem}
-                html,input,select,button{font-family:var(--nc-font-sans)}
-                body{margin:0 auto;max-width:750px;padding:1rem;border-radius:6px;overflow-x:hidden;word-break:break-word;overflow-wrap:break-word;background:var(--nc-bg-1);color:var(--nc-tx-2);font-size:1.03rem}
-                h1,h2,h3,p{line-height:1.5}
-                h1{font-size:1.8rem}
-                h2{font-size:1.5rem}
-                h3{font-size:1.2rem}
-                blockquote{border-left: 5px solid var(--nc-bg-3);padding-left: 1rem}
-                a{color:var(--nc-lk-1);text-decoration: none}
-                a button,button,input[type="submit"],input[type="reset"],input[type="button"]{font-size:1rem;display:inline-block;padding:6px 12px;text-align:center;text-decoration:none;white-space:nowrap;background:var(--nc-lk-1);color:var(--nc-lk-tx);border:0;border-radius:4px;box-sizing:border-box;cursor:pointer;color:var(--nc-lk-tx)}
-                a button[disabled],button[disabled],input[type="submit"][disabled],input[type="reset"][disabled],input[type="button"][disabled]{cursor:default;opacity:.5;cursor:not-allowed}
-                a button:focus,a button:hover,button:focus,button:hover,input[type="submit"]:focus,input[type="submit"]:hover,input[type="reset"]:focus,input[type="reset"]:hover,input[type="button"]:focus,input[type="button"]:hover{background:var(--nc-lk-2)}
-                code,pre{font-family:var(--nc-font-mono);font-size:.9rem}
-                pre{max-width:100%;overflow-x:auto}
-                pre code{background:inherit;font-size:inherit;color:inherit;border:0;padding:0;margin:0}
-                /* fix overflow issue */
-                pre code{word-break:initial;overflow-wrap:initial}
-                code pre{display:inline;background:inherit;font-size:inherit;color:inherit;border:0;padding:0;margin:0}
-                legend{padding:auto .5rem}
-                textarea{max-width:100%}
+                html{font-family:var(--nc-font);-webkit-text-size-adjust:none}
+                body{margin:0 auto;max-width:750px;padding:1rem}
+                h1,h2,h3,p,blockquote{line-height:1.4;text-rendering:optimizeLegibility}
+                h1{font-size:1.25em}
+                h2{font-size:1.125em}
+                h3{font-size:1.05em}
+                blockquote{padding-left: 1rem}
+                input,pre,img,textarea{margin-bottom:1rem}
+                a,a:visited{color:#00acff;text-decoration: none}
+                button{background:#00acff;display:inline-block;padding:6px 12px;text-align:center;text-decoration:none;white-space:nowrap;border:0;border-radius:4px;box-sizing:border-box}
+                code,pre{font-family:var(--nc-font-mono);font-size:.9rem;overflow-x:auto}
                 li{margin-top:.4rem;text-indent: -1em;margin-left: 1.5em}
-                textarea,select,input{width:100%;padding:6px 12px;margin-bottom:.5rem;border:1px solid var(--nc-bg-2);border-radius:4px;box-shadow:none;box-sizing:border-box}
+                input{width:100%;padding:6px 12px;margin:.5rem 0;border:0;border-radius:4px;box-shadow:none;box-sizing:border-box}
                 img{max-width:100%}
                 </style>

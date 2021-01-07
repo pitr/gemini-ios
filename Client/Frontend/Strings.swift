@@ -256,12 +256,8 @@ extension Strings {
     public static let SettingsUseInAppSafariTitle = NSLocalizedString("Settings.InAppSafari.Title", value: "Use In-App Safari", comment: "Title of setting to open http links in-app.")
     public static let SettingsUseInAppSafariStatus = NSLocalizedString("Settings.InAppSafari.Status", value: "Otherwise uses your default browser", comment: "Description displayed under the ”Use In-App Safari” option.")
 
-    public static let SettingsShowLinkURLTitle = NSLocalizedString("Settings.ShowLinkURL.Title", value: "Show Link URL", comment: "Title of setting to show link URL")
-    public static let SettingsShowLinkURLStatus = NSLocalizedString("Settings.ShowLinkURL.Status", value: "Instead of link title", comment: "Status of setting to show link URL")
     public static let SettingsShowImagesInlineTitle = NSLocalizedString("Settings.ShowImagesInline.Title", value: "Show Images inlines", comment: "Title of setting to show images inline")
     public static let SettingsShowImagesInlineStatus = NSLocalizedString("Settings.ShowImagesInline.Status", value: "When link points at an image", comment: "Status of setting to show images inline")
-    public static let SettingsDisableSiteThemeTitle = NSLocalizedString("Settings.DisableSiteTheme.Title", value: "Disable Site Themes", comment: "Title of setting to disable site-specific themes")
-    public static let SettingsDisableSiteThemeStatus = NSLocalizedString("Settings.DisableSiteTheme.Status", value: "Site themes are auto-generated based on site URL", comment: "Status of setting to disable site-specific themes")
 }
 
 // Link Previews
