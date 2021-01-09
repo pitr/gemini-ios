@@ -113,6 +113,7 @@
 		80BAC1EB2485BC1D001111F7 /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 80BAC1E82485BC11001111F7 /* SwiftyJSON.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		80BAC1EE2485BC26001111F7 /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 80BAC1E82485BC11001111F7 /* SwiftyJSON.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		80BAC1F12485BC2E001111F7 /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 80BAC1E82485BC11001111F7 /* SwiftyJSON.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		80C7598425AA478F00B5CBF8 /* DejaVuSansMonoNerdFontCompleteMonoWindowsCompatible.ttf64 in Resources */ = {isa = PBXBuildFile; fileRef = 80C7598325AA478F00B5CBF8 /* DejaVuSansMonoNerdFontCompleteMonoWindowsCompatible.ttf64 */; };
 		80D18444248108CF00698303 /* CertificateMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80D18443248108CF00698303 /* CertificateMenu.swift */; };
 		80D1844624810B2A00698303 /* GeminiHeader.html in Resources */ = {isa = PBXBuildFile; fileRef = 80D1844524810B2A00698303 /* GeminiHeader.html */; };
 		884CA7492344A301002E4711 /* TextContentDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884CA7482344A301002E4711 /* TextContentDetector.swift */; };
@@ -464,6 +465,7 @@
 		80BAC1E4248534CB001111F7 /* SuggestedSites.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SuggestedSites.swift; sourceTree = "<group>"; };
 		80BAC1E5248534CB001111F7 /* DefaultSuggestedSites.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultSuggestedSites.swift; sourceTree = "<group>"; };
 		80BAC1E82485BC11001111F7 /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = Carthage/Build/iOS/SwiftyJSON.framework; sourceTree = "<group>"; };
+		80C7598325AA478F00B5CBF8 /* DejaVuSansMonoNerdFontCompleteMonoWindowsCompatible.ttf64 */ = {isa = PBXFileReference; lastKnownFileType = text; path = DejaVuSansMonoNerdFontCompleteMonoWindowsCompatible.ttf64; sourceTree = "<group>"; };
 		80D18443248108CF00698303 /* CertificateMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CertificateMenu.swift; sourceTree = "<group>"; };
 		80D1844524810B2A00698303 /* GeminiHeader.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = GeminiHeader.html; sourceTree = "<group>"; };
 		884CA7482344A301002E4711 /* TextContentDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextContentDetector.swift; sourceTree = "<group>"; };
@@ -901,6 +903,14 @@
 			path = Intro;
 			sourceTree = "<group>";
 		};
+		80C7598225AA477E00B5CBF8 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				80C7598325AA478F00B5CBF8 /* DejaVuSansMonoNerdFontCompleteMonoWindowsCompatible.ttf64 */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
 		C8F457A61F1FD75A000CB895 /* BrowserViewController */ = {
 			isa = PBXGroup;
 			children = (
@@ -1258,6 +1268,7 @@
 		F84B21EB1A0910F600AAB793 /* Assets */ = {
 			isa = PBXGroup;
 			children = (
+				80C7598225AA477E00B5CBF8 /* Fonts */,
 				D0FCF8031FE4772C004A7995 /* AllFramesAtDocumentEnd.js */,
 				D03F8F22200EAC1E003C2224 /* AllFramesAtDocumentStart.js */,
 				D0FCF8041FE4772D004A7995 /* MainFrameAtDocumentEnd.js */,
@@ -1545,6 +1556,7 @@
 				F35B8D2B1D6380EA008E3D61 /* SessionRestore.html in Resources */,
 				7B42406E1CA04CAC009B5C28 /* Menu.xcassets in Resources */,
 				7B2142FE1E5E055000CDD3FC /* InfoPlist.strings in Resources */,
+				80C7598425AA478F00B5CBF8 /* DejaVuSansMonoNerdFontCompleteMonoWindowsCompatible.ttf64 in Resources */,
 				D37524871C6E8B5A00A5F6C2 /* topdomains.txt in Resources */,
 				80D1844624810B2A00698303 /* GeminiHeader.html in Resources */,
 				2F44FB2C1A9D5D8500FD20CC /* Library.xcassets in Resources */,

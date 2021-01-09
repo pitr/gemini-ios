@@ -252,7 +252,7 @@ extension GeminiClient: StreamDelegate {
             }
             render(with: data, mime: "text/html")
         case .input(let question), .sensitive_input(let question):
-            var body = getHeader(for: self.url)
+            var body = getHeader(for: self.url, title: question)
             var type: String
             switch header {
             case .sensitive_input:
@@ -260,8 +260,7 @@ extension GeminiClient: StreamDelegate {
             default:
                 type = "text"
             }
-            let theme = ThemeManager.instance.current.name
-            body += "<title>\(question)</title></head><body class=\(theme)><h3>\(question)</h3><form><input autocapitalize=off type=\(type) id=q name=q /><button>Submit</button></form>"+inputFooter
+            body += "<h3>\(question)</h3><form><input autocapitalize=off type=\(type) id=q name=q /><button>Submit</button></form>"+inputFooter
             guard let data = body.data(using: .utf8) else {
                 renderError(error: "Could not render form to ask server's question: \(question)", for: url, to: urlSchemeTask)
                 return
@@ -281,9 +280,8 @@ extension GeminiClient: StreamDelegate {
             renderError(error: "\(header.description()): \(err)", for: url, to: urlSchemeTask)
         case .client_certificate_required(let msg), .certificate_not_authorised(let msg), .certificate_not_valid(let msg):
 
-            var body = getHeader(for: self.url)
-            let theme = ThemeManager.instance.current.name
-            body += "<title>\(msg)</title></head><body class=\(theme)><h1>\(header.description().capitalized)</h1><h3>\(msg)</h3>"
+            var body = getHeader(for: self.url, title: msg)
+            body += "<h1>\(header.description().capitalized)</h1><h3>\(msg)</h3>"
             body += "<div id='need-certificate'></div>"
             guard let data = body.data(using: .utf8) else {
                 renderError(error: "Could not render server's certification message: \(msg)", for: url, to: urlSchemeTask)
@@ -300,9 +298,8 @@ extension GeminiClient: StreamDelegate {
     }
 
     fileprivate func renderError(error: String, for url: URL, to urlSchemeTask: WKURLSchemeTask) {
-        var body = getHeader(for: self.url)
-        let theme = ThemeManager.instance.current.name
-        body += "<title>\(error)</title></head><body class=\(theme)><h2>\(error)</h2>"
+        var body = getHeader(for: self.url, title: error)
+        body += "<h2>\(error)</h2>"
         if let data = body.data(using: .utf8) {
             render(with: data, mime: "text/html")
         } else {
@@ -387,14 +384,22 @@ extension GeminiClient: StreamDelegate {
             }
             let title = pageTitle ?? self.url.absoluteDisplayString
 
-            let theme = ThemeManager.instance.current.name
-            return getHeader(for: self.url)+"<title>\(title)</title></head><body class=\(theme)>\n\(body)"
+            return getHeader(for: self.url, title: title)+body
         } catch let err as NSError {
             return "Error: \(err)"
         }
     }
 
-    fileprivate func getHeader(for url: URL) -> String {
-        return try! String(contentsOfFile: Bundle.main.path(forResource: "GeminiHeader", ofType: "html")!)
+    fileprivate func getHeader(for url: URL, title: String) -> String {
+        let header = try! String(contentsOfFile: Bundle.main.path(forResource: "GeminiHeader", ofType: "html")!)
+        let theme = ThemeManager.instance.current.name
+        let fontMono = getFontMono()
+        let fontStyle = "@font-face{font-family:DejavuSansMono;src:url(data:font/ttf;base64,\(fontMono)) format(\"truetype\")}"
+        return header+"<style>\(fontStyle)</style><title>\(title)</title></head><body class=\(theme)>\n"
+    }
+
+    fileprivate func getFontMono() -> String {
+        let path = Bundle.main.url(forResource: "DejaVuSansMonoNerdFontCompleteMonoWindowsCompatible", withExtension: "ttf64")!
+        return try! String(contentsOf: path)
     }
 }
