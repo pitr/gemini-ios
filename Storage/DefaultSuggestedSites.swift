@@ -11,16 +11,12 @@ open class DefaultSuggestedSites {
             title: "Project Gemini"
         ),
         SuggestedSiteData(
-            url: "gemini://gus.guru/",
-            title: "GUS - Gemini Universal Search"
-        ),
-        SuggestedSiteData(
             url: "gemini://geddit.glv.one/",
             title: "Geddit"
         ),
         SuggestedSiteData(
-            url: "gemini://gus.guru/known-hosts",
-            title: "Known Gemini Hosts"
+            url: "gemini://gemini.trans-neptunian.space/~smog/",
+            title: "Saturday Morning News"
         )
     ]
 }
