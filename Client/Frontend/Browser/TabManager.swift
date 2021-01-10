@@ -325,7 +325,7 @@ class TabManager: NSObject {
             }
         }
 
-        tab.nightMode = NightModeHelper.isActivated(profile.prefs)
+        UserScriptManager.shared.injectUserScriptsIntoTab(tab)
 
         if flushToDisk {
         	storeChanges()

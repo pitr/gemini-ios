@@ -394,12 +394,10 @@ class BrowserViewController: UIViewController {
         let dropInteraction = UIDropInteraction(delegate: self)
         view.addInteraction(dropInteraction)
 
-        if !NightModeHelper.isActivated(profile.prefs) {
-            if #available(iOS 13.0, *) {
-                if ThemeManager.instance.systemThemeIsOn {
-                    let userInterfaceStyle = traitCollection.userInterfaceStyle
-                    ThemeManager.instance.current = userInterfaceStyle == .dark ? DarkTheme() : NormalTheme()
-                }
+        if #available(iOS 13.0, *) {
+            if ThemeManager.instance.systemThemeIsOn {
+                let userInterfaceStyle = traitCollection.userInterfaceStyle
+                ThemeManager.instance.current = userInterfaceStyle == .dark ? DarkTheme() : NormalTheme()
             }
         }
     }
@@ -1238,9 +1236,6 @@ extension BrowserViewController: TabDelegate {
 
         let printHelper = PrintHelper(tab: tab)
         tab.addContentScript(printHelper, name: PrintHelper.name())
-
-        let nightModeHelper = NightModeHelper(tab: tab)
-        tab.addContentScript(nightModeHelper, name: NightModeHelper.name())
 
         tab.addContentScript(LocalRequestHelper(), name: LocalRequestHelper.name())
 

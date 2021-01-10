@@ -14,8 +14,6 @@ class UserScriptManager {
 
     private let compiledUserScripts: [String : WKUserScript]
 
-    private let nightModeUserScript = WKUserScript(source: "window.__gemini__.NightMode.setEnabled(true)", injectionTime: .atDocumentStart, forMainFrameOnly: true)
-
     private init() {
         var compiledUserScripts: [String : WKUserScript] = [:]
 
@@ -38,7 +36,7 @@ class UserScriptManager {
         self.compiledUserScripts = compiledUserScripts
     }
 
-    public func injectUserScriptsIntoTab(_ tab: Tab, nightMode: Bool) {
+    public func injectUserScriptsIntoTab(_ tab: Tab) {
         // Start off by ensuring that any previously-added user scripts are
         // removed to prevent the same script from being injected twice.
         tab.webView?.configuration.userContentController.removeAllUserScripts()
@@ -53,11 +51,6 @@ class UserScriptManager {
             if let userScript = compiledUserScripts[name] {
                 tab.webView?.configuration.userContentController.addUserScript(userScript)
             }
-        }
-        // If Night Mode is enabled, inject a small user script to ensure
-        // that it gets enabled immediately when the DOM loads.
-        if nightMode {
-            tab.webView?.configuration.userContentController.addUserScript(nightModeUserScript)
         }
     }
 }

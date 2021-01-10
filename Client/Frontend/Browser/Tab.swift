@@ -92,22 +92,6 @@ class Tab: NSObject {
         return url.absoluteString.lengthOfBytes(using: .utf8) > AppConstants.DB_URL_LENGTH_MAX
     }
 
-    var nightMode: Bool {
-        didSet {
-            guard nightMode != oldValue else {
-                return
-            }
-
-            webView?.evaluateJavaScript("window.__gemini__.NightMode.setEnabled(\(nightMode))")
-            // For WKWebView background color to take effect, isOpaque must be false,
-            // which is counter-intuitive. Default is true. The color is previously
-            // set to black in the WKWebView init.
-            webView?.isOpaque = !nightMode
-
-            UserScriptManager.shared.injectUserScriptsIntoTab(self, nightMode: nightMode)
-        }
-    }
-
     /// The last title shown by this tab. Used by the tab tray to show titles for zombie tabs.
     var lastTitle: String?
 
@@ -129,9 +113,9 @@ class Tab: NSObject {
 
     init(bvc: BrowserViewController, configuration: WKWebViewConfiguration) {
         self.configuration = configuration
-        self.nightMode = false
         self.browserViewController = bvc
         super.init()
+        UserScriptManager.shared.injectUserScriptsIntoTab(self)
 
         debugTabCount += 1
     }
@@ -160,8 +144,9 @@ class Tab: NSObject {
                 webView.allowsLinkPreview = false
             }
 
-            // Night mode enables this by toggling WKWebView.isOpaque, otherwise this has no effect.
-            webView.backgroundColor = .black
+            // Dark mode enables this by toggling WKWebView.isOpaque, otherwise this has no effect.
+            webView.backgroundColor = UIColor(red: 51.0/255, green: 51.0/255, blue: 51.0/255, alpha: 1)
+            webView.isOpaque = ThemeManager.instance.currentName == .normal
 
             // Turning off masking allows the web content to flow outside of the scrollView's frame
             // which allows the content appear beneath the toolbars in the BrowserViewController
@@ -172,7 +157,7 @@ class Tab: NSObject {
 
             self.webView = webView
             self.webView?.addObserver(self, forKeyPath: KVOConstants.URL.rawValue, options: .new, context: nil)
-            UserScriptManager.shared.injectUserScriptsIntoTab(self, nightMode: nightMode)
+            UserScriptManager.shared.injectUserScriptsIntoTab(self)
             tabDelegate?.tab?(self, didCreateWebView: webView)
         }
     }
@@ -544,6 +529,7 @@ class TabWebView: WKWebView, MenuHelperInterface {
             evaluateJavaScript("document.documentElement.style.backgroundColor = '\(backgroundColor)';")
         }
         window?.backgroundColor = UIColor.theme.browser.background
+        self.isOpaque = ThemeManager.instance.currentName == .normal
     }
 
     override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
