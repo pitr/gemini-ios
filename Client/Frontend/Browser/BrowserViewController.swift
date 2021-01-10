@@ -203,7 +203,7 @@ class BrowserViewController: UIViewController {
             toolbar = TabToolbar()
             footer.addSubview(toolbar!)
             toolbar?.tabToolbarDelegate = self
-            toolbar?.applyUIMode(isPrivate: tabManager.selectedTab?.isPrivate ?? false)
+            toolbar?.applyUIMode()
             toolbar?.applyTheme()
             updateTabCountUsingTabManager(self.tabManager)
         }
@@ -293,19 +293,6 @@ class BrowserViewController: UIViewController {
             self.updateDisplayedPopoverProperties = nil
             self.displayedPopoverController = nil
         }
-
-        // If we are displying a private tab, hide any elements in the tab that we wouldn't want shown
-        // when the app is in the home switcher
-        guard let privateTab = tabManager.selectedTab, privateTab.isPrivate else {
-            return
-        }
-
-        webViewContainerBackdrop.alpha = 1
-        webViewContainer.alpha = 0
-        urlBar.locationContainer.alpha = 0
-        topTabsViewController?.switchForegroundStatus(isInForeground: false)
-        presentedViewController?.popoverPresentationController?.containerView?.alpha = 0
-        presentedViewController?.view.alpha = 0
     }
 
     @objc func appDidBecomeActiveNotification() {
@@ -619,7 +606,7 @@ class BrowserViewController: UIViewController {
         }
     }
 
-    fileprivate func showFirefoxHome(inline: Bool) {
+    fileprivate func showGeminiHome(inline: Bool) {
         homePanelIsInline = inline
         if self.geminiHomeViewController == nil {
             let geminiHomeViewController = GeminiHomeViewController(profile: profile)
@@ -646,7 +633,7 @@ class BrowserViewController: UIViewController {
         view.setNeedsUpdateConstraints()
     }
 
-    fileprivate func hideFirefoxHome() {
+    fileprivate func hideGeminiHome() {
         guard let geminiHomeViewController = self.geminiHomeViewController else {
             return
         }
@@ -667,16 +654,16 @@ class BrowserViewController: UIViewController {
         let isAboutHomeURL = url.flatMap { InternalURL($0)?.isAboutHomeURL } ?? false
         if !urlBar.inOverlayMode {
             guard let url = url else {
-                hideFirefoxHome()
+                hideGeminiHome()
                 return
             }
             if isAboutHomeURL {
-                showFirefoxHome(inline: true)
+                showGeminiHome(inline: true)
             } else if !url.absoluteString.hasPrefix("\(InternalURL.baseUrl)/\(SessionRestoreHandler.path)") {
-                hideFirefoxHome()
+                hideGeminiHome()
             }
         } else if isAboutHomeURL {
-            showFirefoxHome(inline: false)
+            showGeminiHome(inline: false)
         }
     }
 
@@ -706,8 +693,7 @@ class BrowserViewController: UIViewController {
             return
         }
 
-        let isPrivate = tabManager.selectedTab?.isPrivate ?? false
-        let searchController = SearchViewController(profile: profile, isPrivate: isPrivate)
+        let searchController = SearchViewController(profile: profile)
         searchController.searchEngines = profile.searchEngines
         searchController.searchDelegate = self
 
@@ -869,24 +855,16 @@ class BrowserViewController: UIViewController {
         urlBar.updatePageStatus(isPage)
     }
 
-    // MARK: Opening New Tabs
-    func switchToPrivacyMode(isPrivate: Bool) {
-         if let tabTrayController = self.tabTrayController, tabTrayController.tabDisplayManager.isPrivate != isPrivate {
-            tabTrayController.changePrivacyMode(isPrivate)
-        }
-        topTabsViewController?.applyUIMode(isPrivate: isPrivate)
-    }
-
-    func switchToTabForURLOrOpen(_ url: URL, isPrivate: Bool = false) {
+    func switchToTabForURLOrOpen(_ url: URL) {
         popToBVC()
         if let tab = tabManager.getTabForURL(url) {
             tabManager.selectTab(tab)
         } else {
-            openURLInNewTab(url, isPrivate: isPrivate)
+            openURLInNewTab(url)
         }
     }
 
-    func openURLInNewTab(_ url: URL?, isPrivate: Bool = false) {
+    func openURLInNewTab(_ url: URL?) {
         if let selectedTab = tabManager.selectedTab {
             screenshotHelper.takeScreenshot(selectedTab)
         }
@@ -897,8 +875,7 @@ class BrowserViewController: UIViewController {
             request = nil
         }
 
-        switchToPrivacyMode(isPrivate: isPrivate)
-        tabManager.selectTab(tabManager.addTab(request, isPrivate: isPrivate))
+        tabManager.selectTab(tabManager.addTab(request))
     }
 
     func focusLocationTextField(forTab tab: Tab?, setSearchText searchText: String? = nil) {
@@ -914,20 +891,20 @@ class BrowserViewController: UIViewController {
         }
     }
 
-    func openBlankNewTab(focusLocationField: Bool, isPrivate: Bool = false, searchFor searchText: String? = nil) {
+    func openBlankNewTab(focusLocationField: Bool, searchFor searchText: String? = nil) {
         popToBVC()
-        openURLInNewTab(nil, isPrivate: isPrivate)
+        openURLInNewTab(nil)
         let freshTab = tabManager.selectedTab
         if focusLocationField {
             focusLocationTextField(forTab: freshTab, setSearchText: searchText)
         }
     }
 
-    func openSearchNewTab(isPrivate: Bool = false, _ text: String) {
+    func openSearchNewTab(_ text: String) {
         popToBVC()
         let engine = profile.searchEngines.defaultEngine
         if let searchURL = engine.searchURLForQuery(text) {
-            openURLInNewTab(searchURL, isPrivate: isPrivate)
+            openURLInNewTab(searchURL)
         } else {
             // We still don't have a valid URL, so something is broken. Give up.
             print("Error handling URL entry: \"\(text)\".")
@@ -992,7 +969,6 @@ class BrowserViewController: UIViewController {
         if let historyType = self.getHistoryTypeForTab(tab, navigation: navigation)?.rawValue {
             info["historyType"] = historyType
         }
-        info["isPrivate"] = tab.isPrivate
         notificationCenter.post(name: .OnLocationChange, object: self, userInfo: info)
     }
 
@@ -1053,8 +1029,7 @@ extension BrowserViewController: ClipboardBarDisplayHandlerDelegate {
 
 extension BrowserViewController: SettingsDelegate {
     func settingsOpenURLInNewTab(_ url: URL) {
-        let isPrivate = tabManager.selectedTab?.isPrivate ?? false
-        self.openURLInNewTab(url, isPrivate: isPrivate)
+        self.openURLInNewTab(url)
     }
 }
 
@@ -1223,7 +1198,7 @@ extension BrowserViewController: URLBarDelegate {
                 toast.removeFromSuperview()
             }
 
-            showFirefoxHome(inline: false)
+            showGeminiHome(inline: false)
         }
     }
 
@@ -1325,7 +1300,7 @@ extension BrowserViewController: TabDelegate {
     }
 
     func tab(_ tab: Tab, didSelectSearchWithGeminiForSelection selection: String) {
-        openSearchNewTab(isPrivate: tab.isPrivate, selection)
+        openSearchNewTab(selection)
     }
 }
 
@@ -1344,8 +1319,8 @@ extension BrowserViewController: LibraryPanelDelegate {
         return self.libraryPanel(didSelectURL: url, historyType: historyType)
     }
 
-    func libraryPanelDidRequestToOpenInNewTab(_ url: URL, isPrivate: Bool) {
-        let tab = self.tabManager.addTab(URLRequest(url: url), afterTab: self.tabManager.selectedTab, isPrivate: isPrivate)
+    func libraryPanelDidRequestToOpenInNewTab(_ url: URL) {
+        let tab = self.tabManager.addTab(URLRequest(url: url), afterTab: self.tabManager.selectedTab)
         // If we are showing toptabs a user can just use the top tab bar
         // If in overlay mode switching doesnt correctly dismiss the homepanels
         guard !topTabsVisible, !self.urlBar.inOverlayMode else {
@@ -1372,8 +1347,8 @@ extension BrowserViewController: HomePanelDelegate {
         finishEditingAndSubmit(url, historyType: historyType, forTab: tab)
     }
 
-    func homePanelDidRequestToOpenInNewTab(_ url: URL, isPrivate: Bool) {
-        let tab = self.tabManager.addTab(URLRequest(url: url), afterTab: self.tabManager.selectedTab, isPrivate: isPrivate)
+    func homePanelDidRequestToOpenInNewTab(_ url: URL) {
+        let tab = self.tabManager.addTab(URLRequest(url: url), afterTab: self.tabManager.selectedTab)
         // If we are showing toptabs a user can just use the top tab bar
         // If in overlay mode switching doesnt correctly dismiss the homepanels
         guard !topTabsVisible, !self.urlBar.inOverlayMode else {
@@ -1437,11 +1412,11 @@ extension BrowserViewController: TabManagerDelegate {
         if let tab = selected, let webView = tab.webView {
             updateURLBarDisplayURL(tab)
 
-            if previous == nil || tab.isPrivate != previous?.isPrivate {
+            if previous == nil {
                 applyTheme()
 
                 let ui: [PrivateModeUI?] = [toolbar, topTabsViewController, urlBar]
-                ui.forEach { $0?.applyUIMode(isPrivate: tab.isPrivate) }
+                ui.forEach { $0?.applyUIMode() }
             }
 
             scrollController.tab = tab
@@ -1528,7 +1503,7 @@ extension BrowserViewController: TabManagerDelegate {
     }
 
     func tabManager(_ tabManager: TabManager, didRemoveTab tab: Tab, isRestoring: Bool) {
-        if let url = tab.url, !(InternalURL(url)?.isAboutURL ?? false), !tab.isPrivate {
+        if let url = tab.url, !(InternalURL(url)?.isAboutURL ?? false) {
             profile.recentlyClosedTabs.addTab(url as URL, title: tab.title)
         }
         updateTabCountUsingTabManager(tabManager)
@@ -1556,7 +1531,7 @@ extension BrowserViewController: TabManagerDelegate {
     }
 
     func tabManagerDidRemoveAllTabs(_ tabManager: TabManager, toast: ButtonToast?) {
-        guard let toast = toast, !(tabTrayController?.tabDisplayManager.isPrivate  ?? false) else {
+        guard let toast = toast else {
             return
         }
         show(toast: toast, afterWaiting: ButtonToastUX.ToastDelay)
@@ -1564,7 +1539,7 @@ extension BrowserViewController: TabManagerDelegate {
 
     func updateTabCountUsingTabManager(_ tabManager: TabManager, animated: Bool = true) {
         if let selectedTab = tabManager.selectedTab {
-            let count = selectedTab.isPrivate ? tabManager.privateTabs.count : tabManager.normalTabs.count
+            let count = tabManager.normalTabs.count
             toolbar?.updateTabCount(count, animated: animated)
             urlBar.updateTabCount(count, animated: !urlBar.inOverlayMode)
             topTabsViewController?.updateTabCount(count, animated: animated)
@@ -1640,11 +1615,10 @@ extension BrowserViewController: ContextMenuHelperDelegate {
 
         if let url = elements.link, let currentTab = tabManager.selectedTab {
             dialogTitle = url.absoluteString
-            let isPrivate = currentTab.isPrivate
             screenshotHelper.takeDelayedScreenshot(currentTab)
 
-            let addTab = { (rURL: URL, isPrivate: Bool) in
-                    let tab = self.tabManager.addTab(URLRequest(url: rURL as URL), afterTab: currentTab, isPrivate: isPrivate)
+            let addTab = { (rURL: URL) in
+                    let tab = self.tabManager.addTab(URLRequest(url: rURL as URL), afterTab: currentTab)
                     guard !self.topTabsVisible else {
                         return
                     }
@@ -1657,12 +1631,10 @@ extension BrowserViewController: ContextMenuHelperDelegate {
                     self.show(toast: toast)
             }
 
-            if !isPrivate {
-                let openNewTabAction =  UIAlertAction(title: Strings.ContextMenuOpenInNewTab, style: .default) { _ in
-                    addTab(url, false)
-                }
-                actionSheetController.addAction(openNewTabAction, accessibilityIdentifier: "linkContextMenu.openInNewTab")
+            let openNewTabAction =  UIAlertAction(title: Strings.ContextMenuOpenInNewTab, style: .default) { _ in
+                addTab(url)
             }
+            actionSheetController.addAction(openNewTabAction, accessibilityIdentifier: "linkContextMenu.openInNewTab")
 
             let bookmarkAction = UIAlertAction(title: Strings.ContextMenuBookmarkLink, style: .default) { _ in
                 self.addBookmark(url: url.absoluteString, title: elements.title)
@@ -1700,7 +1672,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
 
                 let handlePhotoLibraryDenied = {
                     DispatchQueue.main.async {
-                        let accessDenied = UIAlertController(title: Strings.PhotoLibraryFirefoxWouldLikeAccessTitle, message: Strings.PhotoLibraryFirefoxWouldLikeAccessMessage, preferredStyle: .alert)
+                        let accessDenied = UIAlertController(title: Strings.PhotoLibraryGeminiWouldLikeAccessTitle, message: Strings.PhotoLibraryGeminiWouldLikeAccessMessage, preferredStyle: .alert)
                         let dismissAction = UIAlertAction(title: Strings.CancelString, style: .default, handler: nil)
                         accessDenied.addAction(dismissAction)
                         let settingsAction = UIAlertAction(title: Strings.OpenSettingsString, style: .default ) { _ in
@@ -1740,7 +1712,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
                     application.endBackgroundTask(taskId)
                 })
 
-                makeURLSession(userAgent: UserAgent.fxaUserAgent, configuration: URLSessionConfiguration.default).dataTask(with: url) { (data, response, error) in
+                makeURLSession(userAgent: UserAgent.getUserAgent(), configuration: URLSessionConfiguration.default).dataTask(with: url) { (data, response, error) in
                     guard let _ = validatedHTTPResponse(response, statusCode: 200..<300) else {
                         application.endBackgroundTask(taskId)
                         return
@@ -1795,7 +1767,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
     }
 
     fileprivate func getImageData(_ url: URL, success: @escaping (Data) -> Void) {
-        makeURLSession(userAgent: UserAgent.fxaUserAgent, configuration: URLSessionConfiguration.default).dataTask(with: url) { (data, response, error) in
+        makeURLSession(userAgent: UserAgent.getUserAgent(), configuration: URLSessionConfiguration.default).dataTask(with: url) { (data, response, error) in
             if let _ = validatedHTTPResponse(response, statusCode: 200..<300), let data = data {
                 success(data)
             }
@@ -1907,17 +1879,9 @@ extension BrowserViewController: TopTabsDelegate {
         self.urlBarDidPressTabs(urlBar)
     }
 
-    func topTabsDidPressNewTab(_ isPrivate: Bool) {
+    func topTabsDidPressNewTab() {
         libraryDrawerViewController?.close(immediately: true)
-        openBlankNewTab(focusLocationField: false, isPrivate: isPrivate)
-    }
-
-    func topTabsDidTogglePrivateMode() {
-        libraryDrawerViewController?.close(immediately: true)
-        guard let _ = tabManager.selectedTab else {
-            return
-        }
-        urlBar.leaveOverlayMode()
+        openBlankNewTab(focusLocationField: false)
     }
 
     func topTabsDidChangeTab() {
@@ -1945,7 +1909,7 @@ extension BrowserViewController {
 
         func reopenLastTab(_ action: UIAlertAction) {
             let request = URLRequest(url: lastClosedURL)
-            let closedTab = tabManager.addTab(request, afterTab: selectedTab, isPrivate: false)
+            let closedTab = tabManager.addTab(request, afterTab: selectedTab)
             tabManager.selectTab(closedTab)
         }
 

@@ -14,7 +14,7 @@ extension URLComponents {
 
 // The root navigation for the Router. Look at the tests to see a complete URL
 enum NavigationPath {
-    case url(webURL: URL?, isPrivate: Bool)
+    case url(webURL: URL?)
     case text(String)
 
     init?(url: URL) {
@@ -35,15 +35,12 @@ enum NavigationPath {
 
         if urlString.starts(with: "\(scheme)://open-url") {
             let url = components.valueForQuery("url")?.asURL
-            // Unless the `open-url` URL specifies a `private` parameter,
-            // use the last browsing mode the user was in.
-            let isPrivate = Bool(components.valueForQuery("private") ?? "") ?? UserDefaults.standard.bool(forKey: "wasLastSessionPrivate")
-            self = .url(webURL: url, isPrivate: isPrivate)
+            self = .url(webURL: url)
         } else if urlString.starts(with: "\(scheme)://open-text") {
             let text = components.valueForQuery("text")
             self = .text(text ?? "")
         } else if urlString.starts(with: "gemini://") {
-            self = .url(webURL: url, isPrivate: false)
+            self = .url(webURL: url)
         } else {
             return nil
         }
@@ -51,16 +48,16 @@ enum NavigationPath {
 
     static func handle(nav: NavigationPath, with bvc: BrowserViewController) {
         switch nav {
-        case .url(let url, let isPrivate): NavigationPath.handleURL(url: url, isPrivate: isPrivate, with: bvc)
+        case .url(let url): NavigationPath.handleURL(url: url, with: bvc)
         case .text(let text): NavigationPath.handleText(text: text, with: bvc)
         }
     }
 
-    private static func handleURL(url: URL?, isPrivate: Bool, with bvc: BrowserViewController) {
+    private static func handleURL(url: URL?, with bvc: BrowserViewController) {
         if let newURL = url {
-            bvc.switchToTabForURLOrOpen(newURL, isPrivate: isPrivate)
+            bvc.switchToTabForURLOrOpen(newURL)
         } else {
-            bvc.openBlankNewTab(focusLocationField: true, isPrivate: isPrivate)
+            bvc.openBlankNewTab(focusLocationField: true)
         }
     }
 
@@ -74,8 +71,8 @@ extension NavigationPath: Equatable {}
 
 func == (lhs: NavigationPath, rhs: NavigationPath) -> Bool {
     switch (lhs, rhs) {
-    case let (.url(lhsURL, lhsPrivate), .url(rhsURL, rhsPrivate)):
-        return lhsURL == rhsURL && lhsPrivate == rhsPrivate
+    case let (.url(lhsURL), .url(rhsURL)):
+        return lhsURL == rhsURL
     default:
         return false
     }

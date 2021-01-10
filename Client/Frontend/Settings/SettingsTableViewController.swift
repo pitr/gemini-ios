@@ -596,7 +596,6 @@ class SettingsTableViewController: ThemedTableViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        refresh()
     }
 
     override func viewDidDisappear(_ animated: Bool) {
@@ -606,16 +605,6 @@ class SettingsTableViewController: ThemedTableViewController {
     // Override to provide settings in subclasses
     func generateSettings() -> [SettingSection] {
         return []
-    }
-
-    @objc fileprivate func refresh() {
-        // Through-out, be aware that modifying the control while a refresh is in progress is /not/ supported and will likely crash the app.
-        ////self.profile.rustAccount.refreshProfile()
-        // TODO [rustfxa] listen to notification and refresh profile
-    }
-
-    @objc func firefoxAccountDidChange() {
-        self.tableView.reloadData()
     }
 
     @objc func didLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {

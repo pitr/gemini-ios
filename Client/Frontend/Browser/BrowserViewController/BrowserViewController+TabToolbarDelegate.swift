@@ -75,15 +75,12 @@ extension BrowserViewController: TabToolbarDelegate, PhotonActionSheetProtocol {
     func getMoreTabToolbarLongPressActions() -> [PhotonActionSheetItem] {
         let newTab = PhotonActionSheetItem(title: Strings.NewTabTitle, iconString: "quick_action_new_tab", iconType: .Image) { _, _ in
             let shouldFocusLocationField = NewTabAccessors.getNewTabPage(self.profile.prefs) == .blankPage
-            self.openBlankNewTab(focusLocationField: shouldFocusLocationField, isPrivate: false)}
+            self.openBlankNewTab(focusLocationField: shouldFocusLocationField)}
         let closeTab = PhotonActionSheetItem(title: Strings.CloseTabTitle, iconString: "tab_close", iconType: .Image) { _, _ in
             if let tab = self.tabManager.selectedTab {
                 self.tabManager.removeTabAndUpdateSelectedIndex(tab)
                 self.updateTabCountUsingTabManager(self.tabManager)
             }}
-        if let tab = self.tabManager.selectedTab {
-            return tab.isPrivate ? [closeTab] : [newTab, closeTab]
-        }
         return [newTab, closeTab]
     }
 

@@ -43,26 +43,13 @@ protocol URLChangeDelegate {
 }
 
 struct TabState {
-    var isPrivate: Bool = false
     var url: URL?
     var title: String?
 }
 
 class Tab: NSObject {
-    fileprivate var _isPrivate: Bool = false
-    internal fileprivate(set) var isPrivate: Bool {
-        get {
-            return _isPrivate
-        }
-        set {
-            if _isPrivate != newValue {
-                _isPrivate = newValue
-            }
-        }
-    }
-
     var tabState: TabState {
-        return TabState(isPrivate: _isPrivate, url: url, title: displayTitle)
+        return TabState(url: url, title: displayTitle)
     }
 
     var consecutiveCrashes: UInt = 0
@@ -140,12 +127,11 @@ class Tab: NSObject {
 
     weak var browserViewController: BrowserViewController?
 
-    init(bvc: BrowserViewController, configuration: WKWebViewConfiguration, isPrivate: Bool = false) {
+    init(bvc: BrowserViewController, configuration: WKWebViewConfiguration) {
         self.configuration = configuration
         self.nightMode = false
         self.browserViewController = bvc
         super.init()
-        self.isPrivate = isPrivate
 
         debugTabCount += 1
     }
@@ -244,24 +230,6 @@ class Tab: NSObject {
         }
         checkTabCount(failures: 0)
         #endif
-    }
-
-    func closeAndRemovePrivateBrowsingData() {
-        contentScriptManager.uninstall(tab: self)
-
-        webView?.removeObserver(self, forKeyPath: KVOConstants.URL.rawValue)
-
-        if let webView = webView {
-            tabDelegate?.tab?(self, willDeleteWebView: webView)
-        }
-
-        if isPrivate {
-            removeAllBrowsingData()
-        }
-
-        webView?.navigationDelegate = nil
-        webView?.removeFromSuperview()
-        webView = nil
     }
 
     func removeAllBrowsingData(completionHandler: @escaping () -> Void = {}) {
@@ -507,7 +475,7 @@ class Tab: NSObject {
     }
 
     func applyTheme() {
-        UITextField.appearance().keyboardAppearance = isPrivate ? .dark : (ThemeManager.instance.currentName == .dark ? .dark : .light)
+        UITextField.appearance().keyboardAppearance = ThemeManager.instance.currentName == .dark ? .dark : .light
     }
 }
 

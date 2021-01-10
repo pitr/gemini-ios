@@ -422,7 +422,7 @@ class ASHorizontalScrollCellManager: NSObject, UICollectionViewDelegate, UIColle
         }
         // On iPad
         // The number of items in a row is equal to the number of highlights in a row * 2
-        var numItems = Int(FirefoxHomeUX.numberOfItemsPerRowForSizeClassIpad[traits.horizontalSizeClass])
+        var numItems = Int(GeminiHomeUX.numberOfItemsPerRowForSizeClassIpad[traits.horizontalSizeClass])
         if UIApplication.shared.statusBarOrientation.isPortrait || (traits.horizontalSizeClass == .compact && isLandscape) {
             numItems = numItems - 1
         }

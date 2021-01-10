@@ -118,18 +118,15 @@ extension BrowserViewController: WKUIDelegate {
             guard let url = elementInfo.linkURL, let currentTab = self.tabManager.selectedTab,
                 let contextHelper = currentTab.getContentScript(name: ContextMenuHelper.name()) as? ContextMenuHelper,
                 let elements = contextHelper.elements else { return nil }
-            let addTab = { (rURL: URL, isPrivate: Bool) in
-                let tab = self.tabManager.addTab(URLRequest(url: rURL as URL), afterTab: currentTab, isPrivate: isPrivate)
+            let addTab = { (rURL: URL) in
+                let tab = self.tabManager.addTab(URLRequest(url: rURL as URL), afterTab: currentTab)
                 guard !self.topTabsVisible else {
                     return
                 }
                 var toastLabelText: String
                 
-                if isPrivate {
-                    toastLabelText = Strings.ContextMenuButtonToastNewPrivateTabOpenedLabelText
-                } else {
-                    toastLabelText = Strings.ContextMenuButtonToastNewTabOpenedLabelText
-                }
+                toastLabelText = Strings.ContextMenuButtonToastNewTabOpenedLabelText
+
                 // We're not showing the top tabs; show a toast to quick switch to the fresh new tab.
                 let toast = ButtonToast(labelText: toastLabelText, buttonText: Strings.ContextMenuButtonToastNewTabOpenedButtonText, completion: { buttonPressed in
                     if buttonPressed {
@@ -140,7 +137,7 @@ extension BrowserViewController: WKUIDelegate {
             }
 
             let getImageData = { (_ url: URL, success: @escaping (Data) -> Void) in
-                makeURLSession(userAgent: UserAgent.fxaUserAgent, configuration: URLSessionConfiguration.default).dataTask(with: url) { (data, response, error) in
+                makeURLSession(userAgent: UserAgent.getUserAgent(), configuration: URLSessionConfiguration.default).dataTask(with: url) { (data, response, error) in
                     if let _ = validatedHTTPResponse(response, statusCode: 200..<300), let data = data {
                         success(data)
                     }
@@ -151,7 +148,7 @@ extension BrowserViewController: WKUIDelegate {
 
             if url.scheme == "gemini" {
                 actions.append(UIAction(title: Strings.ContextMenuOpenInNewTab, image: UIImage.templateImageNamed("menu-NewTab"), identifier: UIAction.Identifier(rawValue: "linkContextMenu.openInNewTab")) {_ in
-                    addTab(url, false)
+                    addTab(url)
                 })
 
                 actions.append(UIAction(title: Strings.ContextMenuBookmarkLink, image: UIImage.templateImageNamed("menu-Bookmark"), identifier: UIAction.Identifier("linkContextMenu.bookmarkLink")) { _ in
@@ -186,7 +183,7 @@ extension BrowserViewController: WKUIDelegate {
 
                     let handlePhotoLibraryDenied = {
                         DispatchQueue.main.async {
-                            let accessDenied = UIAlertController(title: Strings.PhotoLibraryFirefoxWouldLikeAccessTitle, message: Strings.PhotoLibraryFirefoxWouldLikeAccessMessage, preferredStyle: .alert)
+                            let accessDenied = UIAlertController(title: Strings.PhotoLibraryGeminiWouldLikeAccessTitle, message: Strings.PhotoLibraryGeminiWouldLikeAccessMessage, preferredStyle: .alert)
                             let dismissAction = UIAlertAction(title: Strings.CancelString, style: .default, handler: nil)
                             accessDenied.addAction(dismissAction)
                             let settingsAction = UIAlertAction(title: Strings.OpenSettingsString, style: .default ) { _ in
@@ -225,7 +222,7 @@ extension BrowserViewController: WKUIDelegate {
                         application.endBackgroundTask(taskId)
                     })
 
-                    makeURLSession(userAgent: UserAgent.fxaUserAgent, configuration: URLSessionConfiguration.default).dataTask(with: url) { (data, response, error) in
+                    makeURLSession(userAgent: UserAgent.getUserAgent(), configuration: URLSessionConfiguration.default).dataTask(with: url) { (data, response, error) in
                         guard let _ = validatedHTTPResponse(response, statusCode: 200..<300) else {
                             application.endBackgroundTask(taskId)
                             return
@@ -445,19 +442,17 @@ extension BrowserViewController: WKNavigationDelegate {
             return
         }
 
-        if !(url.scheme?.contains("firefox") ?? true) {
-            if url.scheme?.contains("http") ?? false && self.profile.prefs.boolForKey("useInAppSafari") ?? false {
-                self.present(SFSafariViewController(url: url), animated: true, completion: nil)
-            } else {
-                showSnackbar(forExternalUrl: url, tab: tab) { isOk in
-                    guard isOk else { return }
-                    UIApplication.shared.open(url, options: [:]) { openedURL in
-                        // Do not show error message for JS navigated links or redirect as it's not the result of a user action.
-                        if !openedURL, navigationAction.navigationType == .linkActivated {
-                            let alert = UIAlertController(title: Strings.UnableToOpenURLErrorTitle, message: Strings.UnableToOpenURLError, preferredStyle: .alert)
-                            alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
-                            self.present(alert, animated: true, completion: nil)
-                        }
+        if url.scheme?.contains("http") ?? false && self.profile.prefs.boolForKey("useInAppSafari") ?? false {
+            self.present(SFSafariViewController(url: url), animated: true, completion: nil)
+        } else {
+            showSnackbar(forExternalUrl: url, tab: tab) { isOk in
+                guard isOk else { return }
+                UIApplication.shared.open(url, options: [:]) { openedURL in
+                    // Do not show error message for JS navigated links or redirect as it's not the result of a user action.
+                    if !openedURL, navigationAction.navigationType == .linkActivated {
+                        let alert = UIAlertController(title: Strings.UnableToOpenURLErrorTitle, message: Strings.UnableToOpenURLError, preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
+                        self.present(alert, animated: true, completion: nil)
                     }
                 }
             }

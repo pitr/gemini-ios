@@ -38,7 +38,7 @@ extension LibraryPanelContextMenu {
         guard let siteURL = URL(string: site.url) else { return nil }
 
         let openInNewTabAction = PhotonActionSheetItem(title: Strings.OpenInNewTabContextMenuTitle, iconString: "quick_action_new_tab") { _, _ in
-            libraryPanelDelegate?.libraryPanelDidRequestToOpenInNewTab(siteURL, isPrivate: false)
+            libraryPanelDelegate?.libraryPanelDidRequestToOpenInNewTab(siteURL)
         }
 
         return [openInNewTabAction]

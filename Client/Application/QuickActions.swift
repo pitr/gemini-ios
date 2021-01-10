@@ -98,7 +98,7 @@ class QuickActions: NSObject {
     fileprivate func handleShortCutItemOfType(_ type: ShortcutType, userData: [String: NSSecureCoding]?, browserViewController: BrowserViewController) {
         switch type {
         case .newTab:
-            handleOpenNewTab(withBrowserViewController: browserViewController, isPrivate: false)
+            handleOpenNewTab(withBrowserViewController: browserViewController)
         case .openLastBookmark:
             if let urlToOpen = (userData?[QuickActions.TabURLKey] as? String)?.asURL {
                 handleOpenURL(withBrowserViewController: browserViewController, urlToOpen: urlToOpen)
@@ -106,14 +106,11 @@ class QuickActions: NSObject {
         }
     }
 
-    fileprivate func handleOpenNewTab(withBrowserViewController bvc: BrowserViewController, isPrivate: Bool) {
-        bvc.openBlankNewTab(focusLocationField: true, isPrivate: isPrivate)
+    fileprivate func handleOpenNewTab(withBrowserViewController bvc: BrowserViewController) {
+        bvc.openBlankNewTab(focusLocationField: true)
     }
 
     fileprivate func handleOpenURL(withBrowserViewController bvc: BrowserViewController, urlToOpen: URL) {
-        // open bookmark in a non-private browsing tab
-        bvc.switchToPrivacyMode(isPrivate: false)
-
         // find out if bookmarked URL is currently open
         // if so, open to that tab,
         // otherwise, create a new tab with the bookmarked URL

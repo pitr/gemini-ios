@@ -22,22 +22,6 @@ open class UserAgent {
         return "\(prefix)/\(AppInfo.appVersion)b\(AppInfo.buildNumber) (\(DeviceInfo.deviceModel()); iPhone OS \(UIDevice.current.systemVersion)) (\(AppInfo.displayName))"
     }
 
-    public static var syncUserAgent: String {
-        return clientUserAgent(prefix: "Firefox-iOS-Sync")
-    }
-
-    public static var tokenServerClientUserAgent: String {
-        return clientUserAgent(prefix: "Firefox-iOS-Token")
-    }
-
-    public static var fxaUserAgent: String {
-        return clientUserAgent(prefix: "Firefox-iOS-FxA")
-    }
-
-    public static var defaultClientUserAgent: String {
-        return clientUserAgent(prefix: "Firefox-iOS")
-    }
-
     public static func isDesktop(ua: String) -> Bool {
         return ua.lowercased().contains("intel mac")
     }

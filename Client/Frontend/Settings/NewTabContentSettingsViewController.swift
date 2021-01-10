@@ -31,7 +31,7 @@ class NewTabContentSettingsViewController: SettingsTableViewController {
             self.tableView.reloadData()
         }
 
-        let showTopSites = CheckmarkSetting(title: NSAttributedString(string: Strings.SettingsNewTabTopSites), subtitle: nil, accessibilityIdentifier: "NewTabAsFirefoxHome", isChecked: {return self.currentChoice == NewTabPage.topSites}, onChecked: {
+        let showTopSites = CheckmarkSetting(title: NSAttributedString(string: Strings.SettingsNewTabTopSites), subtitle: nil, accessibilityIdentifier: "NewTabAsGeminiHome", isChecked: {return self.currentChoice == NewTabPage.topSites}, onChecked: {
             self.currentChoice = NewTabPage.topSites
             onFinished()
         })

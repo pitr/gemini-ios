@@ -164,11 +164,8 @@ open class BrowserProfile: Profile {
             let type = HistoryType(rawValue: v),
             let url = notification.userInfo!["url"] as? URL, !isIgnoredURL(url),
             let title = notification.userInfo!["title"] as? NSString {
-            // Only record local vists if the change notification originated from a non-private tab
-            if !(notification.userInfo!["isPrivate"] as? Bool ?? false) {
-                // We don't record a visit if no type was specified -- that means "ignore me".
-                _ = db.addLocalVisit(url: url.absoluteString, title: title as String, type: type, visitedAt: Date())
-            }
+            // We don't record a visit if no type was specified -- that means "ignore me".
+            _ = db.addLocalVisit(url: url.absoluteString, title: title as String, type: type, visitedAt: Date())
         } else {
             log.debug("Ignoring navigation.")
         }

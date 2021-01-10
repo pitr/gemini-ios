@@ -68,10 +68,8 @@ class TabDisplayManager: NSObject {
             // tabs can be deleted while a search is active. Make sure the tab still exists in the tabmanager before displaying
             return searchedTabs.filter({ tabManager.tabs.contains($0) })
         }
-        return self.isPrivate ? tabManager.privateTabs : tabManager.normalTabs
+        return tabManager.normalTabs
     }
-
-    private(set) var isPrivate = false
 
     // Sigh. Dragging on the collection view is either an 'active drag' where the item is moved, or
     // that the item has been long pressed on (and not moved yet), and this gesture recognizer has been triggered
@@ -104,7 +102,6 @@ class TabDisplayManager: NSObject {
         self.collectionView = collectionView
         self.tabDisplayer = tabDisplayer
         self.tabManager = tabManager
-        self.isPrivate = tabManager.selectedTab?.isPrivate ?? false
         self.tabReuseIdentifer = reuseID
         super.init()
 
@@ -115,28 +112,6 @@ class TabDisplayManager: NSObject {
             self.dataStore.insert($0)
         }
         collectionView.reloadData()
-    }
-
-    func togglePrivateMode(isOn: Bool, createTabOnEmptyPrivateMode: Bool) {
-        guard isPrivate != isOn else { return }
-
-        isPrivate = isOn
-        UserDefaults.standard.set(isPrivate, forKey: "wasLastSessionPrivate")
-
-        searchedTabs = nil
-        refreshStore()
-
-        if createTabOnEmptyPrivateMode {
-            //if private tabs is empty and we are transitioning to it add a tab
-            if tabManager.privateTabs.isEmpty && isPrivate {
-                tabManager.addTab(isPrivate: true)
-            }
-        }
-        
-        let tab = mostRecentTab(inTabs: tabsToDisplay) ?? tabsToDisplay.last
-        if let tab = tab {
-            tabManager.selectTab(tab)
-        }
     }
 
     // The collection is showing this Tab as selected
@@ -277,7 +252,7 @@ extension TabDisplayManager: UIDropInteractionDelegate {
                 return
             }
 
-            self.tabManager.addTab(URLRequest(url: url), isPrivate: self.isPrivate)
+            self.tabManager.addTab(URLRequest(url: url))
         }
     }
 }
@@ -318,7 +293,7 @@ extension TabDisplayManager: UICollectionViewDropDelegate {
 
         coordinator.drop(dragItem, toItemAt: destinationIndexPath)
 
-        self.tabManager.moveTab(isPrivate: self.isPrivate, fromIndex: sourceIndex, toIndex: destinationIndexPath.item)
+        self.tabManager.moveTab(fromIndex: sourceIndex, toIndex: destinationIndexPath.item)
 
         _ = dataStore.remove(tab)
         dataStore.insert(tab, at: destinationIndexPath.item)
@@ -404,10 +379,6 @@ extension TabDisplayManager: TabManagerDelegate {
 
         if cancelDragAndGestures() {
             refreshStore()
-            return
-        }
-
-        if tab.isPrivate != self.isPrivate {
             return
         }
 

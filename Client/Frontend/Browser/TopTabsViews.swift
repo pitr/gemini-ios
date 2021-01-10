@@ -153,15 +153,15 @@ class TopTabCell: UICollectionViewCell, PrivateModeUI {
 
         self.clipsToBounds = false
 
-        applyUIMode(isPrivate: false)
+        applyUIMode()
     }
 
-    func applyUIMode(isPrivate: Bool) {
-        highlightLine.backgroundColor = UIColor.theme.topTabs.tabSelectedIndicatorBar(isPrivate)
+    func applyUIMode() {
+        highlightLine.backgroundColor = UIColor.theme.topTabs.tabSelectedIndicatorBar()
     }
 
     func configureWith(tab: Tab, isSelected: Bool) {
-        applyUIMode(isPrivate: tab.isPrivate)
+        applyUIMode()
         self.titleText.text = tab.displayTitle
 
         if tab.displayTitle.isEmpty {

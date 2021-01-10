@@ -23,8 +23,7 @@ struct TopTabsUX {
 
 protocol TopTabsDelegate: AnyObject {
     func topTabsDidPressTabs()
-    func topTabsDidPressNewTab(_ isPrivate: Bool)
-    func topTabsDidTogglePrivateMode()
+    func topTabsDidPressNewTab()
     func topTabsDidChangeTab()
 }
 
@@ -135,7 +134,7 @@ class TopTabsViewController: UIViewController {
         }
 
         tabsButton.applyTheme()
-        applyUIMode(isPrivate: tabManager.selectedTab?.isPrivate ?? false)
+        applyUIMode()
 
         updateTabCount(tabDisplayManager.dataStore.count, animated: false)
     }
@@ -160,12 +159,7 @@ class TopTabsViewController: UIViewController {
     }
 
     @objc func newTabTapped() {
-        self.delegate?.topTabsDidPressNewTab(self.tabDisplayManager.isPrivate)
-    }
-
-    @objc func togglePrivateModeTapped() {
-        tabDisplayManager.togglePrivateMode(isOn: !tabDisplayManager.isPrivate, createTabOnEmptyPrivateMode: true)
-        delegate?.topTabsDidTogglePrivateMode()
+        self.delegate?.topTabsDidPressNewTab()
     }
 
     func scrollToCurrentTab(_ animated: Bool = true, centerCell: Bool = false) {
@@ -215,8 +209,7 @@ extension TopTabsViewController: TopTabCellDelegate {
 }
 
 extension TopTabsViewController: Themeable, PrivateModeUI {
-    func applyUIMode(isPrivate: Bool) {
-        tabDisplayManager.togglePrivateMode(isOn: isPrivate, createTabOnEmptyPrivateMode: true)
+    func applyUIMode() {
     }
 
     func applyTheme() {

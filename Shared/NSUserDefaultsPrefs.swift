@@ -25,8 +25,6 @@ open class NSUserDefaultsPrefs: Prefs {
         self.userDefaults = UserDefaults(suiteName: AppInfo.sharedContainerIdentifier)!
     }
 
-    // Preferences are qualified by the profile's local name.
-    // Connecting a profile to a Firefox Account, or changing to another, won't alter this.
     fileprivate func qualifyKey(_ key: String) -> String {
         return self.prefixWithDot + key
     }

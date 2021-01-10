@@ -8,7 +8,7 @@ protocol Themeable:  AnyObject {
 }
 
 protocol PrivateModeUI {
-    func applyUIMode(isPrivate: Bool)
+    func applyUIMode()
 }
 
 extension UIColor {
@@ -56,8 +56,8 @@ class ActionMenuColor {
 
 class URLBarColor {
     var border: UIColor { return UIColor.Photon.Grey90A10 }
-    func activeBorder(_ isPrivate: Bool) -> UIColor { 
-        return !isPrivate ? UIColor.Photon.Blue40A30 : UIColor.Defaults.MobilePrivatePurple
+    func activeBorder() -> UIColor {
+        return UIColor.Photon.Blue40A30
     }
     var tint: UIColor { return UIColor.Photon.Blue40A30 }
 
@@ -67,13 +67,8 @@ class URLBarColor {
     // 2) <UITextField>.tintColor = textSelectionHighlight.
     // When the text is in edit mode (tapping URL bar second time), this is assigned to the to set the selection (and cursor) color. The color is assigned directly to the tintColor.
     typealias TextSelectionHighlight = (labelMode: UIColor, textFieldMode: UIColor?)
-    func textSelectionHighlight(_ isPrivate: Bool) -> TextSelectionHighlight {
-        if isPrivate {
-            let color = UIColor.Defaults.MobilePrivatePurple
-            return (labelMode: color.withAlphaComponent(0.25), textFieldMode: color)
-        } else {
-            return (labelMode: UIColor.Defaults.iOSTextHighlightBlue, textFieldMode: nil)
-        }
+    func textSelectionHighlight() -> TextSelectionHighlight {
+        return (labelMode: UIColor.Defaults.iOSTextHighlightBlue, textFieldMode: nil)
     }
 
     var certificateButtonSelected: UIColor { return UIColor.Photon.Blue40 }
@@ -95,12 +90,12 @@ class ToolbarButtonColor {
 }
 
 class LoadingBarColor {
-    func start(_ isPrivate: Bool) -> UIColor {
-        return !isPrivate ? UIColor.Photon.Blue40A30 : UIColor.Photon.Magenta60A30
+    func start() -> UIColor {
+        return UIColor.Photon.Blue40A30
     }
 
-    func end(_ isPrivate: Bool) -> UIColor {
-        return !isPrivate ? UIColor.Photon.Teal60 : UIColor.Photon.Purple60
+    func end() -> UIColor {
+        return UIColor.Photon.Teal60
     }
 }
 
@@ -125,8 +120,8 @@ class TopTabsColor {
     var tabBackgroundUnselected: UIColor { return UIColor.Photon.Grey80 }
     var tabForegroundSelected: UIColor { return UIColor.Photon.Grey90 }
     var tabForegroundUnselected: UIColor { return UIColor.Photon.Grey40 }
-    func tabSelectedIndicatorBar(_ isPrivate: Bool) -> UIColor {
-        return !isPrivate ? UIColor.Photon.Blue40 : UIColor.Photon.Purple60
+    func tabSelectedIndicatorBar() -> UIColor {
+        return UIColor.Photon.Blue40
     }
     var buttonTint: UIColor { return UIColor.Photon.Grey40 }
     var closeButtonSelectedTab: UIColor { return tabBackgroundUnselected }

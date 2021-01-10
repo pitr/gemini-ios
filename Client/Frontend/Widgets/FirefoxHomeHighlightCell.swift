@@ -6,7 +6,7 @@ import UIKit
 import Shared
 import Storage
 
-private struct FirefoxHomeHighlightCellUX {
+private struct GeminiHomeHighlightCellUX {
     static let BorderWidth: CGFloat = 0.5
     static let CellSideOffset = 20
     static let TitleLabelOffset = 2
@@ -19,7 +19,7 @@ private struct FirefoxHomeHighlightCellUX {
     static let BorderColor = UIColor.Photon.Grey30
 }
 
-class FirefoxHomeHighlightCell: UICollectionViewCell {
+class GeminiHomeHighlightCell: UICollectionViewCell {
 
     fileprivate lazy var titleLabel: UILabel = {
         let titleLabel = UILabel()
@@ -54,9 +54,9 @@ class FirefoxHomeHighlightCell: UICollectionViewCell {
         siteImageView.contentMode = .scaleAspectFit
         siteImageView.clipsToBounds = true
         siteImageView.contentMode = .center
-        siteImageView.layer.cornerRadius = FirefoxHomeHighlightCellUX.CornerRadius
-        siteImageView.layer.borderColor = FirefoxHomeHighlightCellUX.BorderColor.cgColor
-        siteImageView.layer.borderWidth = FirefoxHomeHighlightCellUX.BorderWidth
+        siteImageView.layer.cornerRadius = GeminiHomeHighlightCellUX.CornerRadius
+        siteImageView.layer.borderColor = GeminiHomeHighlightCellUX.BorderColor.cgColor
+        siteImageView.layer.borderWidth = GeminiHomeHighlightCellUX.BorderWidth
         siteImageView.layer.masksToBounds = true
         return siteImageView
     }()
@@ -65,13 +65,13 @@ class FirefoxHomeHighlightCell: UICollectionViewCell {
         let statusIcon = UIImageView()
         statusIcon.contentMode = .scaleAspectFit
         statusIcon.clipsToBounds = true
-        statusIcon.layer.cornerRadius = FirefoxHomeHighlightCellUX.CornerRadius
+        statusIcon.layer.cornerRadius = GeminiHomeHighlightCellUX.CornerRadius
         return statusIcon
     }()
 
     fileprivate lazy var selectedOverlay: UIView = {
         let selectedOverlay = UIView()
-        selectedOverlay.backgroundColor = FirefoxHomeHighlightCellUX.SelectedOverlayColor
+        selectedOverlay.backgroundColor = GeminiHomeHighlightCellUX.SelectedOverlayColor
         selectedOverlay.isHidden = true
         return selectedOverlay
     }()
@@ -115,7 +115,7 @@ class FirefoxHomeHighlightCell: UICollectionViewCell {
             make.leading.equalTo(contentView.safeArea.leading)
             make.trailing.equalTo(contentView.safeArea.trailing)
             make.centerX.equalTo(contentView)
-            make.height.equalTo(FirefoxHomeHighlightCellUX.SiteImageViewSize)
+            make.height.equalTo(GeminiHomeHighlightCellUX.SiteImageViewSize)
         }
 
         selectedOverlay.snp.makeConstraints { make in
@@ -135,12 +135,12 @@ class FirefoxHomeHighlightCell: UICollectionViewCell {
         }
 
         descriptionLabel.snp.makeConstraints { make in
-            make.leading.equalTo(statusIcon.snp.trailing).offset(FirefoxHomeHighlightCellUX.TitleLabelOffset)
+            make.leading.equalTo(statusIcon.snp.trailing).offset(GeminiHomeHighlightCellUX.TitleLabelOffset)
             make.bottom.equalTo(contentView)
         }
 
         statusIcon.snp.makeConstraints { make in
-            make.size.equalTo(FirefoxHomeHighlightCellUX.StatusIconSize)
+            make.size.equalTo(GeminiHomeHighlightCellUX.StatusIconSize)
             make.centerY.equalTo(descriptionLabel.snp.centerY)
             make.leading.equalTo(siteImageView)
         }

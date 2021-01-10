@@ -136,7 +136,7 @@ extension Strings {
     public static let RecentlyClosedTabsButtonTitle = NSLocalizedString("HistoryPanel.RecentlyClosedTabsButton.Title", value: "Recently Closed", comment: "Title for the Recently Closed button in the History Panel")
     public static let RecentlyClosedTabsPanelTitle = NSLocalizedString("RecentlyClosedTabsPanel.Title", value: "Recently Closed", comment: "Title for the Recently Closed Tabs Panel")
     public static let HistoryPanelClearHistoryButtonTitle = NSLocalizedString("HistoryPanel.ClearHistoryButtonTitle", value: "Clear Recent History…", comment: "Title for button in the history panel to clear recent history")
-    public static let FirefoxHomePage = NSLocalizedString("Firefox.HomePage.Title", value: "Gemini Home Page", comment: "Title for gemini about:home page in tab history list")
+    public static let GeminiHomePage = NSLocalizedString("Gemini.HomePage.Title", value: "Gemini Home Page", comment: "Title for gemini about:home page in tab history list")
 }
 
 // Clear recent history action menu
@@ -173,7 +173,7 @@ extension Strings {
     public static let SettingsNewTabTitle = NSLocalizedString("Settings.NewTab.Title", value: "New Tab", comment: "Title displayed in header of the setting panel.")
     public static let NewTabSectionNameFooter =
         NSLocalizedString("Settings.NewTab.TopSectionNameFooter", value: "Choose what to load when opening a new tab", comment: "Footer at the bottom of the New Tab screen after entering New Tab in settings")
-    public static let SettingsNewTabTopSites = NSLocalizedString("Settings.NewTab.Option.FirefoxHome", value: "Gemini Home", comment: "Option in settings to show Gemini Home when you open a new tab")
+    public static let SettingsNewTabTopSites = NSLocalizedString("Settings.NewTab.Option.GeminiHome", value: "Gemini Home", comment: "Option in settings to show Gemini Home when you open a new tab")
     public static let SettingsNewTabBookmarks = NSLocalizedString("Settings.NewTab.Option.Bookmarks", value: "Bookmarks", comment: "Option in settings to show bookmarks when you open a new tab")
     public static let SettingsNewTabHistory = NSLocalizedString("Settings.NewTab.Option.History", value: "History", comment: "Option in settings to show history when you open a new tab")
     public static let SettingsNewTabBlankPage = NSLocalizedString("Settings.NewTab.Option.BlankPage", value: "Blank Page", comment: "Option in settings to show a blank page when you open a new tab")
@@ -324,8 +324,8 @@ extension Strings {
 
 // Photo Library access.
 extension Strings {
-    public static let PhotoLibraryFirefoxWouldLikeAccessTitle = NSLocalizedString("PhotoLibrary.FirefoxWouldLikeAccessTitle", value: "Gemini would like to access your Photos", comment: "")
-    public static let PhotoLibraryFirefoxWouldLikeAccessMessage = NSLocalizedString("PhotoLibrary.FirefoxWouldLikeAccessMessage", value: "This allows you to save the image to your Camera Roll.", comment: "")
+    public static let PhotoLibraryGeminiWouldLikeAccessTitle = NSLocalizedString("PhotoLibrary.GeminiWouldLikeAccessTitle", value: "Gemini would like to access your Photos", comment: "")
+    public static let PhotoLibraryGeminiWouldLikeAccessMessage = NSLocalizedString("PhotoLibrary.GeminiWouldLikeAccessMessage", value: "This allows you to save the image to your Camera Roll.", comment: "")
 }
 
 // App menu.
@@ -432,8 +432,8 @@ extension Strings {
     public static let ShareBookmarkThisPage = NSLocalizedString("ShareExtension.BookmarkThisPageAction.Title", value: "Bookmark This Page", comment: "Action label on share extension to bookmark the page in Gemini.")
     public static let ShareBookmarkThisPageDone = NSLocalizedString("ShareExtension.BookmarkThisPageActionDone.Title", value: "Bookmarked", comment: "Share extension label shown after user has performed 'Bookmark this Page' action.")
 
-    public static let ShareOpenInFirefox = NSLocalizedString("ShareExtension.OpenInFirefoxAction.Title", value: "Open in Gemini", comment: "Action label on share extension to immediately open page in Gemini.")
-    public static let ShareSearchInFirefox = NSLocalizedString("ShareExtension.SeachInFirefoxAction.Title", value: "Search in Gemini", comment: "Action label on share extension to search for the selected text in Gemini.")
+    public static let ShareOpenInGemini = NSLocalizedString("ShareExtension.OpenInGeminiAction.Title", value: "Open in Gemini", comment: "Action label on share extension to immediately open page in Gemini.")
+    public static let ShareSearchInGemini = NSLocalizedString("ShareExtension.SeachInGeminiAction.Title", value: "Search in Gemini", comment: "Action label on share extension to search for the selected text in Gemini.")
 
     public static let ShareLoadInBackground = NSLocalizedString("ShareExtension.LoadInBackgroundAction.Title", value: "Load in Background", comment: "Action label on share extension to load the page in Gemini when user switches apps to bring it to foreground.")
     public static let ShareLoadInBackgroundDone = NSLocalizedString("ShareExtension.LoadInBackgroundActionDone.Title", value: "Loading in Gemini", comment: "Share extension label shown after user has performed 'Load in Background' action.")

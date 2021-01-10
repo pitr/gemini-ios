@@ -31,8 +31,8 @@ fileprivate class DarkActionMenuColor: ActionMenuColor {
 }
 
 fileprivate class DarkURLBarColor: URLBarColor {
-    override func textSelectionHighlight(_ isPrivate: Bool) -> TextSelectionHighlight {
-        let color = isPrivate ? UIColor.Defaults.MobilePrivatePurple : UIColor(rgb: 0x3d89cc)
+    override func textSelectionHighlight() -> TextSelectionHighlight {
+        let color = UIColor(rgb: 0x3d89cc)
         return (labelMode: color.withAlphaComponent(0.25), textFieldMode: color)
 
     }

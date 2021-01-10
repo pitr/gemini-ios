@@ -64,7 +64,7 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
     // cellForRowAtIndexPath, we create the cell to find its height before it's added to the table.
     fileprivate let suggestionCell = SuggestionCell(style: .default, reuseIdentifier: nil)
 
-    init(profile: Profile, isPrivate: Bool) {
+    override init(profile: Profile) {
         super.init(profile: profile)
     }
 

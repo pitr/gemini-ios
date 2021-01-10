@@ -7,9 +7,7 @@ import UIKit
 
 extension TabTrayController {
     override var keyCommands: [UIKeyCommand]? {
-        let toggleText = tabDisplayManager.isPrivate ? Strings.SwitchToNonPBMKeyCodeTitle: Strings.SwitchToPBMKeyCodeTitle
         var commands = [
-            UIKeyCommand(input: "`", modifierFlags: .command, action: #selector(didTogglePrivateModeKeyCommand), discoverabilityTitle: toggleText),
             UIKeyCommand(input: "w", modifierFlags: .command, action: #selector(didCloseTabKeyCommand)),
             UIKeyCommand(input: "w", modifierFlags: [.command, .shift], action: #selector(didCloseAllTabsKeyCommand), discoverabilityTitle: Strings.CloseAllTabsFromTabTrayKeyCodeTitle),
             UIKeyCommand(input: "\\", modifierFlags: [.command, .shift], action: #selector(didEnterTabKeyCommand)),
@@ -28,11 +26,6 @@ extension TabTrayController {
             commands.append(contentsOf: extraCommands)
         }
         return commands
-    }
-
-    @objc func didTogglePrivateModeKeyCommand() {
-        // NOTE: We cannot and should not capture telemetry here.
-        didTogglePrivateMode()
     }
 
     @objc func didCloseTabKeyCommand() {

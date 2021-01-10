@@ -280,6 +280,6 @@ extension TabToolbar: Themeable, PrivateModeUI {
         warningMenuBadge.badge.tintBackground(color: UIColor.theme.browser.background)
     }
 
-    func applyUIMode(isPrivate: Bool) {
+    func applyUIMode() {
     }
 }

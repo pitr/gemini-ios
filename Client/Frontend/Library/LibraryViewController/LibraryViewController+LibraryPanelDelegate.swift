@@ -6,8 +6,8 @@ import Storage
 import Shared
 
 extension LibraryViewController: LibraryPanelDelegate {
-    func libraryPanelDidRequestToOpenInNewTab(_ url: URL, isPrivate: Bool) {
-        delegate?.libraryPanelDidRequestToOpenInNewTab(url, isPrivate: isPrivate)
+    func libraryPanelDidRequestToOpenInNewTab(_ url: URL) {
+        delegate?.libraryPanelDidRequestToOpenInNewTab(url)
     }
 
     func libraryPanel(didSelectURL url: URL, historyType: HistoryType) {

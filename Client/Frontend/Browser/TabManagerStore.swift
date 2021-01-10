@@ -105,29 +105,24 @@ class TabManagerStore {
         return result
     }
 
-    func restoreStartupTabs(clearPrivateTabs: Bool, tabManager: TabManager) -> Tab? {
-        let selectedTab = restoreTabs(savedTabs: archivedStartupTabs, clearPrivateTabs: clearPrivateTabs, tabManager: tabManager)
+    func restoreStartupTabs(tabManager: TabManager) -> Tab? {
+        let selectedTab = restoreTabs(savedTabs: archivedStartupTabs, tabManager: tabManager)
         archivedStartupTabs.removeAll()
         return selectedTab
     }
 
-    func restoreTabs(savedTabs: [SavedTab], clearPrivateTabs: Bool, tabManager: TabManager) -> Tab? {
+    func restoreTabs(savedTabs: [SavedTab], tabManager: TabManager) -> Tab? {
         assertIsMainThread("Restoration is a main-only operation")
         guard !lockedForReading, savedTabs.count > 0 else { return nil }
         lockedForReading = true
         defer {
             lockedForReading = false
         }
-        var savedTabs = savedTabs
-        // Make sure to wipe the private tabs if the user has the pref turned on
-        if clearPrivateTabs {
-            savedTabs = savedTabs.filter { !$0.isPrivate }
-        }
 
         var tabToSelect: Tab?
         for savedTab in savedTabs {
             // Provide an empty request to prevent a new tab from loading the home screen
-            var tab = tabManager.addTab(flushToDisk: false, zombie: true, isPrivate: savedTab.isPrivate)
+            var tab = tabManager.addTab(flushToDisk: false, zombie: true)
             tab = savedTab.configureSavedTabUsing(tab, imageStore: imageStore)
 
             if savedTab.isSelected {
@@ -136,7 +131,7 @@ class TabManagerStore {
         }
 
         if tabToSelect == nil {
-            tabToSelect = tabManager.tabs.first(where: { $0.isPrivate == false })
+            tabToSelect = tabManager.tabs.first
         }
 
         return tabToSelect

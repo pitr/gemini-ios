@@ -102,11 +102,11 @@ class ShareViewController: UIViewController {
         makeSeparator(addTo: stackView)
 
         if shareItem?.isUrlType() ?? true {
-            makeActionRow(addTo: stackView, label: Strings.ShareOpenInFirefox, imageName: "open-in-firefox", action: #selector(actionOpenInFirefoxNow), hasNavigation: false)
+            makeActionRow(addTo: stackView, label: Strings.ShareOpenInGemini, imageName: "open-in-gemini", action: #selector(actionOpenInGeminiNow), hasNavigation: false)
             makeActionRow(addTo: stackView, label: Strings.ShareLoadInBackground, imageName: "menu-Show-Tabs", action: #selector(actionLoadInBackground), hasNavigation: false)
         } else {
             pageInfoRowUrlLabel?.removeFromSuperview()
-            makeActionRow(addTo: stackView, label: Strings.ShareSearchInFirefox, imageName: "quickSearch", action: #selector(actionSearchInFirefox), hasNavigation: false)
+            makeActionRow(addTo: stackView, label: Strings.ShareSearchInGemini, imageName: "quickSearch", action: #selector(actionSearchInGemini), hasNavigation: false)
         }
 
         let footerSpaceRow = UIView()
@@ -309,8 +309,8 @@ extension ShareViewController {
         finish()
     }
 
-    func openFirefox(withUrl url: String, isSearch: Bool) {
-       func firefoxUrl(_ url: String) -> String {
+    func openGemini(withUrl url: String, isSearch: Bool) {
+       func geminiUrl(_ url: String) -> String {
             let encoded = url.addingPercentEncoding(withAllowedCharacters: NSCharacterSet.alphanumerics) ?? ""
             if isSearch {
                 return "gemini://open-text?text=\(encoded)"
@@ -318,7 +318,7 @@ extension ShareViewController {
             return "gemini://open-url?url=\(encoded)"
         }
 
-        guard let url = URL(string: firefoxUrl(url)) else { return }
+        guard let url = URL(string: geminiUrl(url)) else { return }
         var responder = self as UIResponder?
         let selectorOpenURL = sel_registerName("openURL:")
         while let current = responder {
@@ -331,21 +331,21 @@ extension ShareViewController {
         }
     }
 
-    @objc func actionSearchInFirefox(gesture: UIGestureRecognizer) {
+    @objc func actionSearchInGemini(gesture: UIGestureRecognizer) {
         gesture.isEnabled = false
 
         if let shareItem = shareItem, case .rawText(let text) = shareItem {
-            openFirefox(withUrl: text, isSearch: true)
+            openGemini(withUrl: text, isSearch: true)
         }
 
         finish(afterDelay: 0)
     }
 
-    @objc func actionOpenInFirefoxNow(gesture: UIGestureRecognizer) {
+    @objc func actionOpenInGeminiNow(gesture: UIGestureRecognizer) {
         gesture.isEnabled = false
 
         if let shareItem = shareItem, case .shareItem(let item) = shareItem {
-            openFirefox(withUrl: item.url, isSearch: false)
+            openGemini(withUrl: item.url, isSearch: false)
         }
 
         finish(afterDelay: 0)

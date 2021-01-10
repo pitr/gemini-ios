@@ -37,8 +37,7 @@ extension BrowserViewController {
     }
 
     @objc private func newTabKeyCommand() {
-        let isPrivate = tabManager.selectedTab?.isPrivate ?? false
-        openBlankNewTab(focusLocationField: true, isPrivate: isPrivate)
+        openBlankNewTab(focusLocationField: true)
     }
 
     @objc private func closeTabKeyCommand() {
@@ -53,7 +52,7 @@ extension BrowserViewController {
             return
         }
 
-        let tabs = currentTab.isPrivate ? tabManager.privateTabs : tabManager.normalTabs
+        let tabs = tabManager.normalTabs
         if let index = tabs.firstIndex(of: currentTab), index + 1 < tabs.count {
             tabManager.selectTab(tabs[index + 1])
         } else if let firstTab = tabs.first {
@@ -66,7 +65,7 @@ extension BrowserViewController {
             return
         }
 
-        let tabs = currentTab.isPrivate ? tabManager.privateTabs : tabManager.normalTabs
+        let tabs = tabManager.normalTabs
         if let index = tabs.firstIndex(of: currentTab), index - 1 < tabs.count && index != 0 {
             tabManager.selectTab(tabs[index - 1])
         } else if let lastTab = tabs.last {

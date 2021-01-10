@@ -79,11 +79,6 @@ class TabManager: NSObject {
         return TabManager.makeWebViewConfig(profile: self.profile)
     }()
 
-    // A WKWebViewConfiguration used for private mode tabs
-    lazy fileprivate var privateConfiguration: WKWebViewConfiguration = {
-        return TabManager.makeWebViewConfig(profile: self.profile)
-    }()
-
     var selectedIndex: Int { return _selectedIndex }
 
     // Enables undo of recently closed tabs
@@ -91,12 +86,7 @@ class TabManager: NSObject {
 
     var normalTabs: [Tab] {
         assert(Thread.isMainThread)
-        return tabs.filter { !$0.isPrivate }
-    }
-
-    var privateTabs: [Tab] {
-        assert(Thread.isMainThread)
-        return tabs.filter { $0.isPrivate }
+        return tabs
     }
 
     init(profile: Profile, imageStore: DiskImageStore?) {
@@ -178,11 +168,6 @@ class TabManager: NSObject {
         assert(Thread.isMainThread)
         let previous = previous ?? selectedTab
 
-        // Make sure to wipe the private tabs if the user has the pref turned on
-        if shouldClearPrivateTabs(), !(tab?.isPrivate ?? false) {
-            removeAllPrivateTabs()
-        }
-
         if let tab = tab {
             _selectedIndex = tabs.firstIndex(of: tab) ?? -1
         } else {
@@ -206,24 +191,6 @@ class TabManager: NSObject {
         }
     }
 
-    func shouldClearPrivateTabs() -> Bool {
-        return profile.prefs.boolForKey("settings.closePrivateTabs") ?? false
-    }
-
-    //Called by other classes to signal that they are entering/exiting private mode
-    //This is called by TabTrayVC when the private mode button is pressed and BEFORE we've switched to the new mode
-    //we only want to remove all private tabs when leaving PBM and not when entering.
-    func willSwitchTabMode(leavingPBM: Bool) {
-        recentlyClosedForUndo.removeAll()
-
-        // Clear every time entering/exiting this mode.
-        Tab.ChangeUserAgent.privateModeHostList = Set<String>()
-
-        if shouldClearPrivateTabs() && leavingPBM {
-            removeAllPrivateTabs()
-        }
-    }
-
     func expireSnackbars() {
         assert(Thread.isMainThread)
 
@@ -233,7 +200,7 @@ class TabManager: NSObject {
     }
 
     func addPopupForParentTab(bvc: BrowserViewController, parentTab: Tab, configuration: WKWebViewConfiguration) -> Tab {
-        let popup = Tab(bvc: bvc, configuration: configuration, isPrivate: parentTab.isPrivate)
+        let popup = Tab(bvc: bvc, configuration: configuration)
         configureTab(popup, request: nil, afterTab: parentTab, flushToDisk: true, zombie: false, isPopup: true)
 
         // Wait momentarily before selecting the new tab, otherwise the parent tab
@@ -246,8 +213,8 @@ class TabManager: NSObject {
         return popup
     }
 
-    @discardableResult func addTab(_ request: URLRequest! = nil, configuration: WKWebViewConfiguration! = nil, afterTab: Tab? = nil, isPrivate: Bool = false) -> Tab {
-        return self.addTab(request, configuration: configuration, afterTab: afterTab, flushToDisk: true, zombie: false, isPrivate: isPrivate)
+    @discardableResult func addTab(_ request: URLRequest! = nil, configuration: WKWebViewConfiguration! = nil, afterTab: Tab? = nil) -> Tab {
+        return self.addTab(request, configuration: configuration, afterTab: afterTab, flushToDisk: true, zombie: false)
     }
 
     func addTabsForURLs(_ urls: [URL], zombie: Bool) {
@@ -271,22 +238,22 @@ class TabManager: NSObject {
         storeChanges()
     }
 
-    func addTab(_ request: URLRequest? = nil, configuration: WKWebViewConfiguration? = nil, afterTab: Tab? = nil, flushToDisk: Bool, zombie: Bool, isPrivate: Bool = false) -> Tab {
+    func addTab(_ request: URLRequest? = nil, configuration: WKWebViewConfiguration? = nil, afterTab: Tab? = nil, flushToDisk: Bool, zombie: Bool) -> Tab {
         assert(Thread.isMainThread)
 
         // Take the given configuration. Or if it was nil, take our default configuration for the current browsing mode.
-        let configuration: WKWebViewConfiguration = configuration ?? (isPrivate ? privateConfiguration : self.configuration)
+        let configuration: WKWebViewConfiguration = configuration ?? (self.configuration)
 
         let bvc = BrowserViewController.foregroundBVC()
-        let tab = Tab(bvc: bvc, configuration: configuration, isPrivate: isPrivate)
+        let tab = Tab(bvc: bvc, configuration: configuration)
         configureTab(tab, request: request, afterTab: afterTab, flushToDisk: flushToDisk, zombie: zombie)
         return tab
     }
 
-    func moveTab(isPrivate privateMode: Bool, fromIndex visibleFromIndex: Int, toIndex visibleToIndex: Int) {
+    func moveTab(fromIndex visibleFromIndex: Int, toIndex visibleToIndex: Int) {
         assert(Thread.isMainThread)
 
-        let currentTabs = privateMode ? privateTabs : normalTabs
+        let currentTabs = normalTabs
 
         guard visibleFromIndex < currentTabs.count, visibleToIndex < currentTabs.count else {
             return
@@ -313,7 +280,7 @@ class TabManager: NSObject {
         // We should set request url in order to show url in url bar even no network
         tab.url = request?.url
         
-        if parent == nil || parent?.isPrivate != tab.isPrivate {
+        if parent == nil {
             tabs.append(tab)
         } else if let parent = parent, var insertIndex = tabs.firstIndex(of: parent) {
             insertIndex += 1
@@ -373,15 +340,12 @@ class TabManager: NSObject {
     }
 
     private func updateIndexAfterRemovalOf(_ tab: Tab, deletedIndex: Int) {
-        let closedLastNormalTab = !tab.isPrivate && normalTabs.isEmpty
-        let closedLastPrivateTab = tab.isPrivate && privateTabs.isEmpty
+        let closedLastNormalTab =  normalTabs.isEmpty
 
-        let viableTabs: [Tab] = tab.isPrivate ? privateTabs : normalTabs
+        let viableTabs: [Tab] = normalTabs
 
         if closedLastNormalTab {
             selectTab(addTab(), previous: tab)
-        } else if closedLastPrivateTab {
-            selectTab(mostRecentTab(inTabs: tabs) ?? tabs.last, previous: tab)
         } else if deletedIndex == _selectedIndex {
             if !selectParentTab(afterRemoving: tab) {
                 if let rightOrLeftTab = viableTabs[safe: _selectedIndex] ?? viableTabs[safe: _selectedIndex - 1] {
@@ -409,8 +373,6 @@ class TabManager: NSObject {
         tabs.remove(at: removalIndex)
         assert(count == prevCount - 1, "Make sure the tab count was actually removed")
 
-        tab.closeAndRemovePrivateBrowsingData()
-
         if notify {
             delegates.forEach { $0.get()?.tabManager(self, didRemoveTab: tab, isRestoring: store.isRestoringTabs) }
             TabEvent.post(.didClose, for: tab)
@@ -423,7 +385,7 @@ class TabManager: NSObject {
 
     // Select the most recently visited tab, IFF it is also the parent tab of the closed tab.
     func selectParentTab(afterRemoving tab: Tab) -> Bool {
-        let viableTabs = (tab.isPrivate ? privateTabs : normalTabs).filter { $0 != tab }
+        let viableTabs = normalTabs.filter { $0 != tab }
         guard let parentTab = tab.parent, parentTab != tab, !viableTabs.isEmpty, viableTabs.contains(parentTab) else { return false }
 
         let parentTabIsMostRecentUsed = mostRecentTab(inTabs: viableTabs) == parentTab
@@ -433,15 +395,6 @@ class TabManager: NSObject {
             return true
         }
         return false
-    }
-
-    private func removeAllPrivateTabs() {
-        // reset the selectedTabIndex if we are on a private tab because we will be removing it.
-        if selectedTab?.isPrivate ?? false {
-            _selectedIndex = -1
-        }
-        privateTabs.forEach { $0.closeAndRemovePrivateBrowsingData() }
-        tabs = normalTabs
     }
 
     func removeTabsWithUndoToast(_ tabs: [Tab]) {
@@ -475,20 +428,15 @@ class TabManager: NSObject {
     }
 
     func undoCloseTabs() {
-        guard let isPrivate = recentlyClosedForUndo.first?.isPrivate else {
-            // No valid tabs
-            return
-        }
-
-        let selectedTab = store.restoreTabs(savedTabs: recentlyClosedForUndo, clearPrivateTabs: false, tabManager: self)
+        let selectedTab = store.restoreTabs(savedTabs: recentlyClosedForUndo, tabManager: self)
 
         recentlyClosedForUndo.removeAll()
 
-        let tabs = isPrivate ? privateTabs : normalTabs
+        let tabs = normalTabs
         tabs.forEach({ $0.showContent(true) })
 
         // In non-private mode, delete all tabs will automatically create a tab
-        if let tab = tabs.first, !tab.isPrivate {
+        if let tab = tabs.first {
             removeTabAndUpdateSelectedIndex(tab)
         }
 
@@ -540,11 +488,7 @@ extension TabManager {
             return
         }
 
-        var tabToSelect = store.restoreStartupTabs(clearPrivateTabs: shouldClearPrivateTabs(), tabManager: self)
-        let wasLastSessionPrivate = UserDefaults.standard.bool(forKey: "wasLastSessionPrivate")
-        if wasLastSessionPrivate, !(tabToSelect?.isPrivate ?? false) {
-            tabToSelect = addTab(isPrivate: true)
-        }
+        var tabToSelect = store.restoreStartupTabs(tabManager: self)
 
         for delegate in self.delegates {
             delegate.get()?.tabManagerDidRestoreTabs(self)

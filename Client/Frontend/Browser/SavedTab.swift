@@ -10,7 +10,6 @@ import Shared
 class SavedTab: NSObject, NSCoding {
     let isSelected: Bool
     let title: String?
-    let isPrivate: Bool
     var sessionData: SessionData?
     var screenshotUUID: UUID?
 
@@ -20,7 +19,6 @@ class SavedTab: NSObject, NSCoding {
         
         var json: [String: AnyObject] = [
             "title": title as AnyObject,
-            "isPrivate": String(self.isPrivate) as AnyObject,
             "isSelected": String(self.isSelected) as AnyObject,
             "screenshotUUID": uuid as AnyObject
         ]
@@ -38,7 +36,6 @@ class SavedTab: NSObject, NSCoding {
         self.screenshotUUID = tab.screenshotUUID as UUID?
         self.isSelected = isSelected
         self.title = tab.displayTitle
-        self.isPrivate = tab.isPrivate
         super.init()
         
         if tab.sessionData == nil {
@@ -65,7 +62,6 @@ class SavedTab: NSObject, NSCoding {
         self.screenshotUUID = coder.decodeObject(forKey: "screenshotUUID") as? UUID
         self.isSelected = coder.decodeBool(forKey: "isSelected")
         self.title = coder.decodeObject(forKey: "title") as? String
-        self.isPrivate = coder.decodeBool(forKey: "isPrivate")
     }
     
     func encode(with coder: NSCoder) {
@@ -73,7 +69,6 @@ class SavedTab: NSObject, NSCoding {
         coder.encode(screenshotUUID, forKey: "screenshotUUID")
         coder.encode(isSelected, forKey: "isSelected")
         coder.encode(title, forKey: "title")
-        coder.encode(isPrivate, forKey: "isPrivate")
     }
 
     func configureSavedTabUsing(_ tab: Tab, imageStore: DiskImageStore? = nil) -> Tab {

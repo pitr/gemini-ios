@@ -12,7 +12,7 @@ private let log = Logger.browserLogger
 private let DefaultSuggestedSitesKey = "topSites.deletedSuggestedSites"
 
 // MARK: -  Lifecycle
-struct FirefoxHomeUX {
+struct GeminiHomeUX {
     static let rowSpacing: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 30 : 20
     static let highlightCellHeight: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 250 : 200
     static let sectionInsetsForSizeClass = UXSizeClasses(compact: 0, regular: 101, other: 20)
@@ -57,7 +57,7 @@ struct UXSizeClasses {
 }
 
 protocol HomePanelDelegate: AnyObject {
-    func homePanelDidRequestToOpenInNewTab(_ url: URL, isPrivate: Bool)
+    func homePanelDidRequestToOpenInNewTab(_ url: URL)
     func homePanel(didSelectURL url: URL, historyType: HistoryType)
     func homePanelDidRequestToOpenLibrary(panel: LibraryPanelType)
 }
@@ -108,7 +108,7 @@ extension HomePanelContextMenu {
         guard let siteURL = URL(string: site.url) else { return nil }
 
         let openInNewTabAction = PhotonActionSheetItem(title: Strings.OpenInNewTabContextMenuTitle, iconString: "quick_action_new_tab") { _, _ in
-            homePanelDelegate?.homePanelDidRequestToOpenInNewTab(siteURL, isPrivate: false)
+            homePanelDelegate?.homePanelDidRequestToOpenInNewTab(siteURL)
         }
 
         return [openInNewTabAction]
@@ -245,7 +245,7 @@ extension GeminiHomeViewController {
         func cellHeight(_ traits: UITraitCollection, width: CGFloat) -> CGFloat {
             switch self {
             case .topSites: return 0 //calculated dynamically
-            case .libraryShortcuts: return FirefoxHomeUX.LibraryShortcutsHeight
+            case .libraryShortcuts: return GeminiHomeUX.LibraryShortcutsHeight
             }
         }
 
@@ -259,16 +259,16 @@ extension GeminiHomeViewController {
             if (traits.horizontalSizeClass == .regular && UIScreen.main.bounds.size.width != frameWidth) || UIDevice.current.userInterfaceIdiom == .phone {
                 currentTraits = UITraitCollection(horizontalSizeClass: .compact)
             }
-            var insets = FirefoxHomeUX.sectionInsetsForSizeClass[currentTraits.horizontalSizeClass]
+            var insets = GeminiHomeUX.sectionInsetsForSizeClass[currentTraits.horizontalSizeClass]
 
             switch self {
             case .libraryShortcuts:
                 let window = UIApplication.shared.keyWindow
                 let safeAreaInsets = window?.safeAreaInsets.left ?? 0
-                insets += FirefoxHomeUX.MinimumInsets + safeAreaInsets
+                insets += GeminiHomeUX.MinimumInsets + safeAreaInsets
                 return insets
             case .topSites:
-                insets += FirefoxHomeUX.TopSitesInsets
+                insets += GeminiHomeUX.TopSitesInsets
                 return insets
             }
         }
@@ -373,7 +373,7 @@ extension GeminiHomeViewController: UICollectionViewDelegateFlowLayout {
         case .libraryShortcuts:
             let numberofshortcuts: CGFloat = 4
             let titleSpacing: CGFloat = 10
-            let width = min(FirefoxHomeUX.LibraryShortcutsMaxWidth, cellSize.width)
+            let width = min(GeminiHomeUX.LibraryShortcutsMaxWidth, cellSize.width)
             return CGSize(width: width, height: (width / numberofshortcuts) + titleSpacing)
         }
     }
@@ -401,7 +401,7 @@ extension GeminiHomeViewController: UICollectionViewDelegateFlowLayout {
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return FirefoxHomeUX.rowSpacing
+        return GeminiHomeUX.rowSpacing
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
@@ -422,7 +422,7 @@ extension GeminiHomeViewController {
     }
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        var numItems: CGFloat = FirefoxHomeUX.numberOfItemsPerRowForSizeClassIpad[self.traitCollection.horizontalSizeClass]
+        var numItems: CGFloat = GeminiHomeUX.numberOfItemsPerRowForSizeClassIpad[self.traitCollection.horizontalSizeClass]
         if UIApplication.shared.statusBarOrientation.isPortrait {
             numItems = numItems - 1
         }
@@ -632,7 +632,7 @@ extension GeminiHomeViewController: HomePanelContextMenu {
         }
 
         let openInNewTabAction = PhotonActionSheetItem(title: Strings.OpenInNewTabContextMenuTitle, iconString: "quick_action_new_tab") { _, _ in
-            self.homePanelDelegate?.homePanelDidRequestToOpenInNewTab(siteURL, isPrivate: false)
+            self.homePanelDelegate?.homePanelDidRequestToOpenInNewTab(siteURL)
         }
 
         let bookmarkAction: PhotonActionSheetItem
@@ -712,12 +712,12 @@ extension GeminiHomeViewController: UIPopoverPresentationControllerDelegate {
 }
 
 // MARK: - Section Header View
-private struct FirefoxHomeHeaderViewUX {
+private struct GeminiHomeHeaderViewUX {
     static var SeparatorColor: UIColor { return UIColor.theme.homePanel.separator }
     static let TextFont = DynamicFontHelper.defaultHelper.SmallSizeHeavyWeightAS
     static let ButtonFont = DynamicFontHelper.defaultHelper.MediumSizeBoldFontAS
     static let SeparatorHeight = 0.5
-    static let Insets: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? FirefoxHomeUX.SectionInsetsForIpad + FirefoxHomeUX.MinimumInsets : FirefoxHomeUX.MinimumInsets
+    static let Insets: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? GeminiHomeUX.SectionInsetsForIpad + GeminiHomeUX.MinimumInsets : GeminiHomeUX.MinimumInsets
     static let TitleTopInset: CGFloat = 5
 }
 
@@ -733,7 +733,7 @@ class ASFooterView: UICollectionReusableView {
         self.backgroundColor = UIColor.clear
         addSubview(separatorLine)
         separatorLine.snp.makeConstraints { make in
-            make.height.equalTo(FirefoxHomeHeaderViewUX.SeparatorHeight)
+            make.height.equalTo(GeminiHomeHeaderViewUX.SeparatorHeight)
             leftConstraint = make.leading.equalTo(self.safeArea.leading).inset(insets).constraint
             make.trailing.equalTo(self.safeArea.trailing).inset(insets)
             make.top.equalTo(self.snp.top)
@@ -743,7 +743,7 @@ class ASFooterView: UICollectionReusableView {
     }
 
     var insets: CGFloat {
-        return UIScreen.main.bounds.size.width == self.frame.size.width && UIDevice.current.userInterfaceIdiom == .pad ? FirefoxHomeHeaderViewUX.Insets : FirefoxHomeUX.MinimumInsets
+        return UIScreen.main.bounds.size.width == self.frame.size.width && UIDevice.current.userInterfaceIdiom == .pad ? GeminiHomeHeaderViewUX.Insets : GeminiHomeUX.MinimumInsets
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -764,7 +764,7 @@ class ASFooterView: UICollectionReusableView {
 
 extension ASFooterView: Themeable {
     func applyTheme() {
-        separatorLineView?.backgroundColor = FirefoxHomeHeaderViewUX.SeparatorColor
+        separatorLineView?.backgroundColor = GeminiHomeHeaderViewUX.SeparatorColor
     }
 }
 
@@ -775,7 +775,7 @@ class ASHeaderView: UICollectionReusableView {
         let titleLabel = UILabel()
         titleLabel.text = self.title
         titleLabel.textColor = UIColor.theme.homePanel.activityStreamHeaderText
-        titleLabel.font = FirefoxHomeHeaderViewUX.TextFont
+        titleLabel.font = GeminiHomeHeaderViewUX.TextFont
         titleLabel.minimumScaleFactor = 0.6
         titleLabel.numberOfLines = 1
         titleLabel.adjustsFontSizeToFitWidth = true
@@ -785,7 +785,7 @@ class ASHeaderView: UICollectionReusableView {
     lazy var moreButton: UIButton = {
         let button = UIButton()
         button.isHidden = true
-        button.titleLabel?.font = FirefoxHomeHeaderViewUX.ButtonFont
+        button.titleLabel?.font = GeminiHomeHeaderViewUX.ButtonFont
         button.contentHorizontalAlignment = .right
         button.setTitleColor(UIConstants.SystemBlueColor, for: .normal)
         button.setTitleColor(UIColor.Photon.Grey50, for: .highlighted)
@@ -810,7 +810,7 @@ class ASHeaderView: UICollectionReusableView {
 
     var titleInsets: CGFloat {
         get {
-            return UIScreen.main.bounds.size.width == self.frame.size.width && UIDevice.current.userInterfaceIdiom == .pad ? FirefoxHomeHeaderViewUX.Insets : FirefoxHomeUX.MinimumInsets
+            return UIScreen.main.bounds.size.width == self.frame.size.width && UIDevice.current.userInterfaceIdiom == .pad ? GeminiHomeHeaderViewUX.Insets : GeminiHomeUX.MinimumInsets
         }
     }
 
@@ -840,7 +840,7 @@ class ASHeaderView: UICollectionReusableView {
         moreButton.setContentCompressionResistancePriority(.required, for: .horizontal)
         titleLabel.snp.makeConstraints { make in
             make.leading.equalTo(iconView.snp.trailing).offset(5)
-            make.trailing.equalTo(moreButton.snp.leading).inset(-FirefoxHomeHeaderViewUX.TitleTopInset)
+            make.trailing.equalTo(moreButton.snp.leading).inset(-GeminiHomeHeaderViewUX.TitleTopInset)
             make.top.equalTo(self.snp.top).offset(ASHeaderView.verticalInsets)
             make.bottom.equalToSuperview().offset(-ASHeaderView.verticalInsets)
         }
