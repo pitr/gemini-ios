@@ -228,21 +228,35 @@ extension GeminiClient: StreamDelegate {
                     renderError(error: "Could not parse body with encoding \(mime.charset)", for: url, to: urlSchemeTask)
                     return
                 }
-                if mime.contentType == "text/gemini" {
+                switch mime.contentType {
+                case "text/gemini":
                     guard let resp = parseBody(body).data(using: .utf8) else {
                         renderError(error: "Could not parse body", for: url, to: urlSchemeTask)
                         return
                     }
-                    render(with: resp, mime: "text/html")
-                } else {
+                    render(resp, mime: "text/html")
+                case "text/html":
                     guard let resp = body.data(using: .utf8) else {
                         renderError(error: "Could not parse body", for: url, to: urlSchemeTask)
                         return
                     }
-                    render(with: resp, mime: "text/plain")
+                    render(resp, mime: "text/html")
+                case "text/plain":
+                    let result = getHeader(for: self.url, title: "") + "<pre><code>" + body
+                    guard let data = result.data(using: .utf8) else {
+                        renderError(error: "Could not parse body", for: url, to: urlSchemeTask)
+                        return
+                    }
+                    render(data, mime: "text/html")
+                default:
+                    guard let resp = body.data(using: .utf8) else {
+                        renderError(error: "Could not parse body", for: url, to: urlSchemeTask)
+                        return
+                    }
+                    render(resp, mime: "text/plain")
                 }
             } else {
-                render(with: data, mime: mime.contentType)
+                render(data, mime: mime.contentType)
             }
         case .redirect_permanent(let to), .redirect_temporary(let to):
             let body = "<meta http-equiv=\"refresh\" content=\"0; URL='\(to)'\" />"
@@ -250,7 +264,7 @@ extension GeminiClient: StreamDelegate {
                 renderError(error: "Could not redirect to \(to)", for: url, to: urlSchemeTask)
                 return
             }
-            render(with: data, mime: "text/html")
+            render(data, mime: "text/html")
         case .input(let question), .sensitive_input(let question):
             var body = getHeader(for: self.url, title: question)
             var type: String
@@ -265,7 +279,7 @@ extension GeminiClient: StreamDelegate {
                 renderError(error: "Could not render form to ask server's question: \(question)", for: url, to: urlSchemeTask)
                 return
             }
-            render(with: data, mime: "text/html")
+            render(data, mime: "text/html")
         case .slow_down(let wait):
             renderError(error: "slow down: please wait at least \(wait) seconds before retrying", for: url, to: urlSchemeTask)
         case .temporary_failure(let err),
@@ -287,11 +301,11 @@ extension GeminiClient: StreamDelegate {
                 renderError(error: "Could not render server's certification message: \(msg)", for: url, to: urlSchemeTask)
                 return
             }
-            render(with: data, mime: "text/html")
+            render(data, mime: "text/html")
         }
     }
 
-    fileprivate func render(with data: Data, mime: String){
+    fileprivate func render(_ data: Data, mime: String){
         urlSchemeTask.didReceive(URLResponse(url: url, mimeType: mime, expectedContentLength: -1, textEncodingName: "utf-8"))
         urlSchemeTask.didReceive(data)
         urlSchemeTask.didFinish()
@@ -301,9 +315,9 @@ extension GeminiClient: StreamDelegate {
         var body = getHeader(for: self.url, title: error)
         body += "<h2>\(error)</h2>"
         if let data = body.data(using: .utf8) {
-            render(with: data, mime: "text/html")
+            render(data, mime: "text/html")
         } else {
-            render(with: "browser error!".data(using: .utf8)!, mime: "text/html")
+            render("browser error!".data(using: .utf8)!, mime: "text/html")
         }
     }
 
