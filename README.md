@@ -1,21 +1,29 @@
-Gemini for iOS
-===============
+# Elaho (Gemini for iOS)
 
 A [Project Gemini](https://gemini.circumlunar.space/) browser.
 
-This is a fork of an open source [Firefox Browser for iOS](https://github.com/mozilla-mobile/firefox-ios)
+Supports latest Gemini standard, including:
+- all status codes
+- input (including sensitive input)
+- client certificates
+- all of text/gemini
+
+Built on a fork of an open source [Firefox Browser for iOS](https://github.com/mozilla-mobile/firefox-ios), inheriting the following features:
+- tabs
+- bookmarks
+- customizable search engines
+- share extension
+- etc
 
 Download on [the App Store](https://apps.apple.com/app/id1514950389).
 
 ![Gemini screenshot](https://raw.githubusercontent.com/pitr/gemini-ios/master/screenshot.png)
 
-Requirements
-------------
+## Building Requirements
 
 This branch only works with [Xcode 11.4](https://apps.apple.com/app/xcode/id497799835), Swift 5.2 and supports iOS 12.0 and above.
 
-Building the code
------------------
+### Building the code
 
 1. Install the latest [Xcode developer tools](https://developer.apple.com/xcode/downloads/) from Apple.
 1. Install Carthage and Node
@@ -36,7 +44,7 @@ Building the code
 1. Open `Client.xcodeproj` in Xcode.
 1. Build the `Gemini` scheme in Xcode.
 
-## Building User Scripts
+#### Building User Scripts
 
 User Scripts (JavaScript injected into the `WKWebView`) are compiled, concatenated and minified using [webpack](https://webpack.js.org/). User Scripts to be aggregated are placed in the following directories:
 
