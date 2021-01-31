@@ -1,3 +1,5 @@
+![Logo](https://github.com/pitr/gemini-ios/raw/master/Client/Assets/Images.xcassets/AppIcon.appiconset/180.png)
+
 # Elaho (Gemini for iOS)
 
 A [Project Gemini](https://gemini.circumlunar.space/) browser.
