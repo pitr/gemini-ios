@@ -106,7 +106,7 @@ extension Strings {
     public static let ErrorPagesAdvancedButton = NSLocalizedString("ErrorPages.Advanced.Button", value: "Advanced", comment: "Label for button to perform advanced actions on the error page")
     public static let ErrorPagesAdvancedWarning1 = NSLocalizedString("ErrorPages.AdvancedWarning1.Text", value: "Warning: we can’t confirm your connection to this website is secure.", comment: "Warning text when clicking the Advanced button on error pages")
     public static let ErrorPagesAdvancedWarning2 = NSLocalizedString("ErrorPages.AdvancedWarning2.Text", value: "It may be a misconfiguration or tampering by an attacker. Proceed if you accept the potential risk.", comment: "Additional warning text when clicking the Advanced button on error pages")
-    public static let ErrorPagesCertWarningDescription = NSLocalizedString("ErrorPages.CertWarning.Description", value: "The owner of %@ has configured their website improperly. To protect your information from being stolen, Gemini has not connected to this website.", comment: "Warning text on the certificate error page")
+    public static let ErrorPagesCertWarningDescription = NSLocalizedString("ErrorPages.CertWarning.Description", value: "The owner of %@ has configured their website improperly. To protect your information from being stolen, Elaho has not connected to this website.", comment: "Warning text on the certificate error page")
     public static let ErrorPagesCertWarningTitle = NSLocalizedString("ErrorPages.CertWarning.Title", value: "This Connection is Untrusted", comment: "Title on the certificate error page")
     public static let ErrorPagesGoBackButton = NSLocalizedString("ErrorPages.GoBack.Button", value: "Go Back", comment: "Label for button to go back from the error page")
     public static let ErrorPagesVisitOnceButton = NSLocalizedString("ErrorPages.VisitOnce.Button", value: "Visit site anyway", comment: "Button label to temporarily continue to the site from the certificate error page")
@@ -136,7 +136,7 @@ extension Strings {
     public static let RecentlyClosedTabsButtonTitle = NSLocalizedString("HistoryPanel.RecentlyClosedTabsButton.Title", value: "Recently Closed", comment: "Title for the Recently Closed button in the History Panel")
     public static let RecentlyClosedTabsPanelTitle = NSLocalizedString("RecentlyClosedTabsPanel.Title", value: "Recently Closed", comment: "Title for the Recently Closed Tabs Panel")
     public static let HistoryPanelClearHistoryButtonTitle = NSLocalizedString("HistoryPanel.ClearHistoryButtonTitle", value: "Clear Recent History…", comment: "Title for button in the history panel to clear recent history")
-    public static let GeminiHomePage = NSLocalizedString("Gemini.HomePage.Title", value: "Gemini Home Page", comment: "Title for gemini about:home page in tab history list")
+    public static let GeminiHomePage = NSLocalizedString("Gemini.HomePage.Title", value: "Elaho Home Page", comment: "Title for Elaho about:home page in tab history list")
 }
 
 // Clear recent history action menu
@@ -173,7 +173,7 @@ extension Strings {
     public static let SettingsNewTabTitle = NSLocalizedString("Settings.NewTab.Title", value: "New Tab", comment: "Title displayed in header of the setting panel.")
     public static let NewTabSectionNameFooter =
         NSLocalizedString("Settings.NewTab.TopSectionNameFooter", value: "Choose what to load when opening a new tab", comment: "Footer at the bottom of the New Tab screen after entering New Tab in settings")
-    public static let SettingsNewTabTopSites = NSLocalizedString("Settings.NewTab.Option.GeminiHome", value: "Gemini Home", comment: "Option in settings to show Gemini Home when you open a new tab")
+    public static let SettingsNewTabTopSites = NSLocalizedString("Settings.NewTab.Option.GeminiHome", value: "Elaho Home", comment: "Option in settings to show Elaho Home when you open a new tab")
     public static let SettingsNewTabBookmarks = NSLocalizedString("Settings.NewTab.Option.Bookmarks", value: "Bookmarks", comment: "Option in settings to show bookmarks when you open a new tab")
     public static let SettingsNewTabHistory = NSLocalizedString("Settings.NewTab.Option.History", value: "History", comment: "Option in settings to show history when you open a new tab")
     public static let SettingsNewTabBlankPage = NSLocalizedString("Settings.NewTab.Option.BlankPage", value: "Blank Page", comment: "Option in settings to show a blank page when you open a new tab")
@@ -183,7 +183,7 @@ extension Strings {
     public static let SettingsNewTabASTitle = NSLocalizedString("Settings.NewTab.Option.ASTitle", value: "Customize Top Sites", comment: "The title of the section in newtab that lets you modify the topsites panel")
     public static let SettingsNewTabHiglightsHistory = NSLocalizedString("Settings.NewTab.Option.HighlightsHistory", value: "Visited", comment: "Option in settings to turn off history in the highlights section")
     public static let SettingsNewTabHighlightsBookmarks = NSLocalizedString("Settings.NewTab.Option.HighlightsBookmarks", value: "Recent Bookmarks", comment: "Option in the settings to turn off recent bookmarks in the Highlights section")
-    public static let SettingsTopSitesCustomizeTitle = NSLocalizedString("Settings.NewTab.Option.CustomizeTitle", value: "Customize Gemini Home", comment: "The title for the section to customize top sites in the new tab settings page.")
+    public static let SettingsTopSitesCustomizeTitle = NSLocalizedString("Settings.NewTab.Option.CustomizeTitle", value: "Customize Elaho Home", comment: "The title for the section to customize top sites in the new tab settings page.")
     public static let SettingsTopSitesCustomizeFooter = NSLocalizedString("Settings.NewTab.Option.CustomizeFooter", value: "The sites you visit most", comment: "The footer for the section to customize top sites in the new tab settings page.")
 
 }
@@ -251,7 +251,7 @@ extension Strings {
     public static let GoButtonTittle = NSLocalizedString("ClipboardToast.GoToCopiedLink.Button", value: "Go", comment: "The button to open a new tab with the copied link")
 
     public static let SettingsOfferClipboardBarTitle = NSLocalizedString("Settings.OfferClipboardBar.Title", value: "Offer to Open Copied Links", comment: "Title of setting to enable the Go to Copied URL feature. See https://bug1223660.bmoattachments.org/attachment.cgi?id=8898349")
-    public static let SettingsOfferClipboardBarStatus = NSLocalizedString("Settings.OfferClipboardBar.Status", value: "When Opening Gemini", comment: "Description displayed under the ”Offer to Open Copied Link” option. See https://bug1223660.bmoattachments.org/attachment.cgi?id=8898349")
+    public static let SettingsOfferClipboardBarStatus = NSLocalizedString("Settings.OfferClipboardBar.Status", value: "When Opening Elaho", comment: "Description displayed under the ”Offer to Open Copied Link” option. See https://bug1223660.bmoattachments.org/attachment.cgi?id=8898349")
 
     public static let SettingsUseInAppSafariTitle = NSLocalizedString("Settings.InAppSafari.Title", value: "Use In-App Safari", comment: "Title of setting to open http links in-app.")
     public static let SettingsUseInAppSafariStatus = NSLocalizedString("Settings.InAppSafari.Status", value: "Otherwise uses your default browser", comment: "Description displayed under the ”Use In-App Safari” option.")
@@ -268,11 +268,11 @@ extension Strings {
 
 // errors
 extension Strings {
-    public static let UnableToDownloadError = NSLocalizedString("Downloads.Error.Message", value: "Downloads aren’t supported in Gemini yet.", comment: "The message displayed to a user when they try and perform the download of an asset that Gemini cannot currently handle.")
+    public static let UnableToDownloadError = NSLocalizedString("Downloads.Error.Message", value: "Downloads aren’t supported in Elaho yet.", comment: "The message displayed to a user when they try and perform the download of an asset that Elaho cannot currently handle.")
     public static let UnableToAddPassErrorTitle = NSLocalizedString("AddPass.Error.Title", value: "Failed to Add Pass", comment: "Title of the 'Add Pass Failed' alert. See https://support.apple.com/HT204003 for context on Wallet.")
     public static let UnableToAddPassErrorMessage = NSLocalizedString("AddPass.Error.Message", value: "An error occured while adding the pass to Wallet. Please try again later.", comment: "Text of the 'Add Pass Failed' alert.  See https://support.apple.com/HT204003 for context on Wallet.")
     public static let UnableToAddPassErrorDismiss = NSLocalizedString("AddPass.Error.Dismiss", value: "OK", comment: "Button to dismiss the 'Add Pass Failed' alert.  See https://support.apple.com/HT204003 for context on Wallet.")
-    public static let UnableToOpenURLError = NSLocalizedString("OpenURL.Error.Message", value: "Gemini cannot open the page because it has an invalid address.", comment: "The message displayed to a user when they try to open a URL that cannot be handled by Gemini, or any external app.")
+    public static let UnableToOpenURLError = NSLocalizedString("OpenURL.Error.Message", value: "Elaho cannot open the page because it has an invalid address.", comment: "The message displayed to a user when they try to open a URL that cannot be handled by Elaho, or any external app.")
     public static let UnableToOpenURLErrorTitle = NSLocalizedString("OpenURL.Error.Title", value: "Cannot Open Page", comment: "Title of the message shown when the user attempts to navigate to an invalid link.")
 }
 
@@ -324,7 +324,7 @@ extension Strings {
 
 // Photo Library access.
 extension Strings {
-    public static let PhotoLibraryGeminiWouldLikeAccessTitle = NSLocalizedString("PhotoLibrary.GeminiWouldLikeAccessTitle", value: "Gemini would like to access your Photos", comment: "")
+    public static let PhotoLibraryGeminiWouldLikeAccessTitle = NSLocalizedString("PhotoLibrary.GeminiWouldLikeAccessTitle", value: "Elaho would like to access your Photos", comment: "")
     public static let PhotoLibraryGeminiWouldLikeAccessMessage = NSLocalizedString("PhotoLibrary.GeminiWouldLikeAccessMessage", value: "This allows you to save the image to your Camera Roll.", comment: "")
 }
 
@@ -349,7 +349,7 @@ extension Strings {
     public static let AppMenuHistoryTitleString = NSLocalizedString("Menu.OpenHistoryAction.AccessibilityLabel.v2", tableName: "Menu", value: "History", comment: "Accessibility label for the button, displayed in the menu, used to open the History home panel. Please keep as short as possible, <15 chars of space available.")
     public static let AppMenuCertificatesTitleString = NSLocalizedString("Menu.OpenCertificatesAction.AccessibilityLabel.v2", tableName: "Menu", value: "Certificates", comment: "Accessibility label for the button, displayed in the menu, used to open the Certificates home panel. Please keep as short as possible, <15 chars of space available.")
     public static let AppMenuSyncedTabsTitleString = NSLocalizedString("Menu.OpenSyncedTabsAction.AccessibilityLabel.v2", tableName: "Menu", value: "Synced Tabs", comment: "Accessibility label for the button, displayed in the menu, used to open the Synced Tabs home panel. Please keep as short as possible, <15 chars of space available.")
-    public static let AppMenuLibrarySeeAllTitleString = NSLocalizedString("Menu.SeeAllAction.Title", tableName: "Menu", value: "See All", comment: "Label for the button, displayed in Gemini Home, used to see all Library panels.")
+    public static let AppMenuLibrarySeeAllTitleString = NSLocalizedString("Menu.SeeAllAction.Title", tableName: "Menu", value: "See All", comment: "Label for the button, displayed in Elaho Home, used to see all Library panels.")
     public static let AppMenuButtonAccessibilityLabel = NSLocalizedString("Toolbar.Menu.AccessibilityLabel", value: "Menu", comment: "Accessibility label for the Menu button.")
     public static let TabTrayDeleteMenuButtonAccessibilityLabel = NSLocalizedString("Toolbar.Menu.CloseAllTabs", value: "Close All Tabs", comment: "Accessibility label for the Close All Tabs menu button.")
     public static let AppMenuCopyURLConfirmMessage = NSLocalizedString("Menu.CopyURL.Confirm", value: "URL Copied To Clipboard", comment: "Toast displayed to user after copy url pressed.")
@@ -381,7 +381,7 @@ extension Strings {
 extension Strings {
     public static let SendUsageSettingTitle = NSLocalizedString("Settings.SendUsage.Title", value: "Send Usage Data", comment: "The title for the setting to send usage data.")
     public static let SettingsSiriSectionName = NSLocalizedString("Settings.Siri.SectionName", value: "Siri Shortcuts", comment: "The option that takes you to the siri shortcuts settings page")
-    public static let SettingsSiriSectionDescription = NSLocalizedString("Settings.Siri.SectionDescription", value: "Use Siri shortcuts to quickly open Gemini via Siri", comment: "The description that describes what siri shortcuts are")
+    public static let SettingsSiriSectionDescription = NSLocalizedString("Settings.Siri.SectionDescription", value: "Use Siri shortcuts to quickly open Elaho via Siri", comment: "The description that describes what siri shortcuts are")
     public static let SettingsSiriOpenURL = NSLocalizedString("Settings.Siri.OpenTabShortcut", value: "Open New Tab", comment: "The description of the open new tab siri shortcut")
 }
 
@@ -429,14 +429,14 @@ extension Strings {
 
     // The above items are re-used strings from the old extension. New strings below.
 
-    public static let ShareBookmarkThisPage = NSLocalizedString("ShareExtension.BookmarkThisPageAction.Title", value: "Bookmark This Page", comment: "Action label on share extension to bookmark the page in Gemini.")
+    public static let ShareBookmarkThisPage = NSLocalizedString("ShareExtension.BookmarkThisPageAction.Title", value: "Bookmark This Page", comment: "Action label on share extension to bookmark the page in Elaho.")
     public static let ShareBookmarkThisPageDone = NSLocalizedString("ShareExtension.BookmarkThisPageActionDone.Title", value: "Bookmarked", comment: "Share extension label shown after user has performed 'Bookmark this Page' action.")
 
-    public static let ShareOpenInGemini = NSLocalizedString("ShareExtension.OpenInGeminiAction.Title", value: "Open in Gemini", comment: "Action label on share extension to immediately open page in Gemini.")
-    public static let ShareSearchInGemini = NSLocalizedString("ShareExtension.SeachInGeminiAction.Title", value: "Search in Gemini", comment: "Action label on share extension to search for the selected text in Gemini.")
+    public static let ShareOpenInGemini = NSLocalizedString("ShareExtension.OpenInGeminiAction.Title", value: "Open in Elaho", comment: "Action label on share extension to immediately open page in Elaho.")
+    public static let ShareSearchInGemini = NSLocalizedString("ShareExtension.SeachInGeminiAction.Title", value: "Search in Elaho", comment: "Action label on share extension to search for the selected text in Elaho.")
 
-    public static let ShareLoadInBackground = NSLocalizedString("ShareExtension.LoadInBackgroundAction.Title", value: "Load in Background", comment: "Action label on share extension to load the page in Gemini when user switches apps to bring it to foreground.")
-    public static let ShareLoadInBackgroundDone = NSLocalizedString("ShareExtension.LoadInBackgroundActionDone.Title", value: "Loading in Gemini", comment: "Share extension label shown after user has performed 'Load in Background' action.")
+    public static let ShareLoadInBackground = NSLocalizedString("ShareExtension.LoadInBackgroundAction.Title", value: "Load in Background", comment: "Action label on share extension to load the page in Elaho when user switches apps to bring it to foreground.")
+    public static let ShareLoadInBackgroundDone = NSLocalizedString("ShareExtension.LoadInBackgroundActionDone.Title", value: "Loading in Elaho", comment: "Share extension label shown after user has performed 'Load in Background' action.")
 
 }
 
@@ -463,7 +463,7 @@ extension Strings {
 extension Strings {
     // Dark Mode Cover Sheet
     public static let CoverSheetV22DarkModeTitle = NSLocalizedString("CoverSheet.v22.DarkMode.Title", value: "Dark theme now includes a dark keyboard and dark splash screen.", comment: "Title for the new dark mode change in the version 22 app release.")
-    public static let CoverSheetV22DarkModeDescription = NSLocalizedString("CoverSheet.v22.DarkMode.Description", value: "For iOS 13 users, Gemini now automatically switches to a dark theme when your phone is set to Dark Mode. To change this behavior, go to Settings > Theme.", comment: "Description for the new dark mode change in the version 22 app release. It describes the new automatic dark theme and how to change the theme settings.")
+    public static let CoverSheetV22DarkModeDescription = NSLocalizedString("CoverSheet.v22.DarkMode.Description", value: "For iOS 13 users, Elaho now automatically switches to a dark theme when your phone is set to Dark Mode. To change this behavior, go to Settings > Theme.", comment: "Description for the new dark mode change in the version 22 app release. It describes the new automatic dark theme and how to change the theme settings.")
     
     // ETP Cover Sheet
     public static let CoverSheetETPTitle = NSLocalizedString("CoverSheet.v24.ETP.Title", value: "Protection Against Ad Tracking", comment: "Title for the new ETP mode i.e. standard vs strict")

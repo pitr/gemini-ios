@@ -1533,7 +1533,7 @@ extension BrowserViewController: TabManagerDelegate {
     }
 
     func updateTabCountUsingTabManager(_ tabManager: TabManager, animated: Bool = true) {
-        if let selectedTab = tabManager.selectedTab {
+        if tabManager.selectedTab != nil {
             let count = tabManager.normalTabs.count
             toolbar?.updateTabCount(count, animated: animated)
             urlBar.updateTabCount(count, animated: !urlBar.inOverlayMode)

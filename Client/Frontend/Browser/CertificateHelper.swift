@@ -27,7 +27,6 @@ class CertificateHelper: TabContentScript {
     }
 
     func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
-        let data = message.body as! [String: Bool]
         guard let host = tab?.url?.host else {
             // oops
             return

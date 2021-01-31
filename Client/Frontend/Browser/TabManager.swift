@@ -488,7 +488,7 @@ extension TabManager {
             return
         }
 
-        var tabToSelect = store.restoreStartupTabs(tabManager: self)
+        let tabToSelect = store.restoreStartupTabs(tabManager: self)
 
         for delegate in self.delegates {
             delegate.get()?.tabManagerDidRestoreTabs(self)
