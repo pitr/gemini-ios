@@ -16,7 +16,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "F84B22481A0920C600AAB793"
-               BuildableName = "Gemini.appex"
+               BuildableName = "Elaho.appex"
                BlueprintName = "ShareTo"
                ReferencedContainer = "container:Client.xcodeproj">
             </BuildableReference>
@@ -28,15 +28,6 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "F84B21BD1A090F8100AAB793"
-            BuildableName = "Gemini.app"
-            BlueprintName = "Client"
-            ReferencedContainer = "container:Client.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
       <Testables>
       </Testables>
    </TestAction>
@@ -56,7 +47,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "F84B22481A0920C600AAB793"
-            BuildableName = "Gemini.appex"
+            BuildableName = "Elaho.appex"
             BlueprintName = "ShareTo"
             ReferencedContainer = "container:Client.xcodeproj">
          </BuildableReference>
@@ -80,7 +71,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "F84B22481A0920C600AAB793"
-            BuildableName = "Gemini.appex"
+            BuildableName = "Elaho.appex"
             BlueprintName = "ShareTo"
             ReferencedContainer = "container:Client.xcodeproj">
          </BuildableReference>
