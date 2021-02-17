@@ -11,7 +11,7 @@ public struct PrefsKeys {
     public static let KeyMailToOption = "MailToOption"
     public static let IntroSeen = "IntroViewControllerSeen"
     public static let NumberOfTopSiteRows = "NumberOfTopSiteRows"
-    public static let GeminiShowImagesInline = "GeminiShowImagesInline"
+    public static let GeminiMaxImagesInline = "GeminiMaxImagesInline"
 
     public static let ContextMenuShowLinkPreviews = "showLinkPreviews"
 

@@ -57,11 +57,8 @@ class AppSettingsTableViewController: SettingsTableViewController {
         settings += [ SettingSection(title: NSAttributedString(string: Strings.SettingsGeneralSectionTitle), children: generalSettings)]
 
         settings += [ SettingSection(title: NSAttributedString(string: "Gemini"), children: [
-            BoolSetting(prefs: prefs, prefKey: PrefsKeys.GeminiShowImagesInline, defaultValue: true,
-                        titleText: Strings.SettingsShowImagesInlineTitle,
-                        statusText: Strings.SettingsShowImagesInlineStatus)
-            ])
-        ]
+                                        InlineImagesSettings(settings: self)
+        ])]
 
         return settings
     }
@@ -69,5 +66,61 @@ class AppSettingsTableViewController: SettingsTableViewController {
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = super.tableView(tableView, viewForHeaderInSection: section) as! ThemedTableSectionHeaderFooterView
         return headerView
+    }
+
+    class InlineImagesSettings: Setting {
+        let profile: Profile
+
+        override var accessoryType: UITableViewCell.AccessoryType { return .disclosureIndicator }
+        override var status: NSAttributedString {
+            let num = self.profile.prefs.intForKey(PrefsKeys.GeminiMaxImagesInline) ?? InlineImagesCountSettingsController.defaultImages
+            return NSAttributedString(string: String(format: Strings.InlineImagesCount, num))
+        }
+
+        override var accessibilityIdentifier: String? { return "InlineImagesCount" }
+        override var style: UITableViewCell.CellStyle { return .value1 }
+
+        init(settings: SettingsTableViewController) {
+            self.profile = settings.profile
+            super.init(title: NSAttributedString(string: Strings.SettingsShowImagesInlineTitle, attributes: [NSAttributedString.Key.foregroundColor: UIColor.theme.tableView.rowText]))
+        }
+
+        override func onClick(_ navigationController: UINavigationController?) {
+            let viewController = InlineImagesCountSettingsController(prefs: profile.prefs)
+            viewController.profile = profile
+            navigationController?.pushViewController(viewController, animated: true)
+        }
+    }
+}
+
+class InlineImagesCountSettingsController: SettingsTableViewController {
+    let prefs: Prefs
+    var numberOfInlinedImages: Int32
+    static let defaultImages: Int32 = 5
+
+    init(prefs: Prefs) {
+        self.prefs = prefs
+        numberOfInlinedImages = self.prefs.intForKey(PrefsKeys.GeminiMaxImagesInline) ?? InlineImagesCountSettingsController.defaultImages
+        super.init(style: .grouped)
+        self.title = Strings.SettingsShowImagesInlineTitle
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func generateSettings() -> [SettingSection] {
+
+        let createSetting: (Int32) -> CheckmarkSetting = { num in
+            return CheckmarkSetting(title: NSAttributedString(string: "\(num)"), subtitle: nil, isChecked: { return num == self.numberOfInlinedImages }, onChecked: {
+                self.numberOfInlinedImages = num
+                self.prefs.setInt(Int32(num), forKey: PrefsKeys.GeminiMaxImagesInline)
+                self.tableView.reloadData()
+            })
+        }
+
+        let rows = [0, 1, 5, 10, 20, 30, 100].map(createSetting)
+        let section = SettingSection(title: nil, footerTitle: NSAttributedString(string: Strings.SettingsShowImagesInlineStatus), children: rows)
+        return [section]
     }
 }

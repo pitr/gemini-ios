@@ -327,6 +327,7 @@ extension GeminiClient: StreamDelegate {
             let linkRegex = try NSRegularExpression(pattern: #"^=&gt;\s*(\S+)\s*(.*)$"#, options: [])
 
             var pageTitle: String?
+            var maxPreloadedImages = self.profile.prefs.intForKey(PrefsKeys.GeminiMaxImagesInline) ?? InlineImagesCountSettingsController.defaultImages
             var body = ""
             var pre = false
             for rawLine in content.components(separatedBy: "\n") {
@@ -378,9 +379,11 @@ extension GeminiClient: StreamDelegate {
                     } else if url?.host != self.url.host {
                         prefix = "⇒"
                     } else if let img = url,
+                              img.baseDomain == self.url.baseDomain,
                               ["jpg", "jpeg", "gif ", "png"].contains(img.pathExtension.lowercased()),
-                              self.profile.prefs.boolForKey(PrefsKeys.GeminiShowImagesInline) ?? true {
+                              maxPreloadedImages > 0 {
                         body.append("<img src=\"\(img.absoluteString)\">\n")
+                        maxPreloadedImages-=1
                         continue
                     }
                     if link == title {
