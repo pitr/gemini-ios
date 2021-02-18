@@ -99,6 +99,10 @@ extension Strings {
     public static let SettingsSearchDoneButton = NSLocalizedString("Settings.Search.Done.Button", value: "Done", comment: "Button displayed at the top of the search settings.")
     public static let SettingsSearchEditButton = NSLocalizedString("Settings.Search.Edit.Button", value: "Edit", comment: "Button displayed at the top of the search settings.")
     public static let SettingsCopyAppVersionAlertTitle = NSLocalizedString("Settings.CopyAppVersion.Title", value: "Copied to clipboard", comment: "Copy app version alert shown in settings.")
+
+    public static let SettingsFeedbackTitle = NSLocalizedString("Settings.Feedback.Title", value: "Feedback", comment: "Title of feedback section in settings.")
+    public static let SettingsFeedbackButton = NSLocalizedString("Settings.Feedback.Button", value: "Send Feedback", comment: "Title of feedback button in settings.")
+    public static let SettingsRateButton = NSLocalizedString("Settings.Rate.Button", value: "Rate Elaho", comment: "Title of rate button in settings.")
 }
 
 // Error pages.

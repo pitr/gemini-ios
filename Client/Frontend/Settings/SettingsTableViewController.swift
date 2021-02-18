@@ -4,6 +4,8 @@
 
 import Shared
 import UIKit
+import SafariServices
+import StoreKit
 
 struct SettingsUX {
     static let TableViewHeaderFooterHeight = CGFloat(44)
@@ -157,6 +159,34 @@ private class PaddedSwitch: UIView {
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+}
+
+// A helper class for non-setting rate me button.
+class RateNonSetting: Setting {
+    init(attributedTitleText: NSAttributedString) {
+        super.init(title: attributedTitleText)
+    }
+
+    convenience init(titleText: String) {
+        self.init(attributedTitleText: NSAttributedString(string: titleText, attributes: [NSAttributedString.Key.foregroundColor: UIColor.theme.tableView.rowText]))
+    }
+
+    override func onConfigureCell(_ cell: UITableViewCell) {
+        super.onConfigureCell(cell)
+
+        let control = UISwitchThemed()
+        control.onTintColor = UIConstants.SystemBlueColor
+
+        if let title = title {
+            control.accessibilityLabel = title.string
+            cell.accessibilityLabel = nil
+        }
+        cell.selectionStyle = .none
+    }
+
+    override func onClick(_ navigationController: UINavigationController?) {
+        SKStoreReviewController.requestReview()
     }
 }
 

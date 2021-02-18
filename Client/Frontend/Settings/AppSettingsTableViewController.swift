@@ -60,6 +60,10 @@ class AppSettingsTableViewController: SettingsTableViewController {
                                         InlineImagesSettings(settings: self)
         ])]
 
+        settings += [ SettingSection(title: NSAttributedString(string: Strings.SettingsFeedbackTitle), children: [
+            RateNonSetting(titleText: Strings.SettingsRateButton)
+        ])]
+
         return settings
     }
 
