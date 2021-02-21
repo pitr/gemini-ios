@@ -103,6 +103,10 @@ extension Strings {
     public static let SettingsFeedbackTitle = NSLocalizedString("Settings.Feedback.Title", value: "Feedback", comment: "Title of feedback section in settings.")
     public static let SettingsFeedbackButton = NSLocalizedString("Settings.Feedback.Button", value: "Send Feedback", comment: "Title of feedback button in settings.")
     public static let SettingsRateButton = NSLocalizedString("Settings.Rate.Button", value: "Rate Elaho", comment: "Title of rate button in settings.")
+
+    public static let SettingsEnableSiteThemeTitle = NSLocalizedString("Settings.EnableSiteTheme.Title", value: "Enable Site Themes", comment: "Title of setting to enable site-specific themes")
+    public static let SettingsEnableSiteThemeStatus = NSLocalizedString("Settings.EnableSiteTheme.Status", value: "Site themes are auto-generated based on site URL", comment: "Status of setting to enable site-specific themes")
+
 }
 
 // Error pages.

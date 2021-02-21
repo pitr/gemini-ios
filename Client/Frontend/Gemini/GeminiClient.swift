@@ -408,11 +408,23 @@ extension GeminiClient: StreamDelegate {
     }
 
     fileprivate func getHeader(for url: URL, title: String) -> String {
-        let header = try! String(contentsOfFile: Bundle.main.path(forResource: "GeminiHeader", ofType: "html")!)
+        var header = try! String(contentsOfFile: Bundle.main.path(forResource: "GeminiHeader", ofType: "html")!)
         let theme = ThemeManager.instance.current.name
         let fontMono = getFontMono()
-        let fontStyle = "@font-face{font-family:DejavuSansMono;src:url(data:font/ttf;base64,\(fontMono)) format(\"truetype\")}"
-        return header+"<style>\(fontStyle)</style><title>\(title)</title></head><body class=\(theme)>\n"
+        header += "<style>@font-face{font-family:DejavuSansMono;src:url(data:font/ttf;base64,\(fontMono)) format(\"truetype\")}</style>"
+
+        if self.profile.prefs.boolForKey(PrefsKeys.EnableSiteTheme) ?? false,
+           let hash = url.host?.md5, hash.count > 2 {
+            let hue = CGFloat(hash[0]) + CGFloat(hash[1]) / 510.0
+            let saturation = CGFloat(hash[2]) / 255.0 / 2.0
+
+            let bgNormal = UIColor(hue: hue, saturation: saturation/2.0, brightness: 0.95, alpha: 1.0).hexString
+            let bgDark = UIColor(hue: hue, saturation: saturation, brightness: 0.20, alpha: 1.0).hexString
+
+            header += "<style>.normal {background:\(bgNormal) !important};.dark {background:\(bgDark) !important;}</style>"
+        }
+
+        return header+"<title>\(title)</title></head><body class=\(theme)>\n"
     }
 
     fileprivate func getFontMono() -> String {

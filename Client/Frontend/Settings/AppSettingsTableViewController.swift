@@ -57,7 +57,10 @@ class AppSettingsTableViewController: SettingsTableViewController {
         settings += [ SettingSection(title: NSAttributedString(string: Strings.SettingsGeneralSectionTitle), children: generalSettings)]
 
         settings += [ SettingSection(title: NSAttributedString(string: "Gemini"), children: [
-                                        InlineImagesSettings(settings: self)
+            InlineImagesSettings(settings: self),
+            BoolSetting(prefs: prefs, prefKey: PrefsKeys.EnableSiteTheme, defaultValue: false,
+                        titleText: Strings.SettingsEnableSiteThemeTitle, statusText: Strings.SettingsEnableSiteThemeStatus)
+
         ])]
 
         settings += [ SettingSection(title: NSAttributedString(string: Strings.SettingsFeedbackTitle), children: [
