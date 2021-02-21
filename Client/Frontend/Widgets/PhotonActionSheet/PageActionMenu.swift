@@ -32,6 +32,7 @@ extension PhotonActionSheetProtocol {
     func getTabActions(tab: Tab, buttonView: UIView,
                        presentShareMenu: @escaping (URL, Tab, UIView, UIPopoverArrowDirection) -> Void,
                        findInPage:  @escaping () -> Void,
+                       openBookmarks:  @escaping () -> Void,
                        openSettings:  @escaping () -> Void,
                        presentableVC: PresentableVC,
                        isBookmarked: Bool,
@@ -121,11 +122,15 @@ extension PhotonActionSheetProtocol {
             commonActions.insert(findInPageAction, at: 0)
         }
 
+        let openBookmarks = PhotonActionSheetItem(title: Strings.AppMenuBookmarksTitleString, iconString: "menu-library") { _, _ in
+            openBookmarks()
+        }
+
         let openSettings = PhotonActionSheetItem(title: Strings.AppMenuSettingsTitleString, iconString: "menu-Settings") { _, _ in
             openSettings()
         }
 
-        return [mainActions, commonActions, [openSettings]]
+        return [mainActions, commonActions, [openBookmarks, openSettings]]
     }
 
 }

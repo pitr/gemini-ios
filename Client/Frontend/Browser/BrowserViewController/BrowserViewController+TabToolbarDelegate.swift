@@ -43,6 +43,10 @@ extension BrowserViewController: TabToolbarDelegate, PhotonActionSheetProtocol {
             self.updateFindInPageVisibility(visible: true)
         }
 
+        let openBookmarksAction = {
+            self.showLibrary(panel: .bookmarks)
+        }
+
         let openSettingsAction = {
             self.openSettings()
         }
@@ -63,9 +67,13 @@ extension BrowserViewController: TabToolbarDelegate, PhotonActionSheetProtocol {
         let isPinned = fetchPinnedTopSiteStatus(for: urlString)
 
         let pageActions = self.getTabActions(tab: tab, buttonView: button, presentShareMenu: actionMenuPresenter,
-                                             findInPage: findInPageAction, openSettings: openSettingsAction, presentableVC: self, isBookmarked: isBookmarked,
+                                             findInPage: findInPageAction, openBookmarks: openBookmarksAction, openSettings: openSettingsAction, presentableVC: self, isBookmarked: isBookmarked,
                                              isPinned: isPinned, success: successCallback)
         self.presentSheetWith(actions: pageActions, on: self, from: button)
+    }
+
+    func tabToolbarDidLongPressShare(_ tabToolbar: TabToolbarProtocol, button: UIButton) {
+        showLibrary(panel: .bookmarks)
     }
 
     func tabToolbarDidPressTabs(_ tabToolbar: TabToolbarProtocol, button: UIButton) {

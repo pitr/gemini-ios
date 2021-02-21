@@ -27,6 +27,7 @@ protocol TabToolbarDelegate: AnyObject {
     func tabToolbarDidPressForward(_ tabToolbar: TabToolbarProtocol, button: UIButton)
     func tabToolbarDidLongPressBack(_ tabToolbar: TabToolbarProtocol, button: UIButton)
     func tabToolbarDidLongPressForward(_ tabToolbar: TabToolbarProtocol, button: UIButton)
+    func tabToolbarDidLongPressShare(_ tabToolbar: TabToolbarProtocol, button: UIButton)
     func tabToolbarDidPressUp(_ tabToolbar: TabToolbarProtocol, button: UIButton)
     func tabToolbarDidPressShare(_ tabToolbar: TabToolbarProtocol, button: UIButton)
     func tabToolbarDidPressTabs(_ tabToolbar: TabToolbarProtocol, button: UIButton)
@@ -70,6 +71,8 @@ open class TabToolbarHelper: NSObject {
         toolbar.shareButton.accessibilityLabel = Strings.AppMenuSharePageTitleString
         toolbar.shareButton.addTarget(self, action: #selector(didClickShare), for: .touchUpInside)
         toolbar.shareButton.accessibilityIdentifier = "TabToolbar.shareButton"
+        let longPressGestureShareButton = UILongPressGestureRecognizer(target: self, action: #selector(didLongPressShare))
+        toolbar.shareButton.addGestureRecognizer(longPressGestureShareButton)
 
         setTheme(forButtons: toolbar.actionButtons)
     }
@@ -104,6 +107,10 @@ open class TabToolbarHelper: NSObject {
 
     func didClickShare() {
         toolbar.tabToolbarDelegate?.tabToolbarDidPressShare(toolbar, button: toolbar.shareButton)
+    }
+
+    func didLongPressShare(_ recognizer: UILongPressGestureRecognizer) {
+        toolbar.tabToolbarDelegate?.tabToolbarDidLongPressShare(toolbar, button: toolbar.shareButton)
     }
 
     func didClickUp() {

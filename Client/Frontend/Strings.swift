@@ -130,7 +130,7 @@ extension Strings {
 
 // Certificates Panel
 extension Strings {
-    public static let CertificatesPanelEmptyStateTitle = NSLocalizedString("CertificatesPanel.EmptyState.Title", value: "Certificates will show up here.", comment: "Title for the Certificates Panel empty state.")
+    public static let CertificatesPanelEmptyStateTitle = NSLocalizedString("CertificatesPanel.EmptyState.Title", value: "Client certificates will show up here.", comment: "Title for the Client certificates Panel empty state.")
     public static let CertificatesPanelDeleteTitle = NSLocalizedString("CertificatesPanel.Delete.Title", value: "Delete", comment: "Action button for deleting certificate in the Certificates panel.")
     public static let CertificatesPanelActivateTitle = NSLocalizedString("CertificatesPanel.Activate.Title", value: "Activate", comment: "Action button for activating Certificates in the Certificates panel.")
     public static let CertificatesPanelDeactivateTitle = NSLocalizedString("CertificatesPanel.Deactivate.Title", value: "Deactivate", comment: "Action button for deactivating Certificates in the Certificates panel.")
