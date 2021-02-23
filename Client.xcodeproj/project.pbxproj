@@ -2062,7 +2062,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(inherit)Client/Entitlements/GeminiDevApplication.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2021.02.22;
+				CURRENT_PROJECT_VERSION = 2021.02.24;
 				DEVELOPMENT_TEAM = 297936744Y;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2081,7 +2081,7 @@
 				INFOPLIST_FILE = Client/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.6.0;
+				MARKETING_VERSION = 1.6.1;
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lxml2",
@@ -2121,7 +2121,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(inherit)Extensions/Entitlements/Gemini.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2021.02.22;
+				CURRENT_PROJECT_VERSION = 2021.02.24;
 				DEVELOPMENT_TEAM = 297936744Y;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2132,7 +2132,7 @@
 				INFOPLIST_FILE = Extensions/ShareTo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../../Frameworks";
-				MARKETING_VERSION = 1.6.0;
+				MARKETING_VERSION = 1.6.1;
 				OTHER_SWIFT_FLAGS = "-DMOZ_TARGET_SHARETO";
 				PRODUCT_BUNDLE_IDENTIFIER = com.pitr.Gemini.ShareTo;
 				PRODUCT_NAME = Elaho;
