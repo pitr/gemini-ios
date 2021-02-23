@@ -2,6 +2,15 @@
 <html lang="en">
     <head>
         <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+            <script type="text/javascript">
+                function inlineImage(link){
+                    var i=document.createElement('img');
+                    i.src=link.href;
+                    link.parentNode.appendChild(i);
+                    link.removeAttribute("onclick");
+                    return false;
+                }
+            </script>
             <style>
                 :root{--nc-font:-apple-system,'Helvetica Neue',sans-serif,"Apple Color Emoji";--nc-font-mono:DejavuSansMono,'Menlo',monospace}
 
@@ -31,5 +40,5 @@
                 code,pre{font-family:var(--nc-font-mono);overflow-x:auto}
                 li{margin-top:.4rem;text-indent: -1em;margin-left: 1.5em}
                 input{width:100%;padding:6px 12px;margin:.5rem 0;border:0;border-radius:4px;box-shadow:none;box-sizing:border-box}
-                img{max-width:100%}
+                img{max-width:100%;display:block}
                 </style>

@@ -263,10 +263,6 @@ extension Strings {
 
     public static let SettingsUseInAppSafariTitle = NSLocalizedString("Settings.InAppSafari.Title", value: "Use In-App Safari", comment: "Title of setting to open http links in-app.")
     public static let SettingsUseInAppSafariStatus = NSLocalizedString("Settings.InAppSafari.Status", value: "Otherwise uses your default browser", comment: "Description displayed under the ”Use In-App Safari” option.")
-
-    public static let SettingsShowImagesInlineTitle = NSLocalizedString("Settings.ShowImagesInline.Title", value: "Images to inline", comment: "Title of setting to show images inline")
-    public static let SettingsShowImagesInlineStatus = NSLocalizedString("Settings.ShowImagesInline.Status", value: "Images from different domains are never inlined", comment: "Status of setting to show images inline")
-    public static let InlineImagesCount = NSLocalizedString("Settings.ShowImagesInline.ImageCount", value: "Images: %d", comment: "label showing how many images to inline. %d represents a number")
 }
 
 // Link Previews
