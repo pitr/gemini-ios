@@ -335,11 +335,11 @@ extension GeminiClient: StreamDelegate {
                 if line.starts(with: "```") {
                     pre = !pre
                     if pre {
-                        var title = rawLine.replaceFirstOccurrence(of: "```", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                        var title = rawLine.replaceFirstOccurrence(of: "```", with: "").trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "'", with: "\'")
                         if title.isEmpty {
                             title = "unlabelled preformatted text"
                         }
-                        body.append("<figure role='img' aria-labelledby='\(title)'><pre><code>")
+                        body.append("<pre aria-label='\(title)'><code>")
                     } else {
                         body.append("</code></pre></figure>\n")
                     }
