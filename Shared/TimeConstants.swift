@@ -27,13 +27,13 @@ fileprivate let rfc822DateFormatter: DateFormatter = {
 
 extension TimeInterval {
     public static func fromMicrosecondTimestamp(_ microsecondTimestamp: MicrosecondTimestamp) -> TimeInterval {
-        return Double(microsecondTimestamp) / 1000000
+        return Double(microsecondTimestamp) / 1_000_000
     }
 }
 
 extension Timestamp {
     public static func uptimeInMilliseconds() -> Timestamp {
-        return Timestamp(DispatchTime.now().uptimeNanoseconds) / 1000000
+        return Timestamp(DispatchTime.now().uptimeNanoseconds) / 1_000_000
     }
 }
 
@@ -51,7 +51,7 @@ extension Date {
     }
 
     public static func nowMicroseconds() -> MicrosecondTimestamp {
-        return UInt64(1000000 * Date().timeIntervalSince1970)
+        return UInt64(1_000_000 * Date().timeIntervalSince1970)
     }
 
     public static func fromTimestamp(_ timestamp: Timestamp) -> Date {
@@ -59,7 +59,7 @@ extension Date {
     }
 
     public static func fromMicrosecondTimestamp(_ microsecondTimestamp: MicrosecondTimestamp) -> Date {
-        return Date(timeIntervalSince1970: Double(microsecondTimestamp) / 1000000)
+        return Date(timeIntervalSince1970: Double(microsecondTimestamp) / 1_000_000)
     }
 
     public func toRelativeTimeString(dateStyle: DateFormatter.Style = .short, timeStyle: DateFormatter.Style = .short) -> String {

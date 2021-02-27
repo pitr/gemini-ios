@@ -104,13 +104,11 @@ class GeminiClient: NSObject {
                     return
                 }
                 if !isComplete {
-                    self.renderError(error: "not complete???", for: self.url, to: self.urlSchemeTask)
-                    conn.cancel()
-                    return
+                    log.error("not complete???")
                 }
                 conn.cancel()
                 guard let data = data else {
-                    self.renderError(error: "no error or data?!", for: self.url, to: self.urlSchemeTask)
+                    self.renderError(error: "server responded with no content", for: self.url, to: self.urlSchemeTask)
                     return
                 }
 
@@ -262,17 +260,19 @@ class GeminiClient: NSObject {
             var pageTitle: String?
             var body = ""
             var pre = false
+            var precounter = 0
             for rawLine in content.components(separatedBy: "\n") {
                 let line = rawLine.escapeHTML()
                 let range = NSRange(line.startIndex..<line.endIndex, in: line)
                 if line.starts(with: "```") {
                     pre = !pre
                     if pre {
-                        var title = rawLine.replaceFirstOccurrence(of: "```", with: "").trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "'", with: "\'")
+                        var title = rawLine.replaceFirstOccurrence(of: "```", with: "").trimmingCharacters(in: .whitespacesAndNewlines).escapeHTML()
                         if title.isEmpty {
                             title = "unlabelled preformatted text"
                         }
-                        body.append("<pre aria-label='\(title)'><code>")
+                        precounter += 1
+                        body.append("<figure role='img' aria-labelledby='pre-\(precounter)'><figcaption id='pre-\(precounter)'>\(title)</figcaption><pre><code>")
                     } else {
                         body.append("</code></pre></figure>\n")
                     }
