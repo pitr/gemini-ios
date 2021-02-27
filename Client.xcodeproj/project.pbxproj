@@ -2081,7 +2081,7 @@
 				INFOPLIST_FILE = Client/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.6.1;
+				MARKETING_VERSION = 1.6.2;
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lxml2",
@@ -2132,7 +2132,7 @@
 				INFOPLIST_FILE = Extensions/ShareTo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../../Frameworks";
-				MARKETING_VERSION = 1.6.1;
+				MARKETING_VERSION = 1.6.2;
 				OTHER_SWIFT_FLAGS = "-DMOZ_TARGET_SHARETO";
 				PRODUCT_BUNDLE_IDENTIFIER = com.pitr.Gemini.ShareTo;
 				PRODUCT_NAME = Elaho;
