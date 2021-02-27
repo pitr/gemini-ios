@@ -22,6 +22,7 @@ extension SecCertificate {
 class GeminiClient: NSObject {
     static var serverFingerprints: [String: [String]] = [:]
     static let queue = DispatchQueue(label: "gemini", qos: .default)
+    static var redirects = 0
 
     let urlSchemeTask: WKURLSchemeTask
     let url: URL
@@ -153,6 +154,7 @@ class GeminiClient: NSObject {
         }
         switch header {
         case .success(let mime):
+            GeminiClient.redirects = 0
             let data = data.dropFirst(ix+2)
             if mime.contentType.starts(with: "text/") {
                 guard let body = String(data: data, encoding: mime.charset) else {
@@ -195,8 +197,14 @@ class GeminiClient: NSObject {
                 renderError(error: "Could not redirect to \(to)", for: url, to: urlSchemeTask)
                 return
             }
+            GeminiClient.redirects += 1
+            if GeminiClient.redirects > 5 {
+                renderError(error: "Too many redirects", for: url, to: urlSchemeTask)
+                return
+            }
             render(data, mime: "text/html")
         case .input(let question), .sensitive_input(let question):
+            GeminiClient.redirects = 0
             var body = getHeader(for: self.url, title: question)
             var type: String
             switch header {
@@ -212,6 +220,7 @@ class GeminiClient: NSObject {
             }
             render(data, mime: "text/html")
         case .slow_down(let wait):
+            GeminiClient.redirects = 0
             renderError(error: "slow down: please wait at least \(wait) seconds before retrying", for: url, to: urlSchemeTask)
         case .temporary_failure(let err),
              .server_unavailable(let err),
@@ -222,9 +231,10 @@ class GeminiClient: NSObject {
              .gone(let err),
              .proxy_request_refused(let err),
              .bad_request(let err):
+            GeminiClient.redirects = 0
             renderError(error: "\(header.description()): \(err)", for: url, to: urlSchemeTask)
         case .client_certificate_required(let msg), .certificate_not_authorised(let msg), .certificate_not_valid(let msg):
-
+            GeminiClient.redirects = 0
             var body = getHeader(for: self.url, title: msg)
             body += "<h1>\(header.description().capitalized)</h1><h3>\(msg)</h3>"
             body += "<div id='need-certificate'></div>"
@@ -243,6 +253,8 @@ class GeminiClient: NSObject {
     }
 
     fileprivate func renderError(error: String, for url: URL, to urlSchemeTask: WKURLSchemeTask) {
+        GeminiClient.redirects = 0
+
         var body = getHeader(for: self.url, title: error)
         body += "<h2>\(error)</h2>"
         if let data = body.data(using: .utf8) {

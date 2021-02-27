@@ -89,7 +89,7 @@ class TabLocationView: UIView {
         certificateButton.addTarget(self, action: #selector(didPressCertButton(_:)), for: .touchUpInside)
         certificateButton.tintColor = UIColor.theme.browser.tint
         certificateButton.imageView?.contentMode = .scaleAspectFill
-        certificateButton.accessibilityIdentifier = "TabLocationView.certificateButton"
+        certificateButton.accessibilityIdentifier = NSLocalizedString("Certificates", comment: "Accessibility Label for toolbar Certificate button")
         return certificateButton
     }()
 
