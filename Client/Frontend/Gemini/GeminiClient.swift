@@ -1,117 +1,9 @@
 import WebKit
 import Shared
 import Storage
+import Network
 
 private let log = Logger.browserLogger
-
-class GeminiClient: NSObject {
-    static var serverFingerprints: [String: [String]] = [:]
-
-    var inputStream: InputStream!
-    var outputStream: OutputStream!
-    var done = false
-    let urlSchemeTask: WKURLSchemeTask
-    let url: URL
-    var data: Data
-    let start: DispatchTime
-    let profile: Profile
-
-    init(url: URL, urlSchemeTask: WKURLSchemeTask, profile: Profile) {
-        self.urlSchemeTask = urlSchemeTask
-        if let fragment = url.fragment {
-            self.url = URL(string: url.absoluteString.replacingOccurrences(of: "#\(fragment)", with: "")) ?? url
-        } else {
-            self.url = url
-        }
-        self.data = Data()
-        self.start = DispatchTime.now()
-        self.profile = profile
-    }
-
-    func load() {
-        var certificate = self.profile.db.getActiveCertificate(host: self.url.host!)
-        if let c = certificate {
-            let result = self.profile.db.recordVisit(for: c)
-            if result.isFailure {
-                certificate = nil
-                log.error(result.failureValue!)
-            }
-        }
-        let data = certificate?.data
-        DispatchQueue.global(qos: .userInitiated).async {
-            self._load(cert: data)
-            RunLoop.current.run()
-        }
-    }
-
-    fileprivate func _load(cert: Data?) {
-        var readStream: Unmanaged<CFReadStream>?
-        var writeStream: Unmanaged<CFWriteStream>?
-
-        CFStreamCreatePairWithSocketToHost(kCFAllocatorDefault, self.url.host! as CFString, UInt32(self.url.port ?? 1965), &readStream, &writeStream)
-
-        inputStream = readStream!.takeRetainedValue()
-        outputStream = writeStream!.takeRetainedValue()
-
-        inputStream.delegate = self
-
-        inputStream.schedule(in: .current, forMode: .default)
-        outputStream.schedule(in: .current, forMode: .default)
-
-        // Enable SSL/TLS on the streams
-        inputStream.setProperty(StreamSocketSecurityLevel.negotiatedSSL, forKey: .socketSecurityLevelKey)
-        outputStream.setProperty(StreamSocketSecurityLevel.negotiatedSSL, forKey: .socketSecurityLevelKey)
-        var sslSettings = [
-            NSString(format: kCFStreamSSLValidatesCertificateChain): kCFBooleanFalse!,
-            NSString(format: kCFStreamSSLIsServer): kCFBooleanFalse!,
-            ] as [NSString : Any]
-
-        if let data = cert, let p12 = CertificateUtils.toP12(data: data).successValue {
-            sslSettings[NSString(format: kCFStreamSSLCertificates)] = p12 as CFArray
-        }
-
-        inputStream.setProperty(sslSettings, forKey: kCFStreamPropertySSLSettings as Stream.PropertyKey)
-        outputStream.setProperty(sslSettings, forKey: kCFStreamPropertySSLSettings as Stream.PropertyKey)
-
-        inputStream.open()
-        outputStream.open()
-
-        let request = url.absoluteString + "\r\n"
-        guard let data = request.data(using: .utf8) else {
-            renderError(error: "Could not send request to \(url.absoluteString)", for: url, to: urlSchemeTask)
-            return
-        }
-        _ = data.withUnsafeBytes {
-            outputStream.write($0.bindMemory(to: UInt8.self).baseAddress!, maxLength: data.count)
-        }
-    }
-
-    func stop() {
-        if !done {
-            done = true
-            inputStream.close()
-            outputStream.close()
-            self.inputStream = nil
-            self.outputStream = nil
-        }
-    }
-
-    fileprivate func readServerCert(trust: SecTrust) {
-        let num = SecTrustGetCertificateCount(trust)
-        log.debug("Found \(num) certificates")
-
-        for ix in 0..<num {
-            guard let fingerprint = SecTrustGetCertificateAtIndex(trust, ix)?.fingerprint() else {
-                continue
-            }
-            let hex = fingerprint.joined(separator: ":")
-            log.debug("Fingerprint: \(hex)")
-            if ix == 0 {
-                GeminiClient.serverFingerprints[self.url.domainURL.absoluteDisplayString] = fingerprint
-            }
-        }
-    }
-}
 
 extension SecCertificate {
     func fingerprint() -> [String] {
@@ -127,83 +19,124 @@ extension SecCertificate {
     }
 }
 
-extension GeminiClient: StreamDelegate {
-    func stream(_ aStream: Stream, handle eventCode: Stream.Event) {
-        switch eventCode {
-        case .openCompleted:
-            if let trust = self.inputStream.property(forKey: kCFStreamPropertySSLPeerTrust as Stream.PropertyKey) as! SecTrust? {
-                readServerCert(trust: trust)
-            }
+class GeminiClient: NSObject {
+    static var serverFingerprints: [String: [String]] = [:]
+    static let queue = DispatchQueue(label: "gemini", qos: .default)
 
-            break
-        case .hasSpaceAvailable:
-            log.error("HasSpaceAvailable")
-            break
-        case .endEncountered:
-            let endReceive = DispatchTime.now()
-            var ms = (endReceive.uptimeNanoseconds - start.uptimeNanoseconds) / 1_000_000
-            log.info("Received data in: \(ms)ms")
-            parseResponse(data: data)
-            ms = (DispatchTime.now().uptimeNanoseconds - endReceive.uptimeNanoseconds) / 1_000_000
-            log.info("Parsed in: \(ms)ms")
-            defer {
-                done = true
-                inputStream.close()
-                outputStream.close()
-                self.inputStream = nil
-                self.outputStream = nil
+    let urlSchemeTask: WKURLSchemeTask
+    let url: URL
+    var conn: NWConnection?
+    let start: DispatchTime
+    let profile: Profile
+
+    init(url: URL, urlSchemeTask: WKURLSchemeTask, profile: Profile) {
+        self.urlSchemeTask = urlSchemeTask
+        if let fragment = url.fragment {
+            self.url = URL(string: url.absoluteString.replacingOccurrences(of: "#\(fragment)", with: "")) ?? url
+        } else {
+            self.url = url
+        }
+        self.start = DispatchTime.now()
+        self.profile = profile
+    }
+
+    func load() {
+        var certificate = self.profile.db.getActiveCertificate(host: self.url.host!)
+        if let c = certificate {
+            let result = self.profile.db.recordVisit(for: c)
+            if result.isFailure {
+                certificate = nil
+                log.error(result.failureValue!)
             }
-            break
-        case .hasBytesAvailable:
-            log.debug("hasBytesAvailable")
-            let bufferSize = 1024
-            let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
-            defer {
-                buffer.deallocate()
+        }
+        self._load(cert: certificate?.data)
+    }
+
+    func stop() {
+        self.conn?.cancel()
+        self.conn = nil
+    }
+
+    fileprivate func _load(cert: Data?) {
+        let host = NWEndpoint.Host(self.url.host!)
+        let port = NWEndpoint.Port(integerLiteral: NWEndpoint.Port.IntegerLiteralType(self.url.port ?? 1965))
+        let opts = NWProtocolTLS.Options()
+        sec_protocol_options_set_tls_min_version(opts.securityProtocolOptions, .tlsProtocol12)
+        if let data = cert,
+           let id = CertificateUtils.toIdentity(data: data),
+           let sec_identity = sec_identity_create(id) {
+            sec_protocol_options_set_local_identity(opts.securityProtocolOptions, sec_identity)
+        }
+        sec_protocol_options_set_verify_block(opts.securityProtocolOptions, { (sec_protocol_metadata, sec_trust, sec_protocol_verify_complete) in
+            sec_protocol_metadata_copy_peer_public_key(sec_protocol_metadata)
+            let trust = sec_trust_copy_ref(sec_trust).takeRetainedValue()
+            self.readServerCert(trust: trust)
+            sec_protocol_verify_complete(true)
+        }, GeminiClient.queue)
+
+        let request = url.absoluteString + "\r\n"
+        guard let data = request.data(using: .utf8) else {
+            renderError(error: "Could not send request to \(url.absoluteString)", for: url, to: urlSchemeTask)
+            return
+        }
+        let conn = NWConnection(host: host, port: port, using: NWParameters(tls: opts))
+        self.conn = conn
+        conn.stateUpdateHandler  = { (state)  in
+            switch state {
+            case .failed(let err):
+                self.renderError(error: err.localizedDescription, for: self.url, to: self.urlSchemeTask)
+                conn.cancel()
+            case .waiting(let err):
+                self.renderError(error: err.localizedDescription, for: self.url, to: self.urlSchemeTask)
+                conn.cancel()
+            default:
+                print(state)
             }
-            while inputStream.hasBytesAvailable {
-                let read = inputStream.read(buffer, maxLength: bufferSize)
-                if read < 0 {
-                    log.error("HasBytesAvailable but error reading")
-                    if let error = inputStream.streamError {
-                        renderError(error: error.localizedDescription, for: url, to: urlSchemeTask)
-                    } else {
-                        renderError(error: "Received error reading from server", for: url, to: urlSchemeTask)
-                    }
+        }
+        conn.start(queue: GeminiClient.queue)
+        conn.send(content: data, contentContext: .defaultMessage, isComplete: true, completion: .contentProcessed({ (err) in
+            if let err = err {
+                print(err)
+            }
+            conn.receiveMessage { (data, ctx, isComplete, err) in
+                if let err =  err {
+                    print(err)
                     return
-                } else if read == 0 {
-                    break
                 }
-                data.append(buffer, count: read)
-                log.debug("read \(read) bytes")
+                if !isComplete {
+                    self.renderError(error: "not complete???", for: self.url, to: self.urlSchemeTask)
+                    conn.cancel()
+                    return
+                }
+                conn.cancel()
+                guard let data = data else {
+                    self.renderError(error: "no error or data?!", for: self.url, to: self.urlSchemeTask)
+                    return
+                }
+
+                let endReceive = DispatchTime.now()
+                var ms = (endReceive.uptimeNanoseconds - self.start.uptimeNanoseconds) / 1_000_000
+                log.info("Received data in: \(ms)ms")
+                self.parseResponse(data: data)
+                ms = (DispatchTime.now().uptimeNanoseconds - endReceive.uptimeNanoseconds) / 1_000_000
+                log.info("Parsed in: \(ms)ms")
             }
-            break
-        case .errorOccurred:
-            log.error("ErrorOccurred")
-            if let error = inputStream.streamError {
-                renderError(error: error.localizedDescription, for: url, to: urlSchemeTask)
-            } else {
-                renderError(error: "Received error reading from server", for: url, to: urlSchemeTask)
+        }))
+    }
+
+    fileprivate func readServerCert(trust: SecTrust) {
+        let num = SecTrustGetCertificateCount(trust)
+        log.debug("Found \(num) certificates")
+
+        for ix in 0..<num {
+            guard let fingerprint = SecTrustGetCertificateAtIndex(trust, ix)?.fingerprint() else {
+                continue
             }
-            defer {
-                done = true
-                inputStream.close()
-                outputStream.close()
-                self.inputStream = nil
-                self.outputStream = nil
+            let hex = fingerprint.joined(separator: ":")
+            log.debug("Fingerprint: \(hex)")
+            if ix == 0 {
+                GeminiClient.serverFingerprints[self.url.domainURL.absoluteDisplayString] = fingerprint
             }
-            break
-        default:
-            log.error("Unknown error while reading from server")
-            renderError(error: "Unknown error while reading from server", for: url, to: urlSchemeTask)
-            defer {
-                done = true
-                inputStream.close()
-                outputStream.close()
-                self.inputStream = nil
-                self.outputStream = nil
-            }
-            break
         }
     }
 

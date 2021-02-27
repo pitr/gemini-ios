@@ -21,48 +21,44 @@ struct CertificateUtilsResult {
 
 class CertificateUtils {
 
-    static func toP12(data : Data) -> Maybe<[AnyObject]> {
-        var items: CFArray?
-        let options: NSMutableDictionary = [kSecImportExportPassphrase as NSString: ""]
-        let sanityCheck = SecPKCS12Import(NSData(data: data), options, &items)
+    static func toIdentity(data : Data) -> SecIdentity? {
+        let (id, _, sanityCheck) = parseKeyChainItems(data: data)
 
-        if sanityCheck == errSecSuccess && CFArrayGetCount(items) > 0 {
-            return Maybe(success: parseKeyChainItems(items!))
-        }
         switch sanityCheck {
         case errSecSuccess:
-            return Maybe(failure: CertificateError("no certificate"))
+            break
         case errSecUnimplemented:
-            return Maybe(failure: CertificateError("not implemented"))
+            log.error("not implemented")
         case errSecIO:
-            return Maybe(failure: CertificateError("I/O error"))
+            log.error("I/O error")
         case errSecOpWr:
-            return Maybe(failure: CertificateError("File already open with write permission"))
+            log.error("File already open with write permission")
         case errSecParam:
-            return Maybe(failure: CertificateError("One or more parameters passed to a function were not valid"))
+            log.error("One or more parameters passed to a function were not valid")
         case errSecAllocate:
-            return Maybe(failure: CertificateError("Failed to allocate memory"))
+            log.error("Failed to allocate memory")
         case errSecUserCanceled:
-            return Maybe(failure: CertificateError("User canceled the operation"))
+            log.error("User canceled the operation")
         case errSecBadReq:
-            return Maybe(failure: CertificateError("Bad parameter or invalid state for operation"))
+            log.error("Bad parameter or invalid state for operation")
         case errSecInternalComponent:
-            return Maybe(failure: CertificateError("Internal Component"))
+            log.error("Internal Component")
         case errSecNotAvailable:
-            return Maybe(failure: CertificateError("Not Available"))
+            log.error("Not Available")
         case errSecDuplicateItem:
-            return Maybe(failure: CertificateError("Duplicate Item"))
+            log.error("Duplicate Item")
         case errSecItemNotFound:
-            return Maybe(failure: CertificateError("Item Not Found"))
+            log.error("Item Not Found")
         case errSecInteractionNotAllowed:
-            return Maybe(failure: CertificateError("Interaction Not Allowed"))
+            log.error("Interaction Not Allowed")
         case errSecDecode:
-            return Maybe(failure: CertificateError("Decode error"))
+            log.error("Decode error")
         case errSecAuthFailed:
-            return Maybe(failure: CertificateError("Auth Failed"))
+            log.error("Auth Failed")
         default:
-            return Maybe(failure: CertificateError("Unknown items: \(String(describing: items))"))
+            log.error("Unknown items")
         }
+        return id
     }
 
     static func createCert(days: Int, name: String) -> CertificateUtilsResult? {
@@ -87,8 +83,6 @@ class CertificateUtils {
                 X509_NAME_add_entry_by_txt(subject, cn, MBSTRING_ASC, cn_name, -1, -1, 0)
             })
         })
-
-//        let X509_check_private_key_result = X509_check_private_key(cert, pk)
 
         X509_set_issuer_name(cert, subject)
         X509_sign(cert, pk, EVP_sha256())
@@ -120,33 +114,28 @@ class CertificateUtils {
 
         try! fileManager.removeItem(atPath: url.path)
 
-        var items: CFArray?
-        let options: NSMutableDictionary = [kSecImportExportPassphrase as NSString: ""]
-        let sanityCheck = SecPKCS12Import(NSData(data: data), options, &items)
-
-        guard sanityCheck == errSecSuccess && CFArrayGetCount(items) > 0 else {
+        let (_, secCertM, _) = parseKeyChainItems(data: data)
+        guard let secCert = secCertM else {
             return nil
         }
-
-        guard let secItem = parseKeyChainItems(items!)[safe: 1] else {
-            return nil
-        }
-        let secCert = secItem as! SecCertificate
 
         return CertificateUtilsResult(data: data, fingerprint: secCert.fingerprint().joined(separator: ":"))
     }
 
-    fileprivate static func parseKeyChainItems(_ keychainArray: NSArray) -> [AnyObject] {
-        let dict = keychainArray[0] as! Dictionary<String,AnyObject>
-        let identity = dict[String(kSecImportItemIdentity)] as! SecIdentity?
+    fileprivate static func parseKeyChainItems(data: Data) -> (SecIdentity?, SecCertificate?, OSStatus) {
+        var rawItems: CFArray?
+        let options: NSMutableDictionary = [kSecImportExportPassphrase as NSString: ""]
+        let sanityCheck = SecPKCS12Import(NSData(data: data), options, &rawItems)
 
-        let certArray:[AnyObject] = dict["chain"] as! [SecCertificate]
-
-        var certChain:[AnyObject] = [identity!]
-
-        for item in certArray {
-            certChain.append(item)
+        if sanityCheck != errSecSuccess || CFArrayGetCount(rawItems) == 0 {
+            return (nil, nil, sanityCheck)
         }
-        return certChain
+
+        let items = rawItems! as! Array<Dictionary<String, Any>>
+        let dict = items[0]
+        let identity = dict[String(kSecImportItemIdentity)] as! SecIdentity?
+        let certArray = dict["chain"] as! [SecCertificate]
+
+        return (identity, certArray[safe: 0], sanityCheck)
     }
 }
