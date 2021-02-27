@@ -335,9 +335,13 @@ extension GeminiClient: StreamDelegate {
                 if line.starts(with: "```") {
                     pre = !pre
                     if pre {
-                        body.append("<pre><code>")
+                        var title = rawLine.replaceFirstOccurrence(of: "```", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                        if title.isEmpty {
+                            title = "unlabelled preformatted text"
+                        }
+                        body.append("<figure role='img' aria-labelledby='\(title)'><pre><code>")
                     } else {
-                        body.append("</code></pre>\n")
+                        body.append("</code></pre></figure>\n")
                     }
                     continue
                 }
