@@ -100,7 +100,7 @@ class GeminiClient: NSObject {
                 print(err)
             }
             conn.receiveMessage { (data, ctx, isComplete, err) in
-                if let err =  err {
+                if let err = err {
                     print(err)
                     return
                 }
@@ -115,7 +115,7 @@ class GeminiClient: NSObject {
 
                 let endReceive = DispatchTime.now()
                 var ms = (endReceive.uptimeNanoseconds - self.start.uptimeNanoseconds) / 1_000_000
-                log.info("Received data in: \(ms)ms")
+                log.info("Received \(data.count) bytes in: \(ms)ms")
                 self.parseResponse(data: data)
                 ms = (DispatchTime.now().uptimeNanoseconds - endReceive.uptimeNanoseconds) / 1_000_000
                 log.info("Parsed in: \(ms)ms")
@@ -206,14 +206,13 @@ class GeminiClient: NSObject {
         case .input(let question), .sensitive_input(let question):
             GeminiClient.redirects = 0
             var body = getHeader(for: self.url, title: question)
-            var type: String
             switch header {
             case .sensitive_input:
-                type = "password"
+                body += "<h3>\(question)</h3><form><input autocapitalize=off type=password maxlength=1024 id=q name=q /><button>Submit</button><span id=s></span></form>"
             default:
-                type = "text"
+                body += "<h3>\(question)</h3><form><textarea autofocus rows=10 maxlength=1024 required autocapitalize=off id=q name=q></textarea><button>Submit</button><span id=s></span></form>"
             }
-            body += "<h3>\(question)</h3><form><input autocapitalize=off type=\(type) id=q name=q /><button>Submit</button></form>"+inputFooter
+            body += inputFooter
             guard let data = body.data(using: .utf8) else {
                 renderError(error: "Could not render form to ask server's question: \(question)", for: url, to: urlSchemeTask)
                 return
@@ -247,7 +246,7 @@ class GeminiClient: NSObject {
     }
 
     fileprivate func render(_ data: Data, mime: String){
-        urlSchemeTask.didReceive(URLResponse(url: url, mimeType: mime, expectedContentLength: -1, textEncodingName: "utf-8"))
+        urlSchemeTask.didReceive(URLResponse(url: url, mimeType: mime, expectedContentLength: data.count, textEncodingName: nil))
         urlSchemeTask.didReceive(data)
         urlSchemeTask.didFinish()
     }
