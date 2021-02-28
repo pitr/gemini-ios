@@ -2,19 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import Storage
-import Shared
-import XCGLogger
+import UIKit
 
-private let log = Logger.browserLogger
-
-/* A helper class to find the favicon associated with a URL.
- * This will load the page and parse any icons it finds out of it.
- * If that fails, it will attempt to find a favicon.ico in the root host domain.
- */
-open class FaviconFetcher: NSObject, XMLParserDelegate {
+public class FaviconFetcher {
     fileprivate static var hostToFaviconCache = [String: UIImage]()
-    static var defaultFavicon: UIImage = {
+    public static var defaultFavicon: UIImage = {
         return UIImage(named: "defaultFavicon")!
     }()
 
@@ -22,7 +14,7 @@ open class FaviconFetcher: NSObject, XMLParserDelegate {
 
     // Create (or return from cache) a fallback image for a site based on the first letter of the site's domain
     // Letter is white on a colored background
-    class func letter(forUrl url: URL) -> UIImage {
+    public class func letter(forUrl url: URL) -> UIImage {
         guard let host = url.host, let character = host.first else {
             return defaultFavicon
         }
@@ -38,7 +30,7 @@ open class FaviconFetcher: NSObject, XMLParserDelegate {
         faviconLabel.text = faviconLetter
         faviconLabel.textAlignment = .center
         faviconLabel.font = UIFont.systemFont(ofSize: 40, weight: UIFont.Weight.medium)
-        faviconLabel.textColor = UIColor.Photon.White100
+        faviconLabel.textColor = UIColor(rgb: 0xffffff)
         faviconLabel.backgroundColor = color(forUrl: url)
         UIGraphicsBeginImageContextWithOptions(faviconLabel.bounds.size, false, 0.0)
         faviconLabel.layer.render(in: UIGraphicsGetCurrentContext()!)
@@ -50,9 +42,9 @@ open class FaviconFetcher: NSObject, XMLParserDelegate {
     }
 
     // Returns a color based on the url's hash
-    class func color(forUrl url: URL) -> UIColor {
+    public class func color(forUrl url: URL) -> UIColor {
         guard let hash = url.host?.md5, hash.count > 2 else {
-            return UIColor.Photon.Grey50
+            return UIColor(rgb: 0x737373)
         }
         let hue = CGFloat(hash[0]) + CGFloat(hash[1]) / 510.0
         let saturation = CGFloat(hash[2]) / 255.0

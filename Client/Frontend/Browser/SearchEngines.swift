@@ -151,25 +151,7 @@ class SearchEngines {
     /// Get all bundled (not custom) search engines, with the default search engine first,
     /// but the others in no particular order.
     class func getUnorderedBundledEnginesFor(locale: Locale) -> [OpenSearchEngine] {
-        let parser = OpenSearchParser(pluginMode: true)
-
-        guard let pluginDirectory = Bundle.main.resourceURL?.appendingPathComponent("SearchPlugins") else {
-            assertionFailure("Search plugins not found. Check bundle")
-            return []
-        }
-
-        guard let defaultSearchPrefs = DefaultSearchPrefs(with: pluginDirectory.appendingPathComponent("list.json")) else {
-            assertionFailure("Failed to parse List.json")
-            return []
-        }
-        let engineNames = defaultSearchPrefs.visibleDefaultEngines()
-        let defaultEngineName = defaultSearchPrefs.searchDefault()
-        assert(engineNames.count > 0, "No search engines")
-
-        return engineNames.map({ (name: $0, path: pluginDirectory.appendingPathComponent("\($0).xml").path) })
-            .filter({ FileManager.default.fileExists(atPath: $0.path) })
-            .compactMap({ parser.parse($0.path, engineID: $0.name) })
-            .sorted { e, _ in e.shortName == defaultEngineName }
+        return OpenSearchParser.parse()
     }
 
     /// Get all known search engines, possibly as ordered by the user.

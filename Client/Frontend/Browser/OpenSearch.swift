@@ -4,15 +4,11 @@
 
 import UIKit
 import Shared
-import Fuzi
-
-private let TypeSearch = "text/html"
 
 class OpenSearchEngine: NSObject, NSCoding {
     static let PreferredIconSize = 30
 
     let shortName: String
-    let engineID: String?
     let image: UIImage
     let isCustomEngine: Bool
     let searchTemplate: String
@@ -22,12 +18,11 @@ class OpenSearchEngine: NSObject, NSCoding {
 
     fileprivate lazy var searchQueryComponentKey: String? = self.getQueryArgFromTemplate()
 
-    init(engineID: String?, shortName: String, image: UIImage, searchTemplate: String, isCustomEngine: Bool) {
+    init(shortName: String, image: UIImage, searchTemplate: String, isCustomEngine: Bool) {
         self.shortName = shortName
         self.image = image
         self.searchTemplate = searchTemplate
         self.isCustomEngine = isCustomEngine
-        self.engineID = engineID
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -46,7 +41,6 @@ class OpenSearchEngine: NSObject, NSCoding {
         self.shortName = shortName
         self.isCustomEngine = isCustomEngine
         self.image = image
-        self.engineID = aDecoder.decodeObject(forKey: "engineID") as? String
     }
 
     func encode(with aCoder: NSCoder) {
@@ -54,7 +48,6 @@ class OpenSearchEngine: NSObject, NSCoding {
         aCoder.encode(shortName, forKey: "shortName")
         aCoder.encode(isCustomEngine, forKey: "isCustomEngine")
         aCoder.encode(image, forKey: "image")
-        aCoder.encode(engineID, forKey: "engineID")
     }
 
     /**
@@ -143,135 +136,33 @@ class OpenSearchEngine: NSObject, NSCoding {
     }
 }
 
-/**
- * OpenSearch XML parser.
- *
- * This parser accepts standards-compliant OpenSearch 1.1 XML documents in addition to
- * the Firefox-specific search plugin format.
- *
- * OpenSearch spec: http://www.opensearch.org/Specifications/OpenSearch/1.1
- */
 class OpenSearchParser {
-    fileprivate let pluginMode: Bool
-
-    init(pluginMode: Bool) {
-        self.pluginMode = pluginMode
-    }
-
-    func parse(_ file: String, engineID: String) -> OpenSearchEngine? {
-        guard let data = try? Data(contentsOf: URL(fileURLWithPath: file)) else {
-            print("Invalid search file")
-            return nil
-        }
-
-        guard let indexer = try? XMLDocument(data: data),
-            let docIndexer = indexer.root else {
-                print("Invalid XML document")
-                return nil
-        }
-
-        let shortNameIndexer = docIndexer.children(tag: "ShortName")
-        if shortNameIndexer.count != 1 {
-            print("ShortName must appear exactly once")
-            return nil
-        }
-
-        let shortName = shortNameIndexer[0].stringValue
-        if shortName == "" {
-            print("ShortName must contain text")
-            return nil
-        }
-
-        let urlIndexers = docIndexer.children(tag: "Url")
-        if urlIndexers.isEmpty {
-            print("Url must appear at least once")
-            return nil
-        }
-
-        var searchTemplate: String!
-        for urlIndexer in urlIndexers {
-            let type = urlIndexer.attributes["type"]
-            if type == nil {
-                print("Url element requires a type attribute", terminator: "\n")
-                return nil
-            }
-
-            if type != TypeSearch {
-                // Not a supported search type.
-                continue
-            }
-
-            var template = urlIndexer.attributes["template"]
-            if template == nil {
-                print("Url element requires a template attribute", terminator: "\n")
-                return nil
-            }
-
-            if pluginMode {
-                let paramIndexers = urlIndexer.children(tag: "Param")
-
-                if !paramIndexers.isEmpty {
-                    template! += "?"
-                    var firstAdded = false
-                    for paramIndexer in paramIndexers {
-                        if firstAdded {
-                            template! += "&"
-                        } else {
-                            firstAdded = true
-                        }
-
-                        let name = paramIndexer.attributes["name"]
-                        let value = paramIndexer.attributes["value"]
-                        if name == nil || value == nil {
-                            print("Param element must have name and value attributes", terminator: "\n")
-                            return nil
-                        }
-                        template! += name! + "=" + value!
-                    }
+    static func parse() -> [OpenSearchEngine] {
+        if let path = Bundle.main.path(forResource: "SearchPlugins", ofType: "plist"), let dictRoot = NSArray(contentsOfFile: path) {
+            return dictRoot.compactMap({ dict -> OpenSearchEngine? in
+                guard let searchDict = dict as? [String: String],
+                   let name = searchDict["name"],
+                   let url = searchDict["url"] else {
+                    return nil
                 }
-            }
-
-            searchTemplate = template
-        }
-
-        if searchTemplate == nil {
-            print("Search engine must have a text/html type")
-            return nil
-        }
-
-        let imageIndexers = docIndexer.children(tag: "Image")
-        var largestImage = 0
-        var largestImageElement: XMLElement?
-
-        // TODO: For now, just use the largest icon.
-        for imageIndexer in imageIndexers {
-            let imageWidth = Int(imageIndexer.attributes["width"] ?? "")
-            let imageHeight = Int(imageIndexer.attributes["height"] ?? "")
-
-            // Only accept square images.
-            if imageWidth != imageHeight {
-                continue
-            }
-
-            if let imageWidth = imageWidth {
-                if imageWidth > largestImage {
-                    largestImage = imageWidth
-                    largestImageElement = imageIndexer
+                var uiImage: UIImage
+                if let imageValue = searchDict["img"],
+                   !imageValue.isEmpty,
+                   let imageURL = URL(string: imageValue),
+                   let imageData = try? Data(contentsOf: imageURL),
+                   let image = UIImage.imageFromDataThreadSafe(imageData) {
+                    uiImage = image
+                } else if let url = URL(string: url.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed)!),
+                          url.isWebPage() {
+                    uiImage = FaviconFetcher.letter(forUrl: url)
+                } else {
+                    print("Error: Invalid search image data")
+                    return nil
                 }
-            }
-        }
 
-        let uiImage: UIImage
-        if let imageElement = largestImageElement,
-            let imageURL = URL(string: imageElement.stringValue),
-            let imageData = try? Data(contentsOf: imageURL),
-            let image = UIImage.imageFromDataThreadSafe(imageData) {
-            uiImage = image
-        } else {
-            print("Error: Invalid search image data")
-            return nil
+                return OpenSearchEngine(shortName: name, image: uiImage, searchTemplate: url, isCustomEngine: false)
+            })
         }
-
-        return OpenSearchEngine(engineID: engineID, shortName: shortName, image: uiImage, searchTemplate: searchTemplate, isCustomEngine: false)
+        return []
     }
 }
