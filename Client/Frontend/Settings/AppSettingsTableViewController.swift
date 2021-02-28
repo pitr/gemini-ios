@@ -63,7 +63,8 @@ class AppSettingsTableViewController: SettingsTableViewController {
         ])]
 
         settings += [ SettingSection(title: NSAttributedString(string: Strings.SettingsFeedbackTitle), children: [
-            RateNonSetting(titleText: Strings.SettingsRateButton)
+            LinkNonSetting(titleText: Strings.SettingsFeedbackButton, url: "gemini://elaho.glv.one/feedback"),
+            LinkNonSetting(titleText: Strings.SettingsRateButton, url: "https://itunes.apple.com/app/id1514950389?action=write-review")
         ])]
 
         return settings

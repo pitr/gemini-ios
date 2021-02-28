@@ -161,14 +161,17 @@ private class PaddedSwitch: UIView {
     }
 }
 
-// A helper class for non-setting rate me button.
-class RateNonSetting: Setting {
-    init(attributedTitleText: NSAttributedString) {
+// A helper class for non-setting link button.
+class LinkNonSetting: Setting {
+    let url: String
+
+    init(attributedTitleText: NSAttributedString, url: String) {
+        self.url = url
         super.init(title: attributedTitleText)
     }
 
-    convenience init(titleText: String) {
-        self.init(attributedTitleText: NSAttributedString(string: titleText, attributes: [NSAttributedString.Key.foregroundColor: UIColor.theme.tableView.rowText]))
+    convenience init(titleText: String, url: String) {
+        self.init(attributedTitleText: NSAttributedString(string: titleText, attributes: [NSAttributedString.Key.foregroundColor: UIColor.theme.tableView.rowText]), url: url)
     }
 
     override func onConfigureCell(_ cell: UITableViewCell) {
@@ -185,10 +188,7 @@ class RateNonSetting: Setting {
     }
 
     override func onClick(_ navigationController: UINavigationController?) {
-        let appID = "1514950389"
-        let urlStr = "https://itunes.apple.com/app/id\(appID)?action=write-review"
-
-        guard let url = URL(string: urlStr), UIApplication.shared.canOpenURL(url) else { return }
+        guard let url = URL(string: url), UIApplication.shared.canOpenURL(url) else { return }
 
         UIApplication.shared.open(url, options: [:], completionHandler: nil)
     }
