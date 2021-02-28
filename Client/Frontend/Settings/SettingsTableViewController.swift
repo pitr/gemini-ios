@@ -5,7 +5,6 @@
 import Shared
 import UIKit
 import SafariServices
-import StoreKit
 
 struct SettingsUX {
     static let TableViewHeaderFooterHeight = CGFloat(44)
@@ -186,7 +185,12 @@ class RateNonSetting: Setting {
     }
 
     override func onClick(_ navigationController: UINavigationController?) {
-        SKStoreReviewController.requestReview()
+        let appID = "1514950389"
+        let urlStr = "https://itunes.apple.com/app/id\(appID)?action=write-review"
+
+        guard let url = URL(string: urlStr), UIApplication.shared.canOpenURL(url) else { return }
+
+        UIApplication.shared.open(url, options: [:], completionHandler: nil)
     }
 }
 
