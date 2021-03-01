@@ -19,7 +19,8 @@ class GeminiSchemeHandler: NSObject, WKURLSchemeHandler {
     }
 
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
-        guard let url = urlSchemeTask.request.url else {
+        guard let url = urlSchemeTask.request.url,
+              url.host != nil else {
             urlSchemeTask.didFailWithError(GeminiSchemeHandlerError.badURL)
             return
         }
