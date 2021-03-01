@@ -60,11 +60,21 @@ class URIFixup {
 
         guard let url = URL(string: string, relativeTo: relativeTo) else { return nil }
 
-        var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
-        let host = components?.host?.utf8HostToAscii()
-        components?.host = host
+        guard var components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
+            return nil
+        }
+        let host = components.host?.utf8HostToAscii()
+        components.host = host
+        if let relativeTo = relativeTo {
+            if components.host?.isEmpty ?? true {
+                components.host = relativeTo.host
+            }
+            if components.port == nil {
+                components.port = relativeTo.port
+            }
+        }
 
-        return components?.url
+        return components.url
     }
 
     static func replaceBrackets(url: String) -> String {
