@@ -320,23 +320,23 @@ class GeminiClient: NSObject {
                     let link = line[range1].trimmingCharacters(in: .whitespacesAndNewlines)
                     let title = line[range2].trimmingCharacters(in: .whitespacesAndNewlines)
                     let url = URIFixup.getURL(link, relativeTo: self.url)
-                    var prefix = "→"
+                    var clazz = "samedomain"
                     if url?.scheme != "gemini" {
-                        prefix = "⎋"
+                        clazz = "external"
                     } else if url?.host != self.url.host {
-                        prefix = "⇒"
+                        clazz = "diffdomain"
                     } else if let img = url,
                               ["jpg", "jpeg", "gif ", "png"].contains(img.pathExtension.lowercased()) {
-                        prefix = "🖼"
-                        body.append("<p><a href=\"\(img.absoluteString)\" onclick=\"return inlineImage(this);\">\(prefix) \(title)</a></p>\n")
+                        clazz = "image"
+                        body.append("<p><a href=\"\(img.absoluteString)\" onclick=\"return inlineImage(this);\" class=\(clazz)>\(title)</a></p>\n")
                         continue
                     }
                     if link == title {
-                        body.append("<p><a href=\"\(url?.absoluteString ?? link)\">\(prefix) \(link)</a></p>\n")
+                        body.append("<p><a href=\"\(url?.absoluteString ?? link)\" class=\(clazz)>\(link)</a></p>\n")
                     } else if title.isEmptyOrWhitespace() {
-                        body.append("<p><a href=\"\(url?.absoluteString ?? link)\">\(prefix) \(link)</a></p>\n")
+                        body.append("<p><a href=\"\(url?.absoluteString ?? link)\" class=\(clazz)>\(link)</a></p>\n")
                     } else {
-                        body.append("<p><a href=\"\(url?.absoluteString ?? link)\">\(prefix) \(title)</a></p>\n")
+                        body.append("<p><a href=\"\(url?.absoluteString ?? link)\" class=\(clazz)>\(title)</a></p>\n")
                     }
                 } else if line.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     body.append("<br/>\n")

@@ -37,6 +37,10 @@
                 input,pre,img,textarea{margin-bottom:1rem}
                 a{color:#00acff;text-decoration:none}
                 a:visited{color:#7395d9;text-decoration:none}
+                a.samedomain::before{content: "→ "}
+                a.diffdomain::before{content: "⇒ "}
+                a.external::before{content: "⎋ "}
+                a.image::before{content: "🖼 "}
                 button{background:#00acff;display:inline-block;padding:6px 12px;text-align:center;text-decoration:none;white-space:nowrap;border:0;border-radius:4px;box-sizing:border-box;margin-right:10px}
                 pre{font-size:2vw;width:100%}
                 code,pre{font-family:var(--nc-font-mono)}
