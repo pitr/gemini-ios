@@ -2,6 +2,8 @@
 
 # Elaho (Gemini for iOS)
 
+[![app store](https://developer.apple.com/app-store/marketing/guidelines/images/badge-download-on-the-app-store.svg)](https://apps.apple.com/app/id1514950389)
+
 A [Project Gemini](https://gemini.circumlunar.space/) browser.
 
 Supports latest Gemini standard, including:
