@@ -25,6 +25,11 @@ class GeminiSchemeHandler: NSObject, WKURLSchemeHandler {
             return
         }
 
+        if currentClient?.urlSchemeTask?.isEqual(urlSchemeTask) ?? false {
+            // stop previous client if it's working on the same task
+            currentClient?.stop()
+        }
+
         let client = GeminiClient(url: url, urlSchemeTask: urlSchemeTask, profile: profile)
         currentClient = client
         client.load()
@@ -32,8 +37,6 @@ class GeminiSchemeHandler: NSObject, WKURLSchemeHandler {
 
     func webView(_ webView: WKWebView, stop urlSchemeTask: WKURLSchemeTask) {
         log.info("webView(stop)")
-        do {
-            currentClient?.stop()
-        }
+        currentClient?.stop()
     }
 }

@@ -24,7 +24,7 @@ class GeminiClient: NSObject {
     static let queue = DispatchQueue(label: "gemini", qos: .default)
     static var redirects = 0
 
-    let urlSchemeTask: WKURLSchemeTask
+    var urlSchemeTask: WKURLSchemeTask?
     let url: URL
     var conn: NWConnection?
     let start: DispatchTime
@@ -56,6 +56,7 @@ class GeminiClient: NSObject {
     func stop() {
         self.conn?.cancel()
         self.conn = nil
+        self.urlSchemeTask = nil
     }
 
     fileprivate func _load(cert: Data?) {
@@ -77,7 +78,7 @@ class GeminiClient: NSObject {
 
         let request = url.absoluteString + "\r\n"
         guard let data = request.data(using: .utf8) else {
-            renderError(error: "Could not send request to \(url.absoluteString)", for: url, to: urlSchemeTask)
+            renderError(error: "Could not send request to \(url.absoluteString)")
             return
         }
         let conn = NWConnection(host: host, port: port, using: NWParameters(tls: opts))
@@ -85,10 +86,10 @@ class GeminiClient: NSObject {
         conn.stateUpdateHandler  = { (state)  in
             switch state {
             case .failed(let err):
-                self.renderError(error: err.localizedDescription, for: self.url, to: self.urlSchemeTask)
+                self.renderError(error: err.localizedDescription)
                 conn.cancel()
             case .waiting(let err):
-                self.renderError(error: err.localizedDescription, for: self.url, to: self.urlSchemeTask)
+                self.renderError(error: err.localizedDescription)
                 conn.cancel()
             default:
                 print(state)
@@ -109,7 +110,7 @@ class GeminiClient: NSObject {
                 }
                 conn.cancel()
                 guard let data = data else {
-                    self.renderError(error: "server responded with no content", for: self.url, to: self.urlSchemeTask)
+                    self.renderError(error: "server responded with no content")
                     return
                 }
 
@@ -144,12 +145,12 @@ class GeminiClient: NSObject {
             data[ix+1] == 10,
             ix < (1024+3), // +3 for status code
             let firstLine = String(data: data.prefix(upTo: ix), encoding: .utf8) else {
-                renderError(error: "Invalid response", for: url, to: urlSchemeTask)
+                renderError(error: "Invalid response")
                 return
         }
         log.debug("header: \(firstLine)")
         guard let header = GeminiHeader(header: firstLine) else {
-            renderError(error: "Invalid header: \(firstLine)", for: url, to: urlSchemeTask)
+            renderError(error: "Invalid header: \(firstLine)")
             return
         }
         switch header {
@@ -158,32 +159,32 @@ class GeminiClient: NSObject {
             let data = data.dropFirst(ix+2)
             if mime.contentType.starts(with: "text/") {
                 guard let body = String(data: data, encoding: mime.charset) else {
-                    renderError(error: "Could not parse body with encoding \(mime.charset)", for: url, to: urlSchemeTask)
+                    renderError(error: "Could not parse body with encoding \(mime.charset)")
                     return
                 }
                 switch mime.contentType {
                 case "text/gemini":
                     guard let resp = parseBody(body).data(using: .utf8) else {
-                        renderError(error: "Could not parse body", for: url, to: urlSchemeTask)
+                        renderError(error: "Could not parse body")
                         return
                     }
                     render(resp, mime: "text/html")
                 case "text/html":
                     guard let resp = body.data(using: .utf8) else {
-                        renderError(error: "Could not parse body", for: url, to: urlSchemeTask)
+                        renderError(error: "Could not parse body")
                         return
                     }
                     render(resp, mime: "text/html")
                 case "text/plain":
                     let result = getHeader(for: self.url, title: "") + "<pre><code>" + body
                     guard let data = result.data(using: .utf8) else {
-                        renderError(error: "Could not parse body", for: url, to: urlSchemeTask)
+                        renderError(error: "Could not parse body")
                         return
                     }
                     render(data, mime: "text/html")
                 default:
                     guard let resp = body.data(using: .utf8) else {
-                        renderError(error: "Could not parse body", for: url, to: urlSchemeTask)
+                        renderError(error: "Could not parse body")
                         return
                     }
                     render(resp, mime: "text/plain")
@@ -194,12 +195,12 @@ class GeminiClient: NSObject {
         case .redirect_permanent(let to), .redirect_temporary(let to):
             let body = "<meta http-equiv=\"refresh\" content=\"0; URL='\(to)'\" />"
             guard let data = body.data(using: .utf8) else {
-                renderError(error: "Could not redirect to \(to)", for: url, to: urlSchemeTask)
+                renderError(error: "Could not redirect to \(to)")
                 return
             }
             GeminiClient.redirects += 1
             if GeminiClient.redirects > 5 {
-                renderError(error: "Too many redirects", for: url, to: urlSchemeTask)
+                renderError(error: "Too many redirects")
                 return
             }
             render(data, mime: "text/html")
@@ -214,13 +215,13 @@ class GeminiClient: NSObject {
             }
             body += inputFooter
             guard let data = body.data(using: .utf8) else {
-                renderError(error: "Could not render form to ask server's question: \(question)", for: url, to: urlSchemeTask)
+                renderError(error: "Could not render form to ask server's question: \(question)")
                 return
             }
             render(data, mime: "text/html")
         case .slow_down(let wait):
             GeminiClient.redirects = 0
-            renderError(error: "slow down: please wait at least \(wait) seconds before retrying", for: url, to: urlSchemeTask)
+            renderError(error: "slow down: please wait at least \(wait) seconds before retrying")
         case .temporary_failure(let err),
              .server_unavailable(let err),
              .cgi_error(let err),
@@ -231,14 +232,14 @@ class GeminiClient: NSObject {
              .proxy_request_refused(let err),
              .bad_request(let err):
             GeminiClient.redirects = 0
-            renderError(error: "\(header.description()): \(err)", for: url, to: urlSchemeTask)
+            renderError(error: "\(header.description()): \(err)")
         case .client_certificate_required(let msg), .certificate_not_authorised(let msg), .certificate_not_valid(let msg):
             GeminiClient.redirects = 0
             var body = getHeader(for: self.url, title: msg)
             body += "<h1>\(header.description().capitalized)</h1><h3>\(msg)</h3>"
             body += "<div id='need-certificate'></div>"
             guard let data = body.data(using: .utf8) else {
-                renderError(error: "Could not render server's certification message: \(msg)", for: url, to: urlSchemeTask)
+                renderError(error: "Could not render server's certification message: \(msg)")
                 return
             }
             render(data, mime: "text/html")
@@ -246,12 +247,13 @@ class GeminiClient: NSObject {
     }
 
     fileprivate func render(_ data: Data, mime: String){
-        urlSchemeTask.didReceive(URLResponse(url: url, mimeType: mime, expectedContentLength: data.count, textEncodingName: nil))
-        urlSchemeTask.didReceive(data)
-        urlSchemeTask.didFinish()
+        self.urlSchemeTask?.didReceive(URLResponse(url: url, mimeType: mime, expectedContentLength: data.count, textEncodingName: nil))
+        self.urlSchemeTask?.didReceive(data)
+        self.urlSchemeTask?.didFinish()
+        self.urlSchemeTask = nil
     }
 
-    fileprivate func renderError(error: String, for url: URL, to urlSchemeTask: WKURLSchemeTask) {
+    fileprivate func renderError(error: String) {
         GeminiClient.redirects = 0
 
         var body = getHeader(for: self.url, title: error)
