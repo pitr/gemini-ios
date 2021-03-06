@@ -15,17 +15,20 @@ Supports latest Gemini standard, including:
 Built on a fork of an open source [Firefox Browser for iOS](https://github.com/mozilla-mobile/firefox-ios), inheriting the following features:
 - tabs
 - bookmarks
+- history
 - customizable search engines
 - share extension
 - etc
 
-Download on [the App Store](https://apps.apple.com/app/id1514950389).
+Download on [the App Store](https://apps.apple.com/app/id1514950389). Supports iOS 12.0 and above.
 
 ![Gemini screenshot](https://raw.githubusercontent.com/pitr/gemini-ios/master/screenshot.png)
 
 ## Building Requirements
 
-This branch only works with [Xcode 11.4](https://apps.apple.com/app/xcode/id497799835), Swift 5.2 and supports iOS 12.0 and above.
+* [Relatively recent Xcode](https://apps.apple.com/app/xcode/id497799835)
+* [Carthage](https://github.com/Carthage/Carthage)
+* [Node.js](https://nodejs.org/) (to build user scripts)
 
 ### Building the code
 
