@@ -462,35 +462,10 @@ extension BrowserViewController: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
-        let response = navigationResponse.response
-
-        // We can only show this content in the web view if this web view is not pending
-        // download via the context menu.
-        let canShowInWebView = navigationResponse.canShowMIMEType
-
-        // Check if this response should be handed off to Passbook.
-        if let passbookHelper = OpenPassBookHelper(response: response, canShowInWebView: canShowInWebView, browserViewController: self) {
-            // Clear the network activity indicator since our helper is handling the request.
-            UIApplication.shared.isNetworkActivityIndicatorVisible = false
-
-            // Open our helper and cancel this response from the webview.
-            passbookHelper.open()
-            decisionHandler(.cancel)
-            return
-        }
-
-        // If the content type is not HTML, create a temporary document so it can be downloaded and
-        // shared to external applications later. Otherwise, clear the old temporary document.
-        // NOTE: This should only happen if the request/response came from the main frame, otherwise
-        // we may end up overriding the "Share Page With..." action to share a temp file that is not
-        // representative of the contents of the web view.
         if navigationResponse.isForMainFrame, let tab = tabManager[webView] {
-            tab.temporaryDocument = nil
-            tab.mimeType = response.mimeType
+            tab.mimeType = navigationResponse.response.mimeType
         }
 
-        // If none of our helpers are responsible for handling this response,
-        // just let the webview handle it as normal.
         decisionHandler(.allow)
     }
 

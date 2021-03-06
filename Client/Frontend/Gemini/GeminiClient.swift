@@ -189,8 +189,15 @@ class GeminiClient: NSObject {
                     }
                     render(resp, mime: "text/plain")
                 }
-            } else {
+            } else if MIMEType.canShowInWebView(mime.contentType) {
                 render(data, mime: mime.contentType)
+            } else {
+                let body = "<script>webkit.messageHandlers.downloadManager.postMessage({url: \"\(self.url.absoluteString)\",mimeType: \"\(mime.contentType)\",size: \(data.count), base64String: \"\(data.base64EncodedString)\"})</script>"
+                guard let data = body.data(using: .ascii) else {
+                    renderError(error: "could not download file")
+                    return
+                }
+                render(data, mime: "text/html")
             }
         case .redirect_permanent(let to), .redirect_temporary(let to):
             let body = "<meta http-equiv=\"refresh\" content=\"0; URL='\(to)'\" />"

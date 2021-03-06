@@ -1234,6 +1234,9 @@ extension BrowserViewController: TabDelegate {
         findInPageHelper.delegate = self
         tab.addContentScript(findInPageHelper, name: FindInPageHelper.name())
 
+        let downloadContentScript = DownloadContentScript(tab: tab)
+        tab.addContentScript(downloadContentScript, name: DownloadContentScript.name())
+
         let printHelper = PrintHelper(tab: tab)
         tab.addContentScript(printHelper, name: PrintHelper.name())
 

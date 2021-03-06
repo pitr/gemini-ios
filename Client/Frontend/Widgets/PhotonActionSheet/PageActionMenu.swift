@@ -80,19 +80,7 @@ extension PhotonActionSheetProtocol {
         let sharePage = PhotonActionSheetItem(title: Strings.AppMenuSharePageTitleString, iconString: "action_share") { _, _ in
             guard let url = tab.canonicalURL?.displayURL else { return }
 
-            if let temporaryDocument = tab.temporaryDocument {
-                temporaryDocument.getURL().uponQueue(.main, block: { tempDocURL in
-                    // If we successfully got a temp file URL, share it like a downloaded file,
-                    // otherwise present the ordinary share menu for the web URL.
-                    if tempDocURL.isFileURL {
-                        self.share(fileURL: tempDocURL, buttonView: buttonView, presentableVC: presentableVC)
-                    } else {
-                        presentShareMenu(url, tab, buttonView, .up)
-                    }
-                })
-            } else {
-                presentShareMenu(url, tab, buttonView, .up)
-            }
+            presentShareMenu(url, tab, buttonView, .up)
         }
 
         let copyURL = PhotonActionSheetItem(title: Strings.AppMenuCopyURLTitleString, iconString: "menu-Copy-Link") { _, _ in
