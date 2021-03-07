@@ -8,6 +8,8 @@
 
 import Foundation
 
+public typealias MaybeErrorType = Error & CustomStringConvertible
+
 public enum Maybe<T> {
     case failure(MaybeErrorType)
     case success(T)
