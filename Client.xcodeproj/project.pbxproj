@@ -99,6 +99,7 @@
 		8084B731247C2F8C002C42DC /* IntroViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8084B72F247C2F8B002C42DC /* IntroViewController.swift */; };
 		8084B732247C2F8C002C42DC /* Intro.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8084B730247C2F8B002C42DC /* Intro.xcassets */; };
 		808E313F2487EA20002B7686 /* GeminiConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 808E313E2487EA20002B7686 /* GeminiConstants.swift */; };
+		809391AC25F5591A00A74480 /* GeminiText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 809391AB25F5591A00A74480 /* GeminiText.swift */; };
 		80AD817724744E1600FAF049 /* AllFramesAtDocumentEnd.js in Resources */ = {isa = PBXBuildFile; fileRef = D0FCF8031FE4772C004A7995 /* AllFramesAtDocumentEnd.js */; };
 		80AD817824744E1600FAF049 /* AllFramesAtDocumentStart.js in Resources */ = {isa = PBXBuildFile; fileRef = D03F8F22200EAC1E003C2224 /* AllFramesAtDocumentStart.js */; };
 		80AD817924744E1600FAF049 /* MainFrameAtDocumentEnd.js in Resources */ = {isa = PBXBuildFile; fileRef = D0FCF8041FE4772D004A7995 /* MainFrameAtDocumentEnd.js */; };
@@ -449,6 +450,7 @@
 		8084B72F247C2F8B002C42DC /* IntroViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntroViewController.swift; sourceTree = "<group>"; };
 		8084B730247C2F8B002C42DC /* Intro.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Intro.xcassets; sourceTree = "<group>"; };
 		808E313E2487EA20002B7686 /* GeminiConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiConstants.swift; sourceTree = "<group>"; };
+		809391AB25F5591A00A74480 /* GeminiText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiText.swift; sourceTree = "<group>"; };
 		80BA308725F3B6C9003CED39 /* MIMEType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MIMEType.swift; sourceTree = "<group>"; };
 		80BA308F25F3BC12003CED39 /* DownloadContentScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadContentScript.swift; sourceTree = "<group>"; };
 		80BAC1E224852844001111F7 /* PinnedSite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedSite.swift; sourceTree = "<group>"; };
@@ -870,6 +872,7 @@
 				808E313E2487EA20002B7686 /* GeminiConstants.swift */,
 				806531EC248AED39006F259A /* CertificateUtils.swift */,
 				806531F9248CD267006F259A /* String+Escape.swift */,
+				809391AB25F5591A00A74480 /* GeminiText.swift */,
 			);
 			path = Gemini;
 			sourceTree = "<group>";
@@ -1709,6 +1712,7 @@
 				D301AAEE1A3A55B70078DD1D /* TabTrayController.swift in Sources */,
 				EB9A179B20E69A7F00B12184 /* ThemeManager.swift in Sources */,
 				EBFDB790211C83A5005CCA2F /* BrowserViewController+FindInPage.swift in Sources */,
+				809391AC25F5591A00A74480 /* GeminiText.swift in Sources */,
 				3BB50E111D6274CD004B33DF /* FirefoxHomeTopSitesCell.swift in Sources */,
 				0B62EFD21AD63CD100ACB9CD /* Clearables.swift in Sources */,
 				7482205C1DBAB56300EEEA72 /* MailProviders.swift in Sources */,
