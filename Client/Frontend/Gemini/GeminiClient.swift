@@ -375,7 +375,7 @@ class GeminiClient: NSObject {
             let bgNormal = UIColor(hue: hue, saturation: saturation/2.0, brightness: 0.95, alpha: 1.0).hexString
             let bgDark = UIColor(hue: hue, saturation: saturation, brightness: 0.2, alpha: 1.0).hexString
 
-            header += "<style>.normal {background:\(bgNormal) !important} .dark {background:\(bgDark) !important}</style>"
+            header += "<style>.normal {background:\(bgNormal) !important} .dark,.dark input,.dark textarea {background:\(bgDark) !important}</style>"
         }
 
         return header+"<title>\(title)</title></head><body class=\(theme)>\n"
