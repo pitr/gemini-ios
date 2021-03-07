@@ -63,14 +63,10 @@ class URIFixup {
         guard var components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
             return nil
         }
-        let host = components.host?.utf8HostToAscii()
-        components.host = host
+        components.host = components.host?.utf8HostToAscii()
         if let relativeTo = relativeTo {
             if components.host?.isEmpty ?? true {
                 components.host = relativeTo.host
-            }
-            if components.port == nil {
-                components.port = relativeTo.port
             }
         }
 
