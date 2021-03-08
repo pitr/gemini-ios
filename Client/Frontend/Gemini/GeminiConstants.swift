@@ -5,6 +5,10 @@ struct Mime {
     var charset: String.Encoding = .utf8
     var attributes: [String: String] = [:]
     init(meta: String) {
+        var meta = meta
+        if meta.isEmptyOrWhitespace() {
+            meta = "text/gemini; charset=utf-8"
+        }
         let parts = meta.split(separator: ";").map({ $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() })
         self.contentType = parts[0]
         for part in parts.dropFirst() {
@@ -45,7 +49,7 @@ enum GeminiHeader {
 
     init?(header: String) {
         let split = header.components(separatedBy: .whitespaces)
-        guard let statusNumber = Int(split[0]) else { return nil }
+        guard let status = split.first, let statusNumber = Int(status) else { return nil }
 
         let meta = split.dropFirst().joined(separator: " ").trimmingCharacters(in: .whitespacesAndNewlines)
 
