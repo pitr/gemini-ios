@@ -92,17 +92,17 @@ class GeminiClient: NSObject {
                 self.renderError(error: err.localizedDescription)
                 conn.cancel()
             default:
-                print(state)
+                log.debug(state)
             }
         }
         conn.start(queue: GeminiClient.queue)
         conn.send(content: data, contentContext: .defaultMessage, isComplete: true, completion: .contentProcessed({ (err) in
             if let err = err {
-                print(err)
+                log.debug(err)
             }
             conn.receiveMessage { (data, ctx, isComplete, err) in
                 if let err = err {
-                    print(err)
+                    log.debug(err)
                     return
                 }
                 if !isComplete {
