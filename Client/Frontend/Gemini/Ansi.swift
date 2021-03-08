@@ -19,39 +19,55 @@ class Ansi {
 
         while let result = regex.firstMatch(in: line, options: [], range: NSRange(location: 0, length: line.count)) {
             guard let range = Range(result.range(at: 1), in: line) else { return line }
-            let ints = line[range].split(separator: ";").compactMap { Int($0) }
-            guard let type = ints.first else { return line }
+            var ints = line[range].split(separator: ";").compactMap { Int($0) }
             var rep = ""
-            switch type {
-            case 0:  // reset
-                rep = String(repeating: "</span>", count: spans)
-                spans = 0
-            case 30..<38: // foreground
-                if let color = colors[type-30] {
-                    rep = "<span style=\"color:\(color)\">"
-                    spans += 1
+
+            while !ints.isEmpty {
+                var type = ints.removeFirst()
+                switch type {
+                case 0:  // reset
+                    rep += String(repeating: "</span>", count: spans)
+                    spans = 0
+                case 30..<38: // foreground
+                    if let color = colors[type-30] {
+                        rep += "<span style=\"color:\(color)\">"
+                        spans += 1
+                    }
+                case 38: // foreground
+                    if let color = parseColor(&ints) {
+                        rep += "<span style=\"color:\(color)\">"
+                        spans += 1
+                    }
+                case 40..<48: // background
+                    if let color = colors[type-40] {
+                        rep += "<span style=\"background-color:\(color)\">"
+                        spans += 1
+                    }
+                case 48: // background
+                    if let color = parseColor(&ints) {
+                        rep += "<span style=\"background-color:\(color)\">"
+                        spans += 1
+                    }
+                default:
+                    ()
                 }
-            case 38: // foreground
-                if let color = parseColor(ints) {
-                    rep = "<span style=\"color:\(color)\">"
-                    spans += 1
-                }
-            default:
-                ()
             }
             line = line.replacingCharacters(in: Range(result.range(at: 0), in: line)!, with: rep)
         }
         return line
     }
 
-    func parseColor(_ ints: [Int]) -> String? {
-        guard let type = ints[safe: 1] else { return nil }
-        switch type {
+    func parseColor(_ ints: inout [Int]) -> String? {
+        guard !ints.isEmpty else { return nil }
+        switch ints.removeFirst() {
         case 5:
-            guard let c = ints[safe: 2] else { return nil }
-            return colors[c]
+            guard !ints.isEmpty else { return nil }
+            return colors[ints.removeFirst()]
         case 2:
-            guard let r = ints[safe: 3], let g = ints[safe: 4], let b = ints[safe: 5] else { return nil }
+            guard ints.count>=3 else { return nil }
+            let r = ints.removeFirst()
+            let g = ints.removeFirst()
+            let b = ints.removeFirst()
             return String(format: "#%02X%02X%02X", r, g, b)
         default:
             return nil
