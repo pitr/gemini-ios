@@ -9,7 +9,7 @@ class GeminiText {
             var pageTitle: String?
             var body = ""
             var pre = false
-            var ansi = Ansi()
+            let ansi = Ansi()
             var precounter = 0
             for rawLine in content.components(separatedBy: "\n") {
                 let line = rawLine.escapeHTML()

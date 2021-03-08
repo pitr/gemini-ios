@@ -2045,7 +2045,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(inherit)Client/Entitlements/GeminiDevApplication.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2021.03.06;
+				CURRENT_PROJECT_VERSION = 2021.03.08;
 				DEVELOPMENT_TEAM = 297936744Y;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2104,7 +2104,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(inherit)Extensions/Entitlements/Gemini.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2021.03.06;
+				CURRENT_PROJECT_VERSION = 2021.03.08;
 				DEVELOPMENT_TEAM = 297936744Y;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
