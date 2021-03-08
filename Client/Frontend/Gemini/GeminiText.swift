@@ -9,6 +9,7 @@ class GeminiText {
             var pageTitle: String?
             var body = ""
             var pre = false
+            var ansi = Ansi()
             var precounter = 0
             for rawLine in content.components(separatedBy: "\n") {
                 let line = rawLine.escapeHTML()
@@ -23,34 +24,36 @@ class GeminiText {
                         precounter += 1
                         body.append("<figure role='img' aria-labelledby='pre-\(precounter)'><figcaption id='pre-\(precounter)'>\(title)</figcaption><pre><code>")
                     } else {
+                        body.append(ansi.reset())
                         body.append("</code></pre></figure>\n")
                     }
                     continue
                 }
                 if pre {
-                    body.append("\(line)\n")
+                    body.append(ansi.parse(line))
+                    body.append("\n")
                 } else if line.starts(with: "###") {
-                    let title = line.dropFirst(3)
+                    let title = String(line.dropFirst(3))
                     pageTitle = pageTitle ?? String(title)
-                    body.append("<h3>\(title)</h2>\n")
+                    body.append("<h3>\(ansi.parse(title))\(ansi.reset())</h3>\n")
                 } else if line.starts(with: "##") {
-                    let title = line.dropFirst(2)
+                    let title = String(line.dropFirst(2))
                     pageTitle = pageTitle ?? String(title)
-                    body.append("<h2>\(title)</h2>\n")
+                    body.append("<h2>\(ansi.parse(title))\(ansi.reset())</h2>\n")
                 } else if line.starts(with: "#") {
-                    let title = line.dropFirst(1)
+                    let title = String(line.dropFirst(1))
                     pageTitle = pageTitle ?? String(title)
-                    body.append("<h1>\(title)</h1>\n")
+                    body.append("<h1>\(ansi.parse(title))\(ansi.reset())</h1>\n")
                 } else if let m = listRegex.firstMatch(in: line, options: [], range: range),
                           let range = Range(m.range(at: 1), in: line) {
-                    let title = line[range]
-                    body.append("<li>\(title)</li>\n")
+                    let title = String(line[range])
+                    body.append("<li>\(ansi.parse(title))\(ansi.reset())</li>\n")
                 } else if line.starts(with: "&gt;") {
-                    let quote = line.dropFirst(4)
+                    let quote = String(line.dropFirst(4))
                     if quote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         body.append("<blockquote><br/></blockquote>\n")
                     } else {
-                        body.append("<blockquote>\(quote)</blockquote>\n")
+                        body.append("<blockquote>\(ansi.parse(quote))\(ansi.reset())</blockquote>\n")
                     }
                 } else if let m = linkRegex.firstMatch(in: line, options: [], range: range),
                           let range1 = Range(m.range(at: 1), in: line),
@@ -69,17 +72,15 @@ class GeminiText {
                         body.append("<p><a href=\"\(img.absoluteString)\" onclick=\"return inlineImage(this);\" class=\(clazz)>\(title)</a></p>\n")
                         continue
                     }
-                    if link == title {
-                        body.append("<p><a href=\"\(url?.absoluteString ?? link)\" class=\(clazz)>\(link)</a></p>\n")
-                    } else if title.isEmptyOrWhitespace() {
+                    if link == title || title.isEmptyOrWhitespace() {
                         body.append("<p><a href=\"\(url?.absoluteString ?? link)\" class=\(clazz)>\(link)</a></p>\n")
                     } else {
-                        body.append("<p><a href=\"\(url?.absoluteString ?? link)\" class=\(clazz)>\(title)</a></p>\n")
+                        body.append("<p><a href=\"\(url?.absoluteString ?? link)\" class=\(clazz)>\(ansi.parse(title))\(ansi.reset())</a></p>\n")
                     }
                 } else if line.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     body.append("<br/>\n")
                 } else {
-                    body.append("<p>\(line)</p>\n")
+                    body.append("<p>\(ansi.parse(line))\(ansi.reset())</p>\n")
                 }
             }
             let title = pageTitle ?? pageURL.absoluteDisplayString
