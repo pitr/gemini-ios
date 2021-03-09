@@ -200,7 +200,16 @@ class GeminiClient: NSObject {
                 render(data, mime: "text/html")
             }
         case .redirect_permanent(let to), .redirect_temporary(let to):
-            let body = "<meta http-equiv=\"refresh\" content=\"0; URL='\(to)'\" />"
+            guard let url = URIFixup.getURL(to, relativeTo: self.url) else {
+                renderError(error: "Could not find a way to redirect to \(to)")
+                return
+            }
+            let body: String
+            if url.hostPort == self.url.hostPort {
+                body = "<meta http-equiv=\"refresh\" content=\"0; URL='\(to)'\" />"
+            } else {
+                body = GeminiText.getHeader(for: self.url, title: "Please confirm redirect", profile: self.profile) + "<h1>Please confirm redirect</h1><a href='\(url.absoluteString)'>\(url.absoluteString)</a>"
+            }
             guard let data = body.data(using: .utf8) else {
                 renderError(error: "Could not redirect to \(to)")
                 return
