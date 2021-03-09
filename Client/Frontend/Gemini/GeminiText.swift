@@ -9,7 +9,7 @@ class GeminiText {
             var pageTitle: String?
             var body = ""
             var pre = false
-            let ansi = Ansi()
+            let ansi = Ansi(enabled: profile.prefs.boolForKey(PrefsKeys.EnableANSIEscapeCodes) ?? false)
             var precounter = 0
             for rawLine in content.components(separatedBy: "\n") {
                 let line = rawLine.escapeHTML()
@@ -33,27 +33,27 @@ class GeminiText {
                     body.append(ansi.parse(line))
                     body.append("\n")
                 } else if line.starts(with: "###") {
-                    let title = String(line.dropFirst(3))
+                    let title = line.dropFirst(3)
                     pageTitle = pageTitle ?? String(title)
-                    body.append("<h3>\(ansi.parse(title))\(ansi.reset())</h3>\n")
+                    body.append("<h3>\(title)</h3>\n")
                 } else if line.starts(with: "##") {
-                    let title = String(line.dropFirst(2))
+                    let title = line.dropFirst(2)
                     pageTitle = pageTitle ?? String(title)
-                    body.append("<h2>\(ansi.parse(title))\(ansi.reset())</h2>\n")
+                    body.append("<h2>\(title)</h2>\n")
                 } else if line.starts(with: "#") {
-                    let title = String(line.dropFirst(1))
+                    let title = line.dropFirst(1)
                     pageTitle = pageTitle ?? String(title)
-                    body.append("<h1>\(ansi.parse(title))\(ansi.reset())</h1>\n")
+                    body.append("<h1>\(title)</h1>\n")
                 } else if let m = listRegex.firstMatch(in: line, options: [], range: range),
                           let range = Range(m.range(at: 1), in: line) {
-                    let title = String(line[range])
-                    body.append("<li>\(ansi.parse(title))\(ansi.reset())</li>\n")
+                    let title = line[range]
+                    body.append("<li>\(title)</li>\n")
                 } else if line.starts(with: "&gt;") {
-                    let quote = String(line.dropFirst(4))
+                    let quote = line.dropFirst(4)
                     if quote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         body.append("<blockquote><br/></blockquote>\n")
                     } else {
-                        body.append("<blockquote>\(ansi.parse(quote))\(ansi.reset())</blockquote>\n")
+                        body.append("<blockquote>\(quote)</blockquote>\n")
                     }
                 } else if let m = linkRegex.firstMatch(in: line, options: [], range: range),
                           let range1 = Range(m.range(at: 1), in: line),
@@ -75,12 +75,12 @@ class GeminiText {
                     if link == title || title.isEmptyOrWhitespace() {
                         body.append("<p><a href=\"\(url?.absoluteString ?? link)\" class=\(clazz)>\(link)</a></p>\n")
                     } else {
-                        body.append("<p><a href=\"\(url?.absoluteString ?? link)\" class=\(clazz)>\(ansi.parse(title))\(ansi.reset())</a></p>\n")
+                        body.append("<p><a href=\"\(url?.absoluteString ?? link)\" class=\(clazz)>\(title)</a></p>\n")
                     }
                 } else if line.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     body.append("<br/>\n")
                 } else {
-                    body.append("<p>\(ansi.parse(line))\(ansi.reset())</p>\n")
+                    body.append("<p>\(line)</p>\n")
                 }
             }
             let title = pageTitle ?? pageURL.absoluteDisplayString

@@ -58,7 +58,9 @@ class AppSettingsTableViewController: SettingsTableViewController {
 
         settings += [ SettingSection(title: NSAttributedString(string: "Gemini"), children: [
             BoolSetting(prefs: prefs, prefKey: PrefsKeys.EnableSiteTheme, defaultValue: false,
-                        titleText: Strings.SettingsEnableSiteThemeTitle, statusText: Strings.SettingsEnableSiteThemeStatus)
+                        titleText: Strings.SettingsEnableSiteThemeTitle, statusText: Strings.SettingsEnableSiteThemeStatus),
+            BoolSetting(prefs: prefs, prefKey: PrefsKeys.EnableANSIEscapeCodes, defaultValue: false,
+                        titleText: Strings.SettingsEnableAnsiCodeTitle, statusText: Strings.SettingsEnableAnsiCodeStatus),
 
         ])]
 

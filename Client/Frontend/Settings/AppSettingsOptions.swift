@@ -70,14 +70,6 @@ class NewTabPageSetting: Setting {
     }
 }
 
-fileprivate func getDisclosureIndicator() -> UIImageView {
-    let disclosureIndicator = UIImageView()
-    disclosureIndicator.image = UIImage(named: "menu-Disclosure")?.withRenderingMode(.alwaysTemplate)
-    disclosureIndicator.tintColor = UIColor.theme.tableView.accessoryViewTint
-    disclosureIndicator.sizeToFit()
-    return disclosureIndicator
-}
-
 @available(iOS 12.0, *)
 class SiriPageSetting: Setting {
     let profile: Profile

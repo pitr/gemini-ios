@@ -5,11 +5,14 @@ private let log = Logger.browserLogger
 class Ansi {
     fileprivate let regex: NSRegularExpression
     var spans = 0
+    let enabled: Bool
 
-    init() {
+    init(enabled: Bool) {
+        self.enabled = enabled
         self.regex = try! NSRegularExpression(pattern: "\\x{1B}\\[([\\d;]+)m", options: [])
     }
     func reset() -> String {
+        if !self.enabled { return "" }
         let spans = self.spans
         self.spans = 0
         return String(repeating: "</span>", count: spans)
@@ -22,8 +25,8 @@ class Ansi {
             var ints = line[range].split(separator: ";").compactMap { Int($0) }
             var rep = ""
 
-            while !ints.isEmpty {
-                var type = ints.removeFirst()
+            while self.enabled && !ints.isEmpty {
+                let type = ints.removeFirst()
                 switch type {
                 case 0:  // reset
                     rep += String(repeating: "</span>", count: spans)
@@ -48,6 +51,8 @@ class Ansi {
                         rep += "<span style=\"background-color:\(color)\">"
                         spans += 1
                     }
+                case 58, 59: // non-standard underline, consume colors and continue
+                    _ = parseColor(&ints)
                 default:
                     ()
                 }

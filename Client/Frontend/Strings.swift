@@ -107,6 +107,9 @@ extension Strings {
     public static let SettingsEnableSiteThemeTitle = NSLocalizedString("Settings.EnableSiteTheme.Title", value: "Enable Site Themes", comment: "Title of setting to enable site-specific themes")
     public static let SettingsEnableSiteThemeStatus = NSLocalizedString("Settings.EnableSiteTheme.Status", value: "Site themes are auto-generated based on site URL", comment: "Status of setting to enable site-specific themes")
 
+    public static let SettingsEnableAnsiCodeTitle = NSLocalizedString("Settings.EnableAnsiCode.Title", value: "Enable ANSI Escape Codes", comment: "Title of setting to enable ANSI Escape Codes")
+    public static let SettingsEnableAnsiCodeStatus = NSLocalizedString("Settings.EnableAnsiCode.Status", value: "Only supports colours, and only in the prefformatted blocks", comment: "Status of setting to enable ANSI Escape Codes")
+
 }
 
 // Error pages.
@@ -362,7 +365,6 @@ extension Strings {
     public static let AppMenuAddBookmarkConfirmMessage = NSLocalizedString("Menu.AddBookmark.Confirm", value: "Bookmark Added", comment: "Toast displayed to the user after a bookmark has been added.")
     public static let AppMenuRemoveBookmarkConfirmMessage = NSLocalizedString("Menu.RemoveBookmark.Confirm", value: "Bookmark Removed", comment: "Toast displayed to the user after a bookmark has been removed.")
     public static let SendToDeviceTitle = NSLocalizedString("Send to Device", tableName: "3DTouchActions", comment: "Label for preview action on Tab Tray Tab to send the current tab to another device")
-    public static let AppMenuShowPageSourceString = NSLocalizedString("Menu.PageSourceAction.Title", tableName: "Menu", value: "View Page Source", comment: "Label for the button, displayed in the menu, used to show the html page source")
 }
 
 // Snackbar shown when tapping app store link
