@@ -65,8 +65,9 @@ class URIFixup {
         }
         components.host = components.host?.utf8HostToAscii()
         if let relativeTo = relativeTo {
-            if components.host?.isEmpty ?? true {
+            if components.host?.isEmpty ?? true && components.scheme == relativeTo.scheme {
                 components.host = relativeTo.host
+                components.port = relativeTo.port
             }
         }
 
