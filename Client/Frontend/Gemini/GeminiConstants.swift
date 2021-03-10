@@ -101,5 +101,5 @@ enum GeminiHeader {
 }
 
 let inputFooter = """
-<script>document.forms[0].onsubmit=function(e){e.preventDefault();document.location=document.location.origin+document.location.pathname+"?"+encodeURI(document.getElementById("q").value)};window.q.oninput=function(){window.s.innerText = window.q.value.length ? (window.q.value.length + "/1024") : ""}</script>
+<script>document.forms[0].onsubmit=function(e){e.preventDefault();document.location=document.location.origin+document.location.pathname+"?"+encodeURIComponent(document.getElementById("q").value)};window.q.oninput=function(){window.s.innerText = window.q.value.length ? (window.q.value.length + "/1024") : ""}</script>
 """
