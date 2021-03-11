@@ -13,10 +13,6 @@ open class DefaultSuggestedSites {
         SuggestedSiteData(
             url: "gemini://geddit.glv.one/",
             title: "Geddit"
-        ),
-        SuggestedSiteData(
-            url: "gemini://gemini.trans-neptunian.space/~smog/",
-            title: "Saturday Morning News"
         )
     ]
 }
