@@ -334,14 +334,6 @@ extension TabTrayController: TabDisplayer {
 
 extension TabTrayController {
 
-    @objc func didTapLearnMore() {
-        let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
-        if let langID = Locale.preferredLanguages.first {
-            let learnMoreRequest = URLRequest(url: "https://support.mozilla.org/1/mobile/\(appVersion ?? "0.0")/iOS/\(langID)/private-browsing-ios".asURL!)
-            openNewTab(learnMoreRequest)
-        }
-    }
-
     func closeTabsForCurrentTray() {
         tabDisplayManager.hideDisplayedTabs() {
             self.tabManager.removeTabsWithUndoToast(self.tabDisplayManager.dataStore.compactMap { $0 })

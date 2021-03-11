@@ -205,7 +205,8 @@ class GeminiClient: NSObject {
                 return
             }
             let body: String
-            if url.hostPort == self.url.hostPort {
+
+            if url.host == self.url.host && url.port ?? 1965 == self.url.port ?? 1965 {
                 body = "<meta http-equiv=\"refresh\" content=\"0; URL='\(to)'\" />"
             } else {
                 body = GeminiText.getHeader(for: self.url, title: "Please confirm redirect", profile: self.profile) + "<h1>Please confirm redirect</h1><a href='\(url.absoluteString)'>\(url.absoluteString)</a>"
