@@ -10,9 +10,9 @@ class AppSettingsTableViewController: SettingsTableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        navigationItem.title = NSLocalizedString("Settings", comment: "Title in the settings view controller title bar")
+        navigationItem.title = Strings.AppSettingsTitle
         navigationItem.rightBarButtonItem = UIBarButtonItem(
-            title: NSLocalizedString("Done", comment: "Done button on left side of the Settings view controller title bar"),
+            title: Strings.AppSettingsDone,
             style: .done,
             target: navigationController, action: #selector((navigationController as! ThemedNavigationController).done))
         navigationItem.rightBarButtonItem?.accessibilityIdentifier = "AppSettingsTableViewController.navigationItem.leftBarButtonItem"

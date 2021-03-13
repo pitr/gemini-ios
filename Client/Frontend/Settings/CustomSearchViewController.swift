@@ -151,7 +151,7 @@ class CustomSearchViewController: SettingsTableViewController {
 
         let settings: [SettingSection] = [
             SettingSection(title: NSAttributedString(string: Strings.SettingsAddCustomEngineTitleLabel), children: [titleField]),
-            SettingSection(title: NSAttributedString(string: Strings.SettingsAddCustomEngineURLLabel), footerTitle: NSAttributedString(string: "Example: gemini://gus.guru/search?%s"), children: [urlField])
+            SettingSection(title: NSAttributedString(string: Strings.SettingsAddCustomEngineURLLabel), footerTitle: NSAttributedString(string: Strings.SettingsAddCustomEngineURLDescription), children: [urlField])
         ]
 
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(self.addCustomSearchEngine))

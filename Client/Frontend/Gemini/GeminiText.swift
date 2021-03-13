@@ -19,7 +19,7 @@ class GeminiText {
                     if pre {
                         var title = rawLine.replaceFirstOccurrence(of: "```", with: "").trimmingCharacters(in: .whitespacesAndNewlines).escapeHTML()
                         if title.isEmpty {
-                            title = "unlabelled preformatted text"
+                            title = Strings.GeminiUnlabelledPreformattedText
                         }
                         precounter += 1
                         body.append("<figure role='img' aria-labelledby='pre-\(precounter)'><figcaption id='pre-\(precounter)'>\(title)</figcaption><pre><code>")

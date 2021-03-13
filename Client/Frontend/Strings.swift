@@ -75,6 +75,10 @@ extension Strings {
 
 // Settings.
 extension Strings {
+    public static let AppSettingsTitle = NSLocalizedString("Settings", comment: "Title in the settings view controller title bar")
+    public static let AppSettingsDone = NSLocalizedString("Done", comment: "Done button on left side of the Settings view controller title bar")
+    public static let AppSettingsSearch = NSLocalizedString("Search", comment: "Open search section of settings")
+
     public static let SettingsGeneralSectionTitle = NSLocalizedString("Settings.General.SectionName", value: "General", comment: "General settings section title")
     public static let SettingsWebsiteDataTitle = NSLocalizedString("Settings.WebsiteData.Title", value: "Website Data", comment: "Title displayed in header of the Data Management panel.")
     public static let SettingsSearchDoneButton = NSLocalizedString("Settings.Search.Done.Button", value: "Done", comment: "Button displayed at the top of the search settings.")
@@ -94,6 +98,9 @@ extension Strings {
 
 // Error pages.
 extension Strings {
+    public static let ErrorPageTryAgain = NSLocalizedString("Try again", tableName: "ErrorPages", comment: "Shown in error pages on a button that will try to load the page again")
+    public static let ErrorPageOpenInSafari = NSLocalizedString("Open in Safari", tableName: "ErrorPages", comment: "Shown in error pages for files that can't be shown and need to be downloaded.")
+
     public static let ErrorPagesAdvancedButton = NSLocalizedString("ErrorPages.Advanced.Button", value: "Advanced", comment: "Label for button to perform advanced actions on the error page")
     public static let ErrorPagesAdvancedWarning1 = NSLocalizedString("ErrorPages.AdvancedWarning1.Text", value: "Warning: we can’t confirm your connection to this website is secure.", comment: "Warning text when clicking the Advanced button on error pages")
     public static let ErrorPagesAdvancedWarning2 = NSLocalizedString("ErrorPages.AdvancedWarning2.Text", value: "It may be a misconfiguration or tampering by an attacker. Proceed if you accept the potential risk.", comment: "Additional warning text when clicking the Advanced button on error pages")
@@ -109,6 +116,9 @@ extension Strings {
     public static let CertificatesPanelDeleteTitle = NSLocalizedString("CertificatesPanel.Delete.Title", value: "Delete", comment: "Action button for deleting certificate in the Certificates panel.")
     public static let CertificatesPanelActivateTitle = NSLocalizedString("CertificatesPanel.Activate.Title", value: "Activate", comment: "Action button for activating Certificates in the Certificates panel.")
     public static let CertificatesPanelDeactivateTitle = NSLocalizedString("CertificatesPanel.Deactivate.Title", value: "Deactivate", comment: "Action button for deactivating Certificates in the Certificates panel.")
+
+    public static let CertificatesActivePrefix = NSLocalizedString("(active)", comment: "Label prefix indicating that the certificate is active.")
+    public static let CertificatesLastUsedDescription = NSLocalizedString("last used %@", comment: "Description of certificate, showing when certificate was last used.")
 }
 
 // History Panel
@@ -118,6 +128,8 @@ extension Strings {
     public static let RecentlyClosedTabsButtonTitle = NSLocalizedString("HistoryPanel.RecentlyClosedTabsButton.Title", value: "Recently Closed", comment: "Title for the Recently Closed button in the History Panel")
     public static let HistoryPanelClearHistoryButtonTitle = NSLocalizedString("HistoryPanel.ClearHistoryButtonTitle", value: "Clear Recent History…", comment: "Title for button in the history panel to clear recent history")
     public static let GeminiHomePage = NSLocalizedString("Gemini.HomePage.Title", value: "Elaho Home Page", comment: "Title for Elaho about:home page in tab history list")
+
+    public static let HistoryPanelDelete = NSLocalizedString("Delete", tableName: "HistoryPanel", comment: "Action button for deleting history entries in the history panel.")
 }
 
 // Clear recent history action menu
@@ -219,13 +231,21 @@ extension Strings {
     public static let SettingsUseInAppSafariStatus = NSLocalizedString("Settings.InAppSafari.Status", value: "Otherwise uses your default browser", comment: "Description displayed under the ”Use In-App Safari” option.")
 }
 
+extension Strings {
+    public static let LibraryPanelChooserAccessibilityLabel = NSLocalizedString("Panel Chooser", comment: "Accessibility label for the Library panel's bottom toolbar containing a list of the home panels (top sites, bookmarks, history).")
+
+    public static let LibraryBookmarksAccessibilityLabel = NSLocalizedString("Bookmarks", comment: "Panel accessibility label")
+    public static let LibraryHistoryAccessibilityLabel = NSLocalizedString("History", comment: "Panel accessibility label")
+    public static let LibraryCertificatesAccessibilityLabel = NSLocalizedString("Certificates", comment: "Panel accessibility label")
+}
+
 // Link Previews
 extension Strings {
     public static let SettingsShowLinkPreviewsTitle = NSLocalizedString("Settings.ShowLinkPreviews.Title", value: "Show Link Previews", comment: "Title of setting to enable link previews when long-pressing links.")
     public static let SettingsShowLinkPreviewsStatus = NSLocalizedString("Settings.ShowLinkPreviews.Status", value: "When Long-pressing Links", comment: "Description displayed under the ”Show Link Previews” option")
 }
 
-// errors
+// Errors
 extension Strings {
     public static let UnableToOpenURLError = NSLocalizedString("OpenURL.Error.Message", value: "Elaho cannot open the page because it has an invalid address.", comment: "The message displayed to a user when they try to open a URL that cannot be handled by Elaho, or any external app.")
     public static let UnableToOpenURLErrorTitle = NSLocalizedString("OpenURL.Error.Title", value: "Cannot Open Page", comment: "Title of the message shown when the user attempts to navigate to an invalid link.")
@@ -240,12 +260,20 @@ extension Strings {
 // Add Custom Search Engine
 extension Strings {
     public static let SettingsAddCustomEngine = NSLocalizedString("Settings.AddCustomEngine", value: "Add Search Engine", comment: "The button text in Search Settings that opens the Custom Search Engine view.")
-    public static let SettingsAddCustomEngineTitle = NSLocalizedString("Settings.AddCustomEngine.Title", value: "Add Search Engine", comment: "The title of the  Custom Search Engine view.")
+    public static let SettingsAddCustomEngineTitle = NSLocalizedString("Settings.AddCustomEngine.Title", value: "Add Search Engine", comment: "The title of the Custom Search Engine view.")
     public static let SettingsAddCustomEngineTitleLabel = NSLocalizedString("Settings.AddCustomEngine.TitleLabel", value: "Title", comment: "The title for the field which sets the title for a custom search engine.")
-    public static let SettingsAddCustomEngineURLLabel = NSLocalizedString("Settings.AddCustomEngine.URLLabel", value: "URL", comment: "The title for URL Field")
+    public static let SettingsAddCustomEngineURLLabel = NSLocalizedString("Settings.AddCustomEngine.URLLabel", value: "URL", comment: "The title for URL Field of the Custom Search Engine")
+    public static let SettingsAddCustomEngineURLDescription = NSLocalizedString("Settings.AddCustomEngine.URLDescription", value: "Example: gemini://gus.guru/search?%s", comment: "The description for URL Field of the Custom Search Engine")
     public static let SettingsAddCustomEngineTitlePlaceholder = NSLocalizedString("Settings.AddCustomEngine.TitlePlaceholder", value: "Search Engine", comment: "The placeholder for Title Field when saving a custom search engine.")
     public static let SettingsAddCustomEngineURLPlaceholder = NSLocalizedString("Settings.AddCustomEngine.URLPlaceholder", value: "URL (Replace Query with %s)", comment: "The placeholder for URL Field when saving a custom search engine")
 }
+
+// SearchEngine Picker
+extension String {
+    public static let SearchEnginePickerTitle = NSLocalizedString("Default Search Engine", comment: "Title for default search engine picker.")
+    public static let SearchEnginePickerCancel = NSLocalizedString("Cancel", comment: "Label for Cancel button")
+}
+
 
 // Context menu ButtonToast instances.
 extension Strings {
@@ -352,5 +380,55 @@ extension Strings {
 
     public static let ShareLoadInBackground = NSLocalizedString("ShareExtension.LoadInBackgroundAction.Title", value: "Load in Background", comment: "Action label on share extension to load the page in Elaho when user switches apps to bring it to foreground.")
     public static let ShareLoadInBackgroundDone = NSLocalizedString("ShareExtension.LoadInBackgroundActionDone.Title", value: "Loading in Elaho", comment: "Share extension label shown after user has performed 'Load in Background' action.")
+}
 
+// SearchSettings
+extension String {
+    public static let SearchSettingsTitle = NSLocalizedString("Search", comment: "Navigation title for search settings.")
+    public static let SearchSettingsDefaultSearchEngineAccessibilityLabel = NSLocalizedString("Default Search Engine", comment: "Accessibility label for default search engine setting.")
+    public static let SearchSettingsDefaultSearchEngineTitle = NSLocalizedString("Default Search Engine", comment: "Title for default search engine settings section.")
+    public static let SearchSettingsQuickSearchEnginesTitle = NSLocalizedString("Quick-Search Engines", comment: "Title for quick-search engines settings section.")
+}
+
+// TimeConstants
+extension String {
+    public static let TimeConstantMoreThanAMonth = NSLocalizedString("more than a month ago", comment: "Relative date for dates older than a month and less than two months.")
+    public static let TimeConstantMoreThanAWeek = NSLocalizedString("more than a week ago", comment: "Description for a date more than a week ago, but less than a month ago.")
+    public static let TimeConstantYesterday = NSLocalizedString("yesterday", comment: "Relative date for yesterday.")
+    public static let TimeConstantThisWeek = NSLocalizedString("this week", comment: "Relative date for date in past week.")
+    public static let TimeConstantRelativeToday = NSLocalizedString("today at %@", comment: "Relative date for date older than a minute.")
+    public static let TimeConstantJustNow = NSLocalizedString("just now", comment: "Relative time for a tab that was visited within the last few moments.")
+}
+
+// Gemini
+extension Strings {
+    public static let GeminiCouldNotRender = NSLocalizedString("Could not render", comment: "Error to show when client could not render a page.")
+    public static let GeminiCouldNotDownloadFile = NSLocalizedString("Could not download file", comment: "Error to show when client could not download a file.")
+    public static let GeminiCouldNotFindAWayToRedirect = NSLocalizedString("Could not find a way to redirect to %@", comment: "Error to show when client could not redirect user.")
+    public static let GeminiCouldNotParseBodyWithEncoding = NSLocalizedString("Could not parse body with encoding %@", comment: "Error to show when client could not parse response.")
+    public static let GeminiCouldNotParseBody = NSLocalizedString("Could not parse body", comment: "Error to show when client could not parse response.")
+    public static let GeminiCouldNotRedirect = NSLocalizedString("Could not redirect to %@", comment: "Error to show when.")
+    public static let GeminiCouldNotRenderForm = NSLocalizedString("Could not render form to ask server's question: %@", comment: "Error to show when client could not render an input form.")
+    public static let GeminiCouldNotRenderCertificationMessage = NSLocalizedString("Could not render server's certification message: %@", comment: "Error to show when client could not render server's certification message.")
+    public static let GeminiCouldNotPrepareRequest = NSLocalizedString("Could not prepare request to %@", comment: "Error to show when client could not prepare a request to server.")
+    public static let GeminiInvalidHeader = NSLocalizedString("Invalid header: %@", comment: "Error to show when server responds with an invalid header.")
+    public static let GeminiInvalidResponse = NSLocalizedString("Invalid response", comment: "Error to show when server responds with an invalid response.")
+    public static let GeminiPleaseConfirmRedirect = NSLocalizedString("Please confirm redirect", comment: "Title to show when user is redirected to another server.")
+    public static let GeminiServerRespondedWithNoContent = NSLocalizedString("Server responded with no content", comment: "Error to show when server did not send any response.")
+    public static let GeminiSlowDown = NSLocalizedString("Slow down: please wait at least %@ seconds before retrying", comment: "Error to show when server requested that user slows down with requests.")
+    public static let GeminiSubmit = NSLocalizedString("Submit", comment: "Button title to submit user input.")
+    public static let GeminiTooManyRedirects = NSLocalizedString("Too many redirects", comment: "Error to show when user is being redirected too many times.")
+
+    public static let GeminiUnlabelledPreformattedText = NSLocalizedString("Unlabelled preformatted text", comment: "Accessibility title for unlabelled preformatted text.")
+}
+
+// MenuHelper
+extension String {
+    public static let MenuHelperPasteAndGo = NSLocalizedString("UIMenuItem.PasteGo", value: "Paste & Go", comment: "The menu item that pastes the current contents of the clipboard into the URL bar and navigates to the page")
+    public static let MenuHelperReveal = NSLocalizedString("Reveal", tableName: "LoginManager", comment: "Reveal password text selection menu item")
+    public static let MenuHelperHide =  NSLocalizedString("Hide", tableName: "LoginManager", comment: "Hide password text selection menu item")
+    public static let MenuHelperCopy = NSLocalizedString("Copy", tableName: "LoginManager", comment: "Copy password text selection menu item")
+    public static let MenuHelperOpenAndFill = NSLocalizedString("Open & Fill", tableName: "LoginManager", comment: "Open and Fill website text selection menu item")
+    public static let MenuHelperFindInPage = NSLocalizedString("Find in Page", tableName: "FindInPage", comment: "Text selection menu item")
+    public static let MenuHelperSearchWithGemini = NSLocalizedString("UIMenuItem.SearchWithGemini", value: "Search with Gemini", comment: "Search in New Tab Text selection menu item")
 }

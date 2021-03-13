@@ -78,7 +78,7 @@ class GeminiClient: NSObject {
 
         let request = url.absoluteString + "\r\n"
         guard let data = request.data(using: .utf8) else {
-            renderError(error: "Could not send request to \(url.absoluteString)")
+            renderError(error: String(format: Strings.GeminiCouldNotPrepareRequest, url.absoluteString))
             return
         }
         let conn = NWConnection(host: host, port: port, using: NWParameters(tls: opts))
@@ -110,7 +110,7 @@ class GeminiClient: NSObject {
                 }
                 conn.cancel()
                 guard let data = data else {
-                    self.renderError(error: "server responded with no content")
+                    self.renderError(error: Strings.GeminiServerRespondedWithNoContent)
                     return
                 }
 
@@ -145,12 +145,12 @@ class GeminiClient: NSObject {
             data[ix+1] == 10,
             ix < (1024+3), // +3 for status code
             let firstLine = String(data: data.prefix(upTo: ix), encoding: .utf8) else {
-                renderError(error: "Invalid response")
+                renderError(error: Strings.GeminiInvalidResponse)
                 return
         }
         log.debug("header: \(firstLine)")
         guard let header = GeminiHeader(header: firstLine) else {
-            renderError(error: "Invalid header: \(firstLine)")
+            renderError(error: String(format: Strings.GeminiInvalidHeader, firstLine))
             return
         }
         switch header {
@@ -159,32 +159,32 @@ class GeminiClient: NSObject {
             let data = data.dropFirst(ix+2)
             if mime.contentType.starts(with: "text/") {
                 guard let body = String(data: data, encoding: mime.charset) else {
-                    renderError(error: "Could not parse body with encoding \(mime.charset)")
+                    renderError(error: String(format: Strings.GeminiCouldNotParseBodyWithEncoding, mime.charset.description))
                     return
                 }
                 switch mime.contentType {
                 case "text/gemini":
                     guard let resp = GeminiText.render(body, pageURL: self.url, profile: self.profile) else {
-                        renderError(error: "Could not parse body")
+                        renderError(error: Strings.GeminiCouldNotParseBody)
                         return
                     }
                     render(resp, mime: "text/html")
                 case "text/html":
                     guard let resp = body.data(using: .utf8) else {
-                        renderError(error: "Could not parse body")
+                        renderError(error: Strings.GeminiCouldNotParseBody)
                         return
                     }
                     render(resp, mime: "text/html")
                 case "text/plain":
                     let result = GeminiText.getHeader(for: self.url, title: "", profile: self.profile) + "<pre><code>" + body
                     guard let data = result.data(using: .utf8) else {
-                        renderError(error: "Could not parse body")
+                        renderError(error: Strings.GeminiCouldNotParseBody)
                         return
                     }
                     render(data, mime: "text/html")
                 default:
                     guard let resp = body.data(using: .utf8) else {
-                        renderError(error: "Could not parse body")
+                        renderError(error: Strings.GeminiCouldNotParseBody)
                         return
                     }
                     render(resp, mime: "text/plain")
@@ -194,14 +194,14 @@ class GeminiClient: NSObject {
             } else {
                 let body = "<script>webkit.messageHandlers.downloadManager.postMessage({url: \"\(self.url.absoluteString)\",mimeType: \"\(mime.contentType)\",size: \(data.count), base64String: \"\(data.base64EncodedString)\"})</script>"
                 guard let data = body.data(using: .ascii) else {
-                    renderError(error: "could not download file")
+                    renderError(error: Strings.GeminiCouldNotDownloadFile)
                     return
                 }
                 render(data, mime: "text/html")
             }
         case .redirect_permanent(let to), .redirect_temporary(let to):
             guard let url = URIFixup.getURL(to, relativeTo: self.url) else {
-                renderError(error: "Could not find a way to redirect to \(to)")
+                renderError(error: String(format: Strings.GeminiCouldNotFindAWayToRedirect, to))
                 return
             }
             let body: String
@@ -209,15 +209,15 @@ class GeminiClient: NSObject {
             if url.host == self.url.host && url.port ?? 1965 == self.url.port ?? 1965 {
                 body = "<meta http-equiv=\"refresh\" content=\"0; URL='\(to)'\" />"
             } else {
-                body = GeminiText.getHeader(for: self.url, title: "Please confirm redirect", profile: self.profile) + "<h1>Please confirm redirect</h1><a href='\(url.absoluteString)'>\(url.absoluteString)</a>"
+                body = GeminiText.getHeader(for: self.url, title: Strings.GeminiPleaseConfirmRedirect, profile: self.profile) + "<h1>\(Strings.GeminiPleaseConfirmRedirect)</h1><a href='\(url.absoluteString)'>\(url.absoluteString)</a>"
             }
             guard let data = body.data(using: .utf8) else {
-                renderError(error: "Could not redirect to \(to)")
+                renderError(error: String(format: Strings.GeminiCouldNotRedirect, to))
                 return
             }
             GeminiClient.redirects += 1
             if GeminiClient.redirects > 5 {
-                renderError(error: "Too many redirects")
+                renderError(error: Strings.GeminiTooManyRedirects)
                 return
             }
             render(data, mime: "text/html")
@@ -226,9 +226,9 @@ class GeminiClient: NSObject {
             var body = GeminiText.getHeader(for: self.url, title: question, profile: self.profile)
             switch header {
             case .sensitive_input:
-                body += "<h3>\(question)</h3><form><input autocapitalize=off type=password maxlength=1024 id=q name=q /><button>Submit</button><span id=s></span></form>"
+                body += "<h3>\(question)</h3><form><input autocapitalize=off type=password maxlength=1024 id=q name=q /><button>\(Strings.GeminiSubmit)</button><span id=s></span></form>"
             default:
-                body += "<h3>\(question)</h3><form><textarea autofocus rows=10 maxlength=1024 required autocapitalize=off id=q name=q></textarea><button>Submit</button><span id=s></span></form>"
+                body += "<h3>\(question)</h3><form><textarea autofocus rows=10 maxlength=1024 required autocapitalize=off id=q name=q></textarea><button>\(Strings.GeminiSubmit)</button><span id=s></span></form>"
             }
             body += inputFooter
             guard let data = body.data(using: .utf8) else {
@@ -238,7 +238,7 @@ class GeminiClient: NSObject {
             render(data, mime: "text/html")
         case .slow_down(let wait):
             GeminiClient.redirects = 0
-            renderError(error: "slow down: please wait at least \(wait) seconds before retrying")
+            renderError(error: String(format: Strings.GeminiSlowDown, wait))
         case .temporary_failure(let err),
              .server_unavailable(let err),
              .cgi_error(let err),
@@ -256,7 +256,7 @@ class GeminiClient: NSObject {
             body += "<h1>\(header.description().capitalized)</h1><h3>\(msg)</h3>"
             body += "<div id='need-certificate'></div>"
             guard let data = body.data(using: .utf8) else {
-                renderError(error: "Could not render server's certification message: \(msg)")
+                renderError(error: String(format: Strings.GeminiCouldNotRenderCertificationMessage, msg))
                 return
             }
             render(data, mime: "text/html")
@@ -278,7 +278,7 @@ class GeminiClient: NSObject {
         if let data = body.data(using: .utf8) {
             render(data, mime: "text/html")
         } else {
-            render("browser error!".data(using: .utf8)!, mime: "text/html")
+            render(Strings.GeminiCouldNotRender.data(using: .utf8)!, mime: "text/html")
         }
     }
 }
