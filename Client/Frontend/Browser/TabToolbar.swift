@@ -59,6 +59,7 @@ open class TabToolbarHelper: NSObject {
         toolbar.forwardButton.addTarget(self, action: #selector(didClickForward), for: .touchUpInside)
 
         toolbar.upButton.setImage(UIImage.templateImageNamed("nav-up"), for: .normal)
+        toolbar.upButton.imageEdgeInsets = UIEdgeInsets(equalInset: 8)
         toolbar.upButton.accessibilityLabel = NSLocalizedString("Up", comment: "Accessibility Label for the tab toolbar Up button")
         toolbar.upButton.addTarget(self, action: #selector(didClickUp), for: .touchUpInside)
 
