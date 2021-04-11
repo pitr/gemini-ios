@@ -21,6 +21,9 @@ public class DB {
         }
 
         config.fileURL = URL(fileURLWithPath: (try! files.getAndEnsureDirectory())).appendingPathComponent(filename)
+        if let f = config.fileURL {
+            log.debug("Opening Realm file at \(f)")
+        }
 
         Realm.Configuration.defaultConfiguration = config
 

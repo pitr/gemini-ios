@@ -51,7 +51,7 @@ extension DB {
     }
 
     public func removeHostFromTopSites(_ host: String) -> Maybe<Void> {
-        let p = self.realm.objects(PinnedTopSite.self).filter("host = %@", host)
+        let p = self.realm.objects(PinnedTopSite.self).filter("domain = %@", host)
         do {
             try self.realm.write {
                 self.realm.delete(p)
