@@ -7,7 +7,7 @@ extension BrowserViewController: CertificateHelperDelegate {
             var input: UITextField!
             let alert = UIAlertController(title: "Certificate Name", message: "Enter name you will be identified by on \(host)", preferredStyle:.alert)
             alert.addAction(UIAlertAction(title: "Create", style: .default, handler: { action in
-                guard let name = input.text, let result = CertificateUtils.createCert(days: 365, name: name) else {
+                guard let name = input.text, let result = CertificateUtils.createCert(days: 365*100, name: name) else {
                     self.show(toast: ButtonToast(labelText: "Certificate creation failed", backgroundColor: UIColor.Photon.Grey60, textAlignment: .center))
                     return
                 }

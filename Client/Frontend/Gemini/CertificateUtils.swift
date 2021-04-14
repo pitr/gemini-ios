@@ -63,18 +63,44 @@ class CertificateUtils {
 
     static func createCert(days: Int, name: String) -> CertificateUtilsResult? {
         CRYPTO_mem_ctrl(CRYPTO_MEM_CHECK_ON)
-        OPENSSL_add_all_algorithms_noconf()
+        OpenSSL_add_all_algorithms()
+        SSL_load_error_strings()
         ERR_load_CRYPTO_strings()
 
         let pk = EVP_PKEY_new()!
         let cert = X509_new()!
-        let rsa = RSA_generate_key(2048, UInt(RSA_F4), nil, nil)!
-        EVP_PKEY_assign_wrapper(pk, rsa)
+        defer {
+            X509_free(cert)
+            EVP_PKEY_free(pk)
+        }
 
+        var rsa = RSA_new()
+        let bn = BN_new()
+
+        defer {
+            RSA_free(rsa)
+            BN_free(bn)
+        }
+
+        BN_set_word(bn, 0x10001);
+        RSA_generate_key_ex(rsa, 2048, bn, nil)
+
+        EVP_PKEY_assign(pk, EVP_PKEY_RSA, &rsa)
         X509_set_version(cert, 2)
         ASN1_INTEGER_set(X509_get_serialNumber(cert), 0)
-        X509_gmtime_adj(cert.pointee.cert_info.pointee.validity.pointee.notBefore, 0)
-        X509_gmtime_adj(cert.pointee.cert_info.pointee.validity.pointee.notAfter, 60*60*24*days)
+
+        let notBefore = ASN1_TIME_new()
+        let notAfter = ASN1_TIME_new()
+        defer {
+            ASN1_TIME_free(notBefore)
+            ASN1_TIME_free(notAfter)
+        }
+
+        ASN1_TIME_set(notBefore, 0)
+        X509_set1_notBefore(cert, notBefore)
+        ASN1_TIME_set(notAfter, 60*60*24*days)
+        X509_set1_notAfter(cert, notAfter)
+        EVP_PKEY_set1_RSA(pk, rsa)
         X509_set_pubkey(cert, pk)
 
         let subject = X509_get_subject_name(cert)!
@@ -94,6 +120,9 @@ class CertificateUtils {
             ERR_print_errors_fp(stderr)
             return nil
         }
+        defer {
+            PKCS12_free(p12)
+        }
 
         let fileManager = FileManager.default
         let url = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).appendingPathComponent(Bytes.generateGUID())
@@ -104,9 +133,7 @@ class CertificateUtils {
         }
         let p12File = fdopen(fileHandle.fileDescriptor, "w")
         i2d_PKCS12_fp(p12File, p12)
-        PKCS12_free(p12)
-        X509_free(cert)
-        EVP_PKEY_free(pk)
+
         fclose(p12File)
         fileHandle.closeFile()
 

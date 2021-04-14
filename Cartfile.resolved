@@ -1,7 +1,0 @@
-github "DaveWoodCom/XCGLogger" "7.0.1"
-github "SnapKit/SnapKit" "5.0.1"
-github "SwiftyJSON/SwiftyJSON" "5.0.0"
-github "jrendel/SwiftKeychainWrapper" "3.4.0"
-github "krzyzanowskim/OpenSSL" "1.0.220"
-github "realm/realm-cocoa" "v5.0.2"
-github "swisspol/GCDWebServer" "3.5.4"

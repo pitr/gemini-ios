@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -74,28 +74,26 @@
 		7B2142FE1E5E055000CDD3FC /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7B2142FC1E5E055000CDD3FC /* InfoPlist.strings */; };
 		7B3D9E651E4CBFDB007A50DA /* NSCoderExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3D9E641E4CBFDB007A50DA /* NSCoderExtensions.swift */; };
 		7B42406E1CA04CAC009B5C28 /* Menu.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7B42406D1CA04CAC009B5C28 /* Menu.xcassets */; };
-		7B604FA21C495268006EEEC3 /* SnapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B604FA11C495268006EEEC3 /* SnapKit.framework */; };
-		7B604FBB1C495D8A006EEEC3 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B604FBA1C495D8A006EEEC3 /* XCGLogger.framework */; };
-		7B604FBC1C495E1E006EEEC3 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B604FBA1C495D8A006EEEC3 /* XCGLogger.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		7B604FBD1C495E31006EEEC3 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B604FBA1C495D8A006EEEC3 /* XCGLogger.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		7B844E3D1BBDDB9D00E733A2 /* ChevronView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B844E3C1BBDDB9D00E733A2 /* ChevronView.swift */; };
 		7B9BF91C1E43472E00CB24F4 /* JSONExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B9BF91B1E43472E00CB24F4 /* JSONExtensions.swift */; };
 		7BA0601B1C0F4DE200DFADB6 /* TabPeekViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA0601A1C0F4DE200DFADB6 /* TabPeekViewController.swift */; };
-		7BA4A9471C4CED900091D032 /* GCDWebServers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7BA4A9451C4CED780091D032 /* GCDWebServers.framework */; };
-		7BA4A94C1C4CF03B0091D032 /* SwiftKeychainWrapper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7BA4A94B1C4CF03B0091D032 /* SwiftKeychainWrapper.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		7BEFC6801BFF68C30059C952 /* QuickActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BEFC67F1BFF68C30059C952 /* QuickActions.swift */; };
+		8029A908262322A1005A50A7 /* ObjcExceptionBridging in Frameworks */ = {isa = PBXBuildFile; productRef = 8029A907262322A1005A50A7 /* ObjcExceptionBridging */; };
+		8029A90A262322A1005A50A7 /* XCGLogger in Frameworks */ = {isa = PBXBuildFile; productRef = 8029A909262322A1005A50A7 /* XCGLogger */; };
+		8029A910262322D8005A50A7 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 8029A90F262322D8005A50A7 /* SnapKit */; };
+		8029A91626232375005A50A7 /* SwiftKeychainWrapper in Frameworks */ = {isa = PBXBuildFile; productRef = 8029A91526232375005A50A7 /* SwiftKeychainWrapper */; };
+		8029A91C26232478005A50A7 /* OpenSSL in Frameworks */ = {isa = PBXBuildFile; productRef = 8029A91B26232478005A50A7 /* OpenSSL */; };
+		8029A92226232561005A50A7 /* GCDWebServers in Frameworks */ = {isa = PBXBuildFile; productRef = 8029A92126232561005A50A7 /* GCDWebServers */; };
 		802AEAA024715B0B00567181 /* GeminiClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802AEA9F24715B0B00567181 /* GeminiClient.swift */; };
 		802AEAA22471C4CC00567181 /* GeminiSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802AEAA12471C4CC00567181 /* GeminiSchemeHandler.swift */; };
-		8043326B248295630058FCD7 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 80433269248295630058FCD7 /* RealmSwift.framework */; };
-		8043326D248295630058FCD7 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8043326A248295630058FCD7 /* Realm.framework */; };
 		80433272248295D60058FCD7 /* DB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80433271248295D60058FCD7 /* DB.swift */; };
 		8043327624831D450058FCD7 /* Bookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8043327524831D450058FCD7 /* Bookmark.swift */; };
 		806531ED248AED39006F259A /* CertificateUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806531EC248AED39006F259A /* CertificateUtils.swift */; };
-		806531EF248B97DE006F259A /* OpenSSL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 806531EE248B97DE006F259A /* OpenSSL.framework */; };
 		806531F6248BBB18006F259A /* Certificate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806531F5248BBB18006F259A /* Certificate.swift */; };
 		806531F8248C0089006F259A /* CertificateHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806531F7248C0089006F259A /* CertificateHelper.swift */; };
 		806531FA248CD267006F259A /* String+Escape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806531F9248CD267006F259A /* String+Escape.swift */; };
 		806531FC248CF1C5006F259A /* BrowserViewController+Certificate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806531FB248CF1C5006F259A /* BrowserViewController+Certificate.swift */; };
+		8073C731262626AE00D11B24 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 8073C730262626AE00D11B24 /* SnapKit */; };
 		8084B731247C2F8C002C42DC /* IntroViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8084B72F247C2F8B002C42DC /* IntroViewController.swift */; };
 		8084B732247C2F8C002C42DC /* Intro.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8084B730247C2F8B002C42DC /* Intro.xcassets */; };
 		808E313F2487EA20002B7686 /* GeminiConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 808E313E2487EA20002B7686 /* GeminiConstants.swift */; };
@@ -110,13 +108,12 @@
 		80BAC1E324852844001111F7 /* PinnedSite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80BAC1E224852844001111F7 /* PinnedSite.swift */; };
 		80BAC1E6248534CB001111F7 /* SuggestedSites.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80BAC1E4248534CB001111F7 /* SuggestedSites.swift */; };
 		80BAC1E7248534CB001111F7 /* DefaultSuggestedSites.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80BAC1E5248534CB001111F7 /* DefaultSuggestedSites.swift */; };
-		80BAC1E92485BC11001111F7 /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 80BAC1E82485BC11001111F7 /* SwiftyJSON.framework */; };
-		80BAC1EB2485BC1D001111F7 /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 80BAC1E82485BC11001111F7 /* SwiftyJSON.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		80BAC1EE2485BC26001111F7 /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 80BAC1E82485BC11001111F7 /* SwiftyJSON.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		80BAC1F12485BC2E001111F7 /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 80BAC1E82485BC11001111F7 /* SwiftyJSON.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		80C7598425AA478F00B5CBF8 /* DejaVuSansMonoNerdFontCompleteMonoWindowsCompatible.ttf64 in Resources */ = {isa = PBXBuildFile; fileRef = 80C7598325AA478F00B5CBF8 /* DejaVuSansMonoNerdFontCompleteMonoWindowsCompatible.ttf64 */; };
 		80D18444248108CF00698303 /* CertificateMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80D18443248108CF00698303 /* CertificateMenu.swift */; };
 		80D1844624810B2A00698303 /* GeminiHeader.html in Resources */ = {isa = PBXBuildFile; fileRef = 80D1844524810B2A00698303 /* GeminiHeader.html */; };
+		80DD332526231A3C005C289C /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = 80DD332426231A3C005C289C /* Realm */; };
+		80DD332726231A3C005C289C /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 80DD332626231A3C005C289C /* RealmSwift */; };
+		80E0F945262739CB0009DC72 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 80E0F944262739CB0009DC72 /* SwiftyJSON */; };
 		80E67C8B25EC4E5100D615C2 /* FaviconFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65075561E37F714006961AC /* FaviconFetcher.swift */; };
 		80E67C9525EC510800D615C2 /* SearchPlugins.plist in Resources */ = {isa = PBXBuildFile; fileRef = 80E67C8125EC476B00D615C2 /* SearchPlugins.plist */; };
 		884CA7492344A301002E4711 /* TextContentDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884CA7482344A301002E4711 /* TextContentDetector.swift */; };
@@ -192,9 +189,6 @@
 		D8D33A7D1FBD080300A20A28 /* SnapKitExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D33A7C1FBD080300A20A28 /* SnapKitExtensions.swift */; };
 		D8EFFA0C1FF5B1FA001D3A09 /* NavigationRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8EFFA0B1FF5B1FA001D3A09 /* NavigationRouter.swift */; };
 		D8FDEB57220CFE970069A582 /* UIImage+ImageEffects.m in Sources */ = {isa = PBXBuildFile; fileRef = D8FDEB55220CFE970069A582 /* UIImage+ImageEffects.m */; };
-		DABDA4AD20DA0FB900FBB0BD /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DABDA4AC20DA0FB800FBB0BD /* ObjcExceptionBridging.framework */; };
-		DABDA4AE20DA0FDB00FBB0BD /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DABDA4AC20DA0FB800FBB0BD /* ObjcExceptionBridging.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		DABDA4AF20DA0FE400FBB0BD /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DABDA4AC20DA0FB800FBB0BD /* ObjcExceptionBridging.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		DD31E0FB1B382B520077078A /* TabPrintPageRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD31E0FA1B382B520077078A /* TabPrintPageRenderer.swift */; };
 		E40FAB0C1A7ABB77009CB80D /* WebServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E40FAB0B1A7ABB77009CB80D /* WebServer.swift */; };
 		E418D0D91A251B3200CAE47A /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D34DC84D1A16C40C00D49B7B /* Profile.swift */; };
@@ -424,26 +418,20 @@
 		7B2142FD1E5E055000CDD3FC /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		7B3D9E641E4CBFDB007A50DA /* NSCoderExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSCoderExtensions.swift; sourceTree = "<group>"; };
 		7B42406D1CA04CAC009B5C28 /* Menu.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Menu.xcassets; sourceTree = "<group>"; };
-		7B604FA11C495268006EEEC3 /* SnapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SnapKit.framework; path = Carthage/Build/iOS/SnapKit.framework; sourceTree = "<group>"; };
-		7B604FBA1C495D8A006EEEC3 /* XCGLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCGLogger.framework; path = Carthage/Build/iOS/XCGLogger.framework; sourceTree = "<group>"; };
 		7B844E3C1BBDDB9D00E733A2 /* ChevronView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChevronView.swift; sourceTree = "<group>"; };
 		7B9BF91B1E43472E00CB24F4 /* JSONExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONExtensions.swift; sourceTree = "<group>"; };
 		7BA0601A1C0F4DE200DFADB6 /* TabPeekViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabPeekViewController.swift; sourceTree = "<group>"; };
-		7BA4A9451C4CED780091D032 /* GCDWebServers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GCDWebServers.framework; path = Carthage/Build/iOS/GCDWebServers.framework; sourceTree = "<group>"; };
-		7BA4A94B1C4CF03B0091D032 /* SwiftKeychainWrapper.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftKeychainWrapper.framework; path = Carthage/Build/iOS/SwiftKeychainWrapper.framework; sourceTree = "<group>"; };
 		7BEFC67F1BFF68C30059C952 /* QuickActions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuickActions.swift; sourceTree = "<group>"; };
 		802AEA9F24715B0B00567181 /* GeminiClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiClient.swift; sourceTree = "<group>"; };
 		802AEAA12471C4CC00567181 /* GeminiSchemeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiSchemeHandler.swift; sourceTree = "<group>"; };
-		80433269248295630058FCD7 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = Carthage/Build/iOS/RealmSwift.framework; sourceTree = "<group>"; };
-		8043326A248295630058FCD7 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Carthage/Build/iOS/Realm.framework; sourceTree = "<group>"; };
 		80433271248295D60058FCD7 /* DB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DB.swift; sourceTree = "<group>"; };
 		8043327524831D450058FCD7 /* Bookmark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bookmark.swift; sourceTree = "<group>"; };
 		806531EC248AED39006F259A /* CertificateUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CertificateUtils.swift; sourceTree = "<group>"; };
-		806531EE248B97DE006F259A /* OpenSSL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenSSL.framework; path = Carthage/Build/iOS/OpenSSL.framework; sourceTree = "<group>"; };
 		806531F5248BBB18006F259A /* Certificate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Certificate.swift; sourceTree = "<group>"; };
 		806531F7248C0089006F259A /* CertificateHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CertificateHelper.swift; sourceTree = "<group>"; };
 		806531F9248CD267006F259A /* String+Escape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Escape.swift"; sourceTree = "<group>"; };
 		806531FB248CF1C5006F259A /* BrowserViewController+Certificate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+Certificate.swift"; sourceTree = "<group>"; };
+		8073C73826262B3B00D11B24 /* Elaho.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Elaho.entitlements; sourceTree = "<group>"; };
 		8084B72F247C2F8B002C42DC /* IntroViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntroViewController.swift; sourceTree = "<group>"; };
 		8084B730247C2F8B002C42DC /* Intro.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Intro.xcassets; sourceTree = "<group>"; };
 		808E313E2487EA20002B7686 /* GeminiConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiConstants.swift; sourceTree = "<group>"; };
@@ -454,7 +442,6 @@
 		80BAC1E224852844001111F7 /* PinnedSite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedSite.swift; sourceTree = "<group>"; };
 		80BAC1E4248534CB001111F7 /* SuggestedSites.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SuggestedSites.swift; sourceTree = "<group>"; };
 		80BAC1E5248534CB001111F7 /* DefaultSuggestedSites.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultSuggestedSites.swift; sourceTree = "<group>"; };
-		80BAC1E82485BC11001111F7 /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = Carthage/Build/iOS/SwiftyJSON.framework; sourceTree = "<group>"; };
 		80C7598325AA478F00B5CBF8 /* DejaVuSansMonoNerdFontCompleteMonoWindowsCompatible.ttf64 */ = {isa = PBXFileReference; lastKnownFileType = text; path = DejaVuSansMonoNerdFontCompleteMonoWindowsCompatible.ttf64; sourceTree = "<group>"; };
 		80D18443248108CF00698303 /* CertificateMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CertificateMenu.swift; sourceTree = "<group>"; };
 		80D1844524810B2A00698303 /* GeminiHeader.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = GeminiHeader.html; sourceTree = "<group>"; };
@@ -538,7 +525,6 @@
 		D8EFFA0B1FF5B1FA001D3A09 /* NavigationRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationRouter.swift; sourceTree = "<group>"; };
 		D8FDEB54220CFE970069A582 /* UIImage+ImageEffects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+ImageEffects.h"; path = "ThirdParty/Apple/UIImage+ImageEffects.h"; sourceTree = "<group>"; };
 		D8FDEB55220CFE970069A582 /* UIImage+ImageEffects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIImage+ImageEffects.m"; path = "ThirdParty/Apple/UIImage+ImageEffects.m"; sourceTree = "<group>"; };
-		DABDA4AC20DA0FB800FBB0BD /* ObjcExceptionBridging.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ObjcExceptionBridging.framework; path = Carthage/Build/iOS/ObjcExceptionBridging.framework; sourceTree = "<group>"; };
 		DD31E0FA1B382B520077078A /* TabPrintPageRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabPrintPageRenderer.swift; sourceTree = "<group>"; };
 		E40A18F71EDC73D5006B7F28 /* GeminiDev.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = GeminiDev.entitlements; sourceTree = "<group>"; };
 		E40A18F91EDC73D5006B7F28 /* Gemini.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = Gemini.entitlements; sourceTree = "<group>"; };
@@ -605,8 +591,6 @@
 		E692E3361C46E86A009D1240 /* AppSettingsOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppSettingsOptions.swift; sourceTree = "<group>"; };
 		E693F0D81E9D64BD0086DC17 /* OptionalExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptionalExtensions.swift; sourceTree = "<group>"; };
 		E698FFD91B4AADF40001F623 /* TabScrollController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabScrollController.swift; sourceTree = "<group>"; };
-		E6C191D41E38F7B7000A213B /* Cartfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Cartfile; sourceTree = "<group>"; };
-		E6C191D51E38F7B7000A213B /* Cartfile.resolved */ = {isa = PBXFileReference; lastKnownFileType = text; path = Cartfile.resolved; sourceTree = "<group>"; };
 		E6D8D5E61B569D70009E5A58 /* BrowserTrayAnimators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserTrayAnimators.swift; sourceTree = "<group>"; };
 		E6F738741EB7A8D300B50143 /* GeminiDevApplication.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GeminiDevApplication.entitlements; sourceTree = "<group>"; };
 		E6F738761EB7A97500B50143 /* GeminiApplication.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GeminiApplication.entitlements; sourceTree = "<group>"; };
@@ -649,10 +633,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				80BAC1EE2485BC26001111F7 /* SwiftyJSON.framework in Frameworks */,
-				7BA4A94C1C4CF03B0091D032 /* SwiftKeychainWrapper.framework in Frameworks */,
-				7B604FBC1C495E1E006EEEC3 /* XCGLogger.framework in Frameworks */,
-				DABDA4AE20DA0FDB00FBB0BD /* ObjcExceptionBridging.framework in Frameworks */,
+				8029A908262322A1005A50A7 /* ObjcExceptionBridging in Frameworks */,
+				8029A91626232375005A50A7 /* SwiftKeychainWrapper in Frameworks */,
+				80E0F945262739CB0009DC72 /* SwiftyJSON in Frameworks */,
+				8029A90A262322A1005A50A7 /* XCGLogger in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -661,17 +645,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				C8E18F20222EDED000E30E52 /* SafariServices.framework in Frameworks */,
-				806531EF248B97DE006F259A /* OpenSSL.framework in Frameworks */,
-				8043326B248295630058FCD7 /* RealmSwift.framework in Frameworks */,
 				288A2D9D1AB8B3260023ABC3 /* Shared.framework in Frameworks */,
+				8029A92226232561005A50A7 /* GCDWebServers in Frameworks */,
 				2FCAE2311ABB51F800877008 /* Storage.framework in Frameworks */,
-				7BA4A9471C4CED900091D032 /* GCDWebServers.framework in Frameworks */,
-				8043326D248295630058FCD7 /* Realm.framework in Frameworks */,
+				8029A91C26232478005A50A7 /* OpenSSL in Frameworks */,
 				0B8E0FF41A932BD500161DC3 /* ImageIO.framework in Frameworks */,
-				DABDA4AD20DA0FB900FBB0BD /* ObjcExceptionBridging.framework in Frameworks */,
-				7B604FA21C495268006EEEC3 /* SnapKit.framework in Frameworks */,
-				7B604FBB1C495D8A006EEEC3 /* XCGLogger.framework in Frameworks */,
-				80BAC1E92485BC11001111F7 /* SwiftyJSON.framework in Frameworks */,
+				8029A910262322D8005A50A7 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -679,10 +658,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				80BAC1F12485BC2E001111F7 /* SwiftyJSON.framework in Frameworks */,
+				80DD332726231A3C005C289C /* RealmSwift in Frameworks */,
 				D09A0CD81FAA23F6009A0273 /* Shared.framework in Frameworks */,
-				7B604FBD1C495E31006EEEC3 /* XCGLogger.framework in Frameworks */,
-				DABDA4AF20DA0FE400FBB0BD /* ObjcExceptionBridging.framework in Frameworks */,
+				80DD332526231A3C005C289C /* Realm in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -690,8 +668,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				80BAC1EB2485BC1D001111F7 /* SwiftyJSON.framework in Frameworks */,
 				28C8D1391AD4CE9100F62011 /* Shared.framework in Frameworks */,
+				8073C731262626AE00D11B24 /* SnapKit in Frameworks */,
 				28C8D11D1AD4CE8900F62011 /* Storage.framework in Frameworks */,
 				0B75AEA91AC20FB20015E5DC /* ImageIO.framework in Frameworks */,
 			);
@@ -827,21 +805,12 @@
 		7B604FC11C496005006EEEC3 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				806531EE248B97DE006F259A /* OpenSSL.framework */,
-				80BAC1E82485BC11001111F7 /* SwiftyJSON.framework */,
-				8043326A248295630058FCD7 /* Realm.framework */,
-				80433269248295630058FCD7 /* RealmSwift.framework */,
 				C8E18F1F222EDED000E30E52 /* SafariServices.framework */,
 				C8E18F1D222EDE4400E30E52 /* Accelerate.framework */,
 				E6231C001B90A44F005ABB0D /* libz.tbd */,
 				D39FA16B1A83E17800EE869C /* CoreGraphics.framework */,
 				0B8E0FF31A932BD500161DC3 /* ImageIO.framework */,
 				D36998881AD70A0A00650C6C /* IOKit.framework */,
-				7BA4A94B1C4CF03B0091D032 /* SwiftKeychainWrapper.framework */,
-				7BA4A9451C4CED780091D032 /* GCDWebServers.framework */,
-				7B604FBA1C495D8A006EEEC3 /* XCGLogger.framework */,
-				DABDA4AC20DA0FB800FBB0BD /* ObjcExceptionBridging.framework */,
-				7B604FA11C495268006EEEC3 /* SnapKit.framework */,
 				3905274B1C874D35007E0BB7 /* NotificationCenter.framework */,
 			);
 			name = Frameworks;
@@ -1177,8 +1146,6 @@
 		F84B21B51A090F8100AAB793 = {
 			isa = PBXGroup;
 			children = (
-				E6C191D41E38F7B7000A213B /* Cartfile */,
-				E6C191D51E38F7B7000A213B /* Cartfile.resolved */,
 				F84B21C01A090F8100AAB793 /* Client */,
 				F8708D1E1A0970990051AB07 /* Extensions */,
 				7B604FC11C496005006EEEC3 /* Frameworks */,
@@ -1204,6 +1171,7 @@
 		F84B21C01A090F8100AAB793 /* Client */ = {
 			isa = PBXGroup;
 			children = (
+				8073C73826262B3B00D11B24 /* Elaho.entitlements */,
 				7B2142FC1E5E055000CDD3FC /* InfoPlist.strings */,
 				F84B22431A09165600AAB793 /* Info.plist */,
 				F84B21EB1A0910F600AAB793 /* Assets */,
@@ -1311,23 +1279,6 @@
 		};
 /* End PBXGroup section */
 
-/* Begin PBXHeadersBuildPhase section */
-		288A2D831AB8B3260023ABC3 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		2FCAE2171ABB51F800877008 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXHeadersBuildPhase section */
-
 /* Begin PBXNativeTarget section */
 		288A2D851AB8B3260023ABC3 /* Shared */ = {
 			isa = PBXNativeTarget;
@@ -1335,14 +1286,18 @@
 			buildPhases = (
 				288A2D811AB8B3260023ABC3 /* Sources */,
 				288A2D821AB8B3260023ABC3 /* Frameworks */,
-				288A2D831AB8B3260023ABC3 /* Headers */,
-				288A2D841AB8B3260023ABC3 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = Shared;
+			packageProductDependencies = (
+				8029A907262322A1005A50A7 /* ObjcExceptionBridging */,
+				8029A909262322A1005A50A7 /* XCGLogger */,
+				8029A91526232375005A50A7 /* SwiftKeychainWrapper */,
+				80E0F944262739CB0009DC72 /* SwiftyJSON */,
+			);
 			productName = Shared;
 			productReference = 288A2D861AB8B3260023ABC3 /* Shared.framework */;
 			productType = "com.apple.product-type.framework";
@@ -1353,8 +1308,6 @@
 			buildPhases = (
 				2FCAE2151ABB51F800877008 /* Sources */,
 				2FCAE2161ABB51F800877008 /* Frameworks */,
-				2FCAE2171ABB51F800877008 /* Headers */,
-				2FCAE2181ABB51F800877008 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -1362,6 +1315,10 @@
 				2FCAE23C1ABB520700877008 /* PBXTargetDependency */,
 			);
 			name = Storage;
+			packageProductDependencies = (
+				80DD332426231A3C005C289C /* Realm */,
+				80DD332626231A3C005C289C /* RealmSwift */,
+			);
 			productName = Storage;
 			productReference = 2FCAE21A1ABB51F800877008 /* Storage.framework */;
 			productType = "com.apple.product-type.framework";
@@ -1370,7 +1327,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F84B21DD1A090F8100AAB793 /* Build configuration list for PBXNativeTarget "Client" */;
 			buildPhases = (
-				7B604F8F1C494AAA006EEEC3 /* Copy Carthage Dependencies */,
 				F84B21BA1A090F8100AAB793 /* Sources */,
 				F84B21BC1A090F8100AAB793 /* Resources */,
 				28CE83DE1A1D1E7C00576538 /* Frameworks */,
@@ -1386,6 +1342,11 @@
 				F84B22521A0920C600AAB793 /* PBXTargetDependency */,
 			);
 			name = Client;
+			packageProductDependencies = (
+				8029A90F262322D8005A50A7 /* SnapKit */,
+				8029A91B26232478005A50A7 /* OpenSSL */,
+				8029A92126232561005A50A7 /* GCDWebServers */,
+			);
 			productName = Client;
 			productReference = F84B21BE1A090F8100AAB793 /* Elaho.app */;
 			productType = "com.apple.product-type.application";
@@ -1405,6 +1366,9 @@
 				2F9A72321ABB856100F9F05D /* PBXTargetDependency */,
 			);
 			name = ShareTo;
+			packageProductDependencies = (
+				8073C730262626AE00D11B24 /* SnapKit */,
+			);
 			productName = ShareToFirefox;
 			productReference = F84B22491A0920C600AAB793 /* Elaho.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -1482,6 +1446,15 @@
 				Base,
 			);
 			mainGroup = F84B21B51A090F8100AAB793;
+			packageReferences = (
+				80DD332326231A3C005C289C /* XCRemoteSwiftPackageReference "realm-cocoa" */,
+				8029A8FA26232238005A50A7 /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
+				8029A906262322A1005A50A7 /* XCRemoteSwiftPackageReference "XCGLogger" */,
+				8029A90E262322D8005A50A7 /* XCRemoteSwiftPackageReference "SnapKit" */,
+				8029A91426232375005A50A7 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
+				8029A91A26232478005A50A7 /* XCRemoteSwiftPackageReference "OpenSSL" */,
+				8029A92026232561005A50A7 /* XCRemoteSwiftPackageReference "GCDWebServer" */,
+			);
 			productRefGroup = F84B21BF1A090F8100AAB793 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1495,20 +1468,6 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		288A2D841AB8B3260023ABC3 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		2FCAE2181ABB51F800877008 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		F84B21BC1A090F8100AAB793 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1548,30 +1507,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		7B604F8F1C494AAA006EEEC3 /* Copy Carthage Dependencies */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"$(SRCROOT)/Carthage/Build/iOS/SnapKit.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/ObjcExceptionBridging.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/XCGLogger.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/GCDWebServers.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/SwiftKeychainWrapper.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/SwiftyJSON.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/ObjcExceptionBridging.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/Realm.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/RealmSwift.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/OpenSSL.framework",
-			);
-			name = "Copy Carthage Dependencies";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "/usr/local/bin/carthage copy-frameworks\n";
-		};
 		E6639F191BF11E3A002D0853 /* Conditionally Add Settings Bundle */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1920,7 +1855,6 @@
 		2FCAE2341ABB51F900877008 /* Gemini */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 297936744Y;
@@ -1931,8 +1865,11 @@
 				INFOPLIST_FILE = Storage/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.pitr.Storage;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1981,14 +1918,13 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = (
+					"$(BUILD_DIR)/Gemini$(EFFECTIVE_PLATFORM_NAME)",
 					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/iOS",
-					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -2002,11 +1938,9 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"$(SRCROOT)",
 					"$(SDKROOT)/usr/include/libxml2",
-					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)/include/**",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -2035,11 +1969,6 @@
 				CURRENT_PROJECT_VERSION = 2021.03.13;
 				DEVELOPMENT_TEAM = 297936744Y;
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
-					"$(PROJECT_DIR)/Carthage/Build/iOS",
-				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
@@ -2050,13 +1979,14 @@
 				);
 				INFOPLIST_FILE = Client/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				MARKETING_VERSION = 1.6.3;
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lxml2",
-					"-framework",
-					AssetsLibrary,
 					"-framework",
 					CoreText,
 					"-framework",
@@ -2077,28 +2007,23 @@
 				PRODUCT_MODULE_NAME = Client;
 				PRODUCT_NAME = Elaho;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = BUDDYBUILD;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/Client/Client-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Gemini;
 		};
 		F84B22561A0920C600AAB793 /* Gemini */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				APPLICATION_EXTENSION_API_ONLY = YES;
-				CODE_SIGN_ENTITLEMENTS = "$(inherit)Extensions/Entitlements/Gemini.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2021.03.13;
 				DEVELOPMENT_TEAM = 297936744Y;
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/iOS",
-					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
-				);
 				INFOPLIST_FILE = Extensions/ShareTo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../../Frameworks";
@@ -2108,6 +2033,7 @@
 				PRODUCT_NAME = Elaho;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -2157,6 +2083,118 @@
 			defaultConfigurationName = Gemini;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		8029A8FA26232238005A50A7 /* XCRemoteSwiftPackageReference "SwiftyJSON" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftyJSON/SwiftyJSON.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.1;
+			};
+		};
+		8029A906262322A1005A50A7 /* XCRemoteSwiftPackageReference "XCGLogger" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/DaveWoodCom/XCGLogger.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.0.1;
+			};
+		};
+		8029A90E262322D8005A50A7 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.1;
+			};
+		};
+		8029A91426232375005A50A7 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/jrendel/SwiftKeychainWrapper";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.1;
+			};
+		};
+		8029A91A26232478005A50A7 /* XCRemoteSwiftPackageReference "OpenSSL" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/krzyzanowskim/OpenSSL.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.1100;
+			};
+		};
+		8029A92026232561005A50A7 /* XCRemoteSwiftPackageReference "GCDWebServer" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/tapcentive/GCDWebServer";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.5.5;
+			};
+		};
+		80DD332326231A3C005C289C /* XCRemoteSwiftPackageReference "realm-cocoa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/realm-cocoa.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 10.7.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8029A907262322A1005A50A7 /* ObjcExceptionBridging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8029A906262322A1005A50A7 /* XCRemoteSwiftPackageReference "XCGLogger" */;
+			productName = ObjcExceptionBridging;
+		};
+		8029A909262322A1005A50A7 /* XCGLogger */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8029A906262322A1005A50A7 /* XCRemoteSwiftPackageReference "XCGLogger" */;
+			productName = XCGLogger;
+		};
+		8029A90F262322D8005A50A7 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8029A90E262322D8005A50A7 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+		8029A91526232375005A50A7 /* SwiftKeychainWrapper */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8029A91426232375005A50A7 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */;
+			productName = SwiftKeychainWrapper;
+		};
+		8029A91B26232478005A50A7 /* OpenSSL */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8029A91A26232478005A50A7 /* XCRemoteSwiftPackageReference "OpenSSL" */;
+			productName = OpenSSL;
+		};
+		8029A92126232561005A50A7 /* GCDWebServers */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8029A92026232561005A50A7 /* XCRemoteSwiftPackageReference "GCDWebServer" */;
+			productName = GCDWebServers;
+		};
+		8073C730262626AE00D11B24 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8029A90E262322D8005A50A7 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+		80DD332426231A3C005C289C /* Realm */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 80DD332326231A3C005C289C /* XCRemoteSwiftPackageReference "realm-cocoa" */;
+			productName = Realm;
+		};
+		80DD332626231A3C005C289C /* RealmSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 80DD332326231A3C005C289C /* XCRemoteSwiftPackageReference "realm-cocoa" */;
+			productName = RealmSwift;
+		};
+		80E0F944262739CB0009DC72 /* SwiftyJSON */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8029A8FA26232238005A50A7 /* XCRemoteSwiftPackageReference "SwiftyJSON" */;
+			productName = SwiftyJSON;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F84B21B61A090F8100AAB793 /* Project object */;
 }

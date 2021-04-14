@@ -33,17 +33,16 @@ Download on [the App Store](https://apps.apple.com/app/id1514950389). Supports i
 ### Building the code
 
 1. Install the latest [Xcode developer tools](https://developer.apple.com/xcode/downloads/) from Apple.
-1. Install Carthage and Node
+1. Install Node.js
     ```shell
     brew update
-    brew install carthage
     brew install node
     ```
 1. Clone the repository:
     ```shell
     git clone https://github.com/pitr/gemini-ios
     ```
-1. Pull in the project dependencies:
+1. Build User Scripts:
     ```shell
     cd gemini-ios
     sh ./bootstrap.sh
