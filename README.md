@@ -1,8 +1,6 @@
 ![Logo](https://github.com/pitr/gemini-ios/raw/master/Client/Assets/Images.xcassets/AppIcon.appiconset/180.png)
 
-# Elaho (Gemini for iOS)
-
-[![app store](https://developer.apple.com/app-store/marketing/guidelines/images/badge-download-on-the-app-store.svg)](https://apps.apple.com/app/id1514950389)
+# Elaho (Gemini for iOS) - DEPRECATED
 
 A [Project Gemini](https://gemini.circumlunar.space/) browser.
 
@@ -20,7 +18,7 @@ Built on a fork of an open source [Firefox Browser for iOS](https://github.com/m
 - share extension
 - etc
 
-Download on [the App Store](https://apps.apple.com/app/id1514950389). Supports iOS 12.0 and above.
+~~Download on [the App Store](https://apps.apple.com/app/id1514950389)~~ (no longer available). Supports iOS 12.0 and above.
 
 ![Gemini screenshot](https://raw.githubusercontent.com/pitr/gemini-ios/master/screenshot.png)
 
